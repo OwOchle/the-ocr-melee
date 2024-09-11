@@ -1,0 +1,19 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+AlignAfterOpenBracket: BlockIndent
+---
+Language: Cpp
+PointerAlignment: Right
+BreakBeforeBraces: Allman
+ColumnLimit: 90
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeParens: ControlStatements
+SortIncludes: CaseSensitive
+AlignConsecutiveAssignments: Consecutive
+QualifierAlignment: Left
+RemoveParentheses: MultipleParentheses
+AlignTrailingComments: Always
+IncludeBlocksStyle: Preserve
+

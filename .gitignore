@@ -1,0 +1,13 @@
+# Extension-less files
+*
+!*.*
+!*/
+!README
+!Makefile
+!AUTHORS
+
+*.o
+*.out
+
+.idea/
+
