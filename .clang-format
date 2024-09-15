@@ -6,7 +6,7 @@ AlignAfterOpenBracket: BlockIndent
 Language: Cpp
 PointerAlignment: Right
 BreakBeforeBraces: Allman
-ColumnLimit: 90
+ColumnLimit: 80
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeCaseColon: false
 SpaceBeforeParens: ControlStatements
