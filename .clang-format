@@ -14,5 +14,5 @@ SortIncludes: CaseSensitive
 QualifierAlignment: Left
 RemoveParentheses: MultipleParentheses
 AlignTrailingComments: Always
-IncludeBlocksStyle: Preserve
+IncludeBlocks: Preserve
 
