@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 Network *
-network_new(char layerCount, int16_t *nodesPerLayer, int16_t entryCount)
+network_new(char layerCount, uint16_t *nodesPerLayer, uint16_t entryCount)
 {
     if (layerCount < 2)
         return NULL;

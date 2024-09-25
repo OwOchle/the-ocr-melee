@@ -1,13 +1,14 @@
 #include "network.h"
 #include <stdlib.h>
 #include <err.h>
+#include <unistd.h>
 
 int main() {
-    int16_t nodesPerLayers[] = {
-        3, 4, 5
+    uint16_t nodesPerLayers[] = {
+        1024, 512, 26
     };
 
-    Network *network = network_new(3, nodesPerLayers, 2);
+    Network *network = network_new(3, nodesPerLayers, 625);
 
     if (network == NULL) {
         errx(1, "Could not allocate a new network");
