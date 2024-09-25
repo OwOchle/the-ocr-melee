@@ -15,9 +15,9 @@ int main()
         errx(1, "Could not allocate a new network");
     }
 
-    init_flat_network(network);
+    network_init_flat(network);
 
-    free_network(network);
+    network_free(network);
 
     return EXIT_SUCCESS;
 }

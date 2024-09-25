@@ -55,7 +55,7 @@ network_new(char layerCount, uint16_t *nodesPerLayer, uint16_t entryCount)
     return network;
 }
 
-void init_flat_network(Network *network)
+void network_init_flat(Network *network)
 {
     for (char l = 0; l < network->layerCount; l++)
     {
@@ -83,7 +83,7 @@ void init_flat_network(Network *network)
     }
 }
 
-void free_network(Network *network)
+void network_free(Network *network)
 {
     for (char l = 0; l < network->layerCount; l++)
     {
