@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = main.o network.o
+OBJS = main.o network.o file_io.o
 CFLAGS = 
 
 debug: CFLAGS += -g -fsanitize=address
