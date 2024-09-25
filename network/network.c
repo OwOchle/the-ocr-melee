@@ -1,59 +1,93 @@
 #include "network.h"
-#include <err.h>
+#include <errno.h>
+#include <stdint.h>
 #include <stdlib.h>
 
-/**
- * depth: Layer count
- * nodePerLayer: List of layer nodes lengths
- */
-Network *generate_flat_network(int depth, const int *nodePerLayer)
+Network *
+network_new(char layerCount, int16_t *nodesPerLayer, int16_t entryCount)
 {
-    if (depth < 2)
-    {
-        errx(1, "Minimum depth of network is 2, was : %d", depth);
-    }
+    if (layerCount < 2)
+        return NULL;
 
     Network *network = malloc(sizeof(Network));
 
-    network->layerCount = depth;
-    network->layers = malloc(depth * sizeof(Layer *));
+    if (network == NULL)
+        return NULL;
 
-    for (int iL = 0; iL < depth; iL++)
+    network->entryCount = entryCount;
+    network->layerCount = layerCount;
+    network->layers = calloc(layerCount, sizeof(Layer *));
+
+    if (network->layers == NULL)
+        return NULL;
+
+    for (char i = 0; i < layerCount; i++)
     {
+        int nodeCount = nodesPerLayer[i];
         Layer *layer = malloc(sizeof(Layer));
 
-        layer->nodeCount = nodePerLayer[iL];
-        layer->nodes = malloc(layer->nodeCount * sizeof(Node *));
+        if (layer == NULL)
+            return NULL;
+
+        network->layers[i] = layer;
+
+        layer->nodeCount = nodeCount;
+
+        int pastLayerCount;
+        if (i == 0)
+        {
+            pastLayerCount = entryCount;
+        }
+        else
+        {
+            pastLayerCount = network->layers[i - 1]->nodeCount;
+        }
+
+        layer->weights = calloc(pastLayerCount * nodeCount, sizeof(float));
+        if (layer->weights == NULL)
+            return NULL;
+
+        layer->bias = calloc(nodeCount, sizeof(float));
+        if (layer->bias == NULL)
+            return NULL;
     }
 
-    for (int iL = 0; iL < depth; iL++)
-    {
-        Layer *layer = network->layers[iL];
-        for (int iNode = 0; iNode < layer->nodeCount; iNode++)
-        {
-            Node *node = malloc(sizeof(Node));
+    return network;
+}
 
-            node->bias = 0.5f;
+void init_flat_network(Network *network)
+{
+    for (char l = 0; l < network->layerCount; l++) {
+        Layer *layer = network->layers[l];
 
-            if (iL == 0)
-            {
-                node->entering = NULL;
-            }
-            else
-            {
-                node->entering = malloc(network->layers[iL-1]->nodeCount * sizeof(Edge *));
-            } 
-            
-            if (iL == depth - 1)
-            {
-                node->exiting = NULL;
-            }
-            else
-            {
-                node->exiting = malloc(network->layers[iL+1]->nodeCount * sizeof(Edge *));
-            }
+        int prev;
+        if (l == 0) {
+            prev = network->entryCount;
+        } else {
+            prev = network->layers[l-1]->nodeCount;
+        }
+
+        for (int n = 0; n < layer->nodeCount * prev; n++) {
+            layer->weights[n] = 0.5f;
+        }
+
+        for (int n = 0; n < layer->nodeCount; n++) {
+            layer->bias[n] = 0.5f;
         }
     }
+}
 
-    
+void free_network(Network *network)
+{
+    for (char l = 0; l < network->layerCount; l++)
+    {
+        Layer *layer = network->layers[l];
+
+        free(layer->bias);
+        free(layer->weights);
+        free(layer);
+    }
+
+    free(network->layers);
+    free(network);
 }

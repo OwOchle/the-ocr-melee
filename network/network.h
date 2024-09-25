@@ -1,26 +1,22 @@
 #pragma once
 #include <stdint.h>
 
-typedef struct {
-    float weight;
-    
-    Node *exiting;
-    Node *entering;
-} Edge;
-
-typedef struct {
-    float bias;
-
-    Edge **entering; // List of edges, size of before layer
-    Edge **exiting; // List of edges, size of after layer
-} Node;
-
-typedef struct {
-    Node **nodes; // List of nodes
+typedef struct Layer
+{
+    float *weights; // Matrix of layer-1 × layer as a list of node, in line order
     int16_t nodeCount;
+    float *bias; // List of bias of each node of the layer.
 } Layer;
 
-typedef struct {
-    Layer **layers; // List of layers
+typedef struct Network
+{
+    int16_t entryCount;
     char layerCount;
+    Layer **layers; // List of layers*
 } Network;
+
+Network *network_new(char layerCount, int16_t *nodesPerLayer, int16_t entryCount);
+
+void init_flat_network(Network *network);
+
+void free_network(Network *network);
