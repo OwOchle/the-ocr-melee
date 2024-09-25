@@ -57,21 +57,27 @@ network_new(char layerCount, uint16_t *nodesPerLayer, uint16_t entryCount)
 
 void init_flat_network(Network *network)
 {
-    for (char l = 0; l < network->layerCount; l++) {
+    for (char l = 0; l < network->layerCount; l++)
+    {
         Layer *layer = network->layers[l];
 
         int prev;
-        if (l == 0) {
+        if (l == 0)
+        {
             prev = network->entryCount;
-        } else {
-            prev = network->layers[l-1]->nodeCount;
+        }
+        else
+        {
+            prev = network->layers[l - 1]->nodeCount;
         }
 
-        for (int n = 0; n < layer->nodeCount * prev; n++) {
+        for (int n = 0; n < layer->nodeCount * prev; n++)
+        {
             layer->weights[n] = 0.5f;
         }
 
-        for (int n = 0; n < layer->nodeCount; n++) {
+        for (int n = 0; n < layer->nodeCount; n++)
+        {
             layer->bias[n] = 0.5f;
         }
     }
