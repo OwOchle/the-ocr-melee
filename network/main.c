@@ -1,4 +1,5 @@
 #include "network.h"
+#include "file_io.h"
 
 #include <err.h>
 #include <stdlib.h>
@@ -6,9 +7,9 @@
 
 int main()
 {
-    uint16_t nodesPerLayers[] = {1024, 512, 26};
+    uint16_t nodesPerLayers[] = {16, 8};
 
-    Network *network = network_new(3, nodesPerLayers, 625);
+    Network *network = network_new(2, nodesPerLayers, 2);
 
     if (network == NULL)
     {
@@ -16,6 +17,8 @@ int main()
     }
 
     network_init_flat(network);
+
+    network_write(network, "net.neuron");
 
     network_free(network);
 

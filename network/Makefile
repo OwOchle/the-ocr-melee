@@ -1,6 +1,5 @@
 CC = gcc
-OBJS = main.o network.o file_io.o
-CFLAGS = 
+OBJS = main.o network.o file_io.o arrays.o
 
 debug: CFLAGS += -g -fsanitize=address
 debug: $(OBJS)
