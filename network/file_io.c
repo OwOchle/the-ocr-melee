@@ -1,5 +1,5 @@
 #include "file_io.h"
-#include "arrays.h"
+#include "utils/arrays.h"
 #include "network.h"
 #include <stdio.h>
 #include <stdlib.h>

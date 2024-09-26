@@ -1,5 +1,6 @@
 CC = gcc
-OBJS = main.o network.o file_io.o arrays.o
+OBJS = main.o network.o file_io.o utils/arrays.o
+CFLAGS =
 
 debug: CFLAGS += -g -fsanitize=address
 debug: $(OBJS)
@@ -11,4 +12,4 @@ debug-no-asan: $(OBJS)
 	$(CC) $^ $(CFLAGS) -o network
 
 clean:
-	rm -rf $(OBJS) solver
+	rm -rf $(OBJS) network
