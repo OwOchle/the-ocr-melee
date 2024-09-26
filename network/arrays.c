@@ -21,3 +21,7 @@ void array_print(size_t size, const uint16_t array[]) {
 float array_get_as_matrix(const float array[], size_t rowLength, size_t row, size_t column) {
     return array[row * rowLength + column];
 }
+
+float *array_get_as_matrix_ptr(float array[], size_t rowLength, size_t row, size_t column) {
+    return array + (row * rowLength) + column;
+}

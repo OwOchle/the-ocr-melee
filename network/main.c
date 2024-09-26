@@ -4,6 +4,8 @@
 #include <err.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
 
 int main()
 {
@@ -20,7 +22,17 @@ int main()
 
     network_write(network, "net.neuron");
 
+    Network *networkR;
+    int error = network_read(&networkR, "net.neuron");
+
+    if (networkR == NULL) {
+        errx(1, "Could not read file with error : %d and errno %d", error, errno);
+    }
+
+    network_write(networkR, "netR.neuron");
+
     network_free(network);
+    network_free(networkR);
 
     return EXIT_SUCCESS;
 }

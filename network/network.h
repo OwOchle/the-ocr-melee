@@ -19,6 +19,10 @@ typedef struct Network
 Network *
 network_new(char layerCount, uint16_t *nodesPerLayer, uint16_t entryCount);
 
+/**
+ * Prints network infos.
+ */
+void network_print(Network *network);
 void network_init_flat(Network *network);
 
 void network_free(Network *network);
