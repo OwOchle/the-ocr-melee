@@ -42,8 +42,8 @@ void network_init_flat(Network *network);
 
 /**
  * Frees the network. Freeing a network should not be made by hand and should
- * only occur with this method. 
- * 
+ * only occur with this method.
+ *
  * @note Using the network after it has been freed is
  * considered an undefined behavior.
  */

@@ -31,8 +31,8 @@ NETWORK_ERRNO network_write(Network *network, char *filename);
 /**
  * File format description
  * | version (8 bit) |
- * entry nodes count (16 bit) | 
- * layer count (8 bit) denoted l afterwards | 
+ * entry nodes count (16 bit) |
+ * layer count (8 bit) denoted l afterwards |
  * l × nodes in layer Ll (16 bit each) denoted Lln |
  * node L0N0 bias (32 bit) |
  * weight of L(l-1)N(x) to LlN(x) (32 bit) |

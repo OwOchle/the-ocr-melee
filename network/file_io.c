@@ -1,6 +1,6 @@
 #include "file_io.h"
-#include "utils/arrays.h"
 #include "network.h"
+#include "utils/array.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -81,23 +81,34 @@ NETWORK_ERRNO network_read(Network **network, const char *filename)
             prevCount = net->layers[l - 1]->nodeCount;
         }
 
-        for (int n = 0; n < net->layers[l]->nodeCount; n++) {
-            if (fread(buf, sizeof(char), 4, file) < 4) {
+        for (int n = 0; n < net->layers[l]->nodeCount; n++)
+        {
+            if (fread(buf, sizeof(char), 4, file) < 4)
+            {
                 fclose(file);
                 *network = NULL;
                 return MALFORMED_FILE;
             }
 
-            memcpy(net->layers[l]->bias + n, buf, 4); // Copy the buffer into the bias list at n's position
+            memcpy(
+                net->layers[l]->bias + n, buf, 4
+            ); // Copy the buffer into the bias list at n's position
 
-            for (int w = 0; w < prevCount; w++) {
-                if (fread(buf, sizeof(char), 4, file) < 4) {
+            for (int w = 0; w < prevCount; w++)
+            {
+                if (fread(buf, sizeof(char), 4, file) < 4)
+                {
                     fclose(file);
                     *network = NULL;
                     return MALFORMED_FILE;
                 }
 
-                memcpy(array_get_as_matrix_ptr(net->layers[l]->weights, net->layers[l]->nodeCount, w, n), buf, 4);
+                memcpy(
+                    array_get_as_matrix_ptr(
+                        net->layers[l]->weights, net->layers[l]->nodeCount, n, w
+                    ),
+                    buf, 4
+                );
             }
         }
     }
@@ -149,7 +160,7 @@ NETWORK_ERRNO network_write(Network *network, char *filename)
             {
                 float weight = array_get_as_matrix(
                     network->layers[i]->weights, network->layers[i]->nodeCount,
-                    w, n
+                    n, w
                 );
 
                 fwrite(&weight, sizeof(float), 1, file);

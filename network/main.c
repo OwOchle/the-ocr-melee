@@ -1,11 +1,11 @@
-#include "network.h"
 #include "file_io.h"
+#include "network.h"
 
 #include <err.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int main()
 {
@@ -25,8 +25,11 @@ int main()
     Network *networkR;
     int error = network_read(&networkR, "net.neuron");
 
-    if (networkR == NULL) {
-        errx(1, "Could not read file with error : %d and errno %d", error, errno);
+    if (networkR == NULL)
+    {
+        errx(
+            1, "Could not read file with error : %d and errno %d", error, errno
+        );
     }
 
     network_write(networkR, "netR.neuron");

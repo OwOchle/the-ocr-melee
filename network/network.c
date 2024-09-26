@@ -2,8 +2,8 @@
 
 #include <errno.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 Network *
 network_new(char layerCount, uint16_t *nodesPerLayer, uint16_t entryCount)
@@ -85,13 +85,15 @@ void network_init_flat(Network *network)
     }
 }
 
-void network_print(Network *network) {
+void network_print(Network *network)
+{
     printf("struct Network {\n");
     printf("\tentryCount -> %hi\n", network->entryCount);
     printf("\tlayerCount -> %hhi\n", network->layerCount);
     printf("\tnodesPerLayer -> [");
 
-    for (int i = 0; i < network->layerCount - 1; i++) {
+    for (int i = 0; i < network->layerCount - 1; i++)
+    {
         printf("%hi, ", network->layers[i]->nodeCount);
     }
 
