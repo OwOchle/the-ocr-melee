@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = main.o network.o file_io.o utils/array.o
+OBJS = main.o network.o file_io.o utils/array.o utils/matrix.o
 TEST_OBJS = tests/tests.o utils/array.o utils/matrix.o
 CFLAGS =
 

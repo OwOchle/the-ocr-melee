@@ -32,3 +32,28 @@ float *matrix_multiply(
 
     return res;
 }
+
+void matrix_add(
+    size_t width1, size_t height1, float *mat1, size_t width2, size_t height2,
+    const float *mat2
+)
+{
+    if (width1 != width2)
+    {
+        return;
+    }
+
+    if (height1 != height2)
+    {
+        return;
+    }
+
+    for (size_t y = 0; y < height1; y++)
+    {
+        for (size_t x = 0; x < width1; x++)
+        {
+            float *ptr = array_get_as_matrix_ptr(mat1, width1, x, y);
+            *ptr += array_get_as_matrix(mat2, width2, x, y);
+        }
+    }
+}

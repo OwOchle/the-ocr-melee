@@ -1,5 +1,7 @@
 #include "file_io.h"
 #include "network.h"
+#include "utils/array.h"
+#include "utils/matrix.h"
 
 #include <err.h>
 #include <errno.h>
@@ -34,8 +36,25 @@ int main()
 
     network_write(networkR, "netR.neuron");
 
+    float *input = calloc(2, sizeof(float));
+
+    input[0] = 1.0f;
+    input[1] = 0.0f;
+
+    float *out = network_apply(network, input);
+
+    if (out == NULL)
+    {
+        network_free(network);
+        network_free(networkR);
+        errx(1, "Error happend while applying the network");
+    }
+
+    array_float_print(2, out);
+
     network_free(network);
     network_free(networkR);
+    free(out);
 
     return EXIT_SUCCESS;
 }
