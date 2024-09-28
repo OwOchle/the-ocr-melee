@@ -1,5 +1,6 @@
 #include "activation_functions.h"
 #include <math.h>
+#include <stdlib.h>
 
 void sigmoid(size_t size, const float input[], float output[])
 {
@@ -40,4 +41,12 @@ void softmax(size_t size, const float input[], float output[])
     {
         output[i] /= sum_exp;
     }
+}
+
+float randn()
+{
+    float u1 = (float)rand() / RAND_MAX; // so that it is between [0;1]
+    float u2 = (float)rand() / RAND_MAX;
+    float x = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
+    return x;
 }

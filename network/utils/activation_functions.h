@@ -17,3 +17,9 @@ void sigmoid_prime(size_t size, const float input[], float output[]);
  * (exp(x - max(x)))/(sum(exp(x - max(x))))
  */
 void softmax(size_t size, const float input[], float output[]);
+
+/**
+ * Generate a normally distributed random number using Box-Muller
+ * see https://rh8liuqy.github.io/Box_Muller_Algorithm.html
+ */
+float randn();
