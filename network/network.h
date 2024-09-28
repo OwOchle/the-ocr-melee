@@ -41,6 +41,11 @@ void network_print(Network *network);
 void network_init_flat(Network *network);
 
 /**
+ * Initialize the network using Gaussian distribution mean 0 and deviation 1
+ */
+void network_init_gaussian(Network *network);
+
+/**
  * Apply the network on the input `in` in place.
  * @param in The input value list (one dim matrix) of size `entryCount`
  */

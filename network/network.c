@@ -1,7 +1,9 @@
 #include "network.h"
+#include "utils/activation_functions.h"
 #include "utils/matrix.h"
 
 #include <errno.h>
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -86,6 +88,46 @@ void network_init_flat(Network *network)
     }
 }
 
+void network_init_gaussian(Network *network)
+{
+    for (char l = 0; l < network->layerCount; l++)
+    {
+        Layer *layer = network->layers[l];
+
+        int prev;
+        if (l == 0)
+        {
+            prev = network->entryCount;
+        }
+        else
+        {
+            prev = network->layers[l - 1]->nodeCount;
+        }
+
+        float scale = sqrt(prev); // not a hundred percent sure about this one
+        for (int n = 0; n < layer->nodeCount * prev; n++)
+        {
+            layer->weights[n] = randn() / scale;
+        }
+
+        // By convention we do not set any biases for the input layer
+        if (l == 0)
+        {
+            for (int n = 0; n < layer->nodeCount; n++)
+            {
+                layer->bias[n] = 0;
+            }
+        }
+        else
+        {
+            for (int n = 0; n < layer->nodeCount; n++)
+            {
+                layer->bias[n] = randn();
+            }
+        }
+    }
+}
+
 void network_print(Network *network)
 {
     printf("struct Network {\n");
@@ -118,13 +160,14 @@ float *network_apply(Network *network, float *input)
         }
 
         float *tmp = matrix_multiply(
-            prevSize, 1, mat, network->layers[l]->nodeCount, prevSize, network->layers[l]->weights
+            prevSize, 1, mat, network->layers[l]->nodeCount, prevSize,
+            network->layers[l]->weights
         );
 
         free(mat);
         mat = tmp;
 
-        if (mat == NULL) 
+        if (mat == NULL)
             return NULL;
 
         matrix_add(
