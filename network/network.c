@@ -1,9 +1,13 @@
 #include "network.h"
+#include "utils/activation_functions.h"
+#include "utils/matrix.h"
 
 #include <errno.h>
+#include <math.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 Network *
 network_new(char layerCount, uint16_t *nodesPerLayer, uint16_t entryCount)
@@ -85,18 +89,93 @@ void network_init_flat(Network *network)
     }
 }
 
-void network_print(Network *network) {
+void network_init_gaussian(Network *network)
+{
+    // Set the seed
+    srand(time(NULL));
+    for (char l = 0; l < network->layerCount; l++)
+    {
+        Layer *layer = network->layers[l];
+
+        int prev;
+        if (l == 0)
+        {
+            prev = network->entryCount;
+        }
+        else
+        {
+            prev = network->layers[l - 1]->nodeCount;
+        }
+
+        float scale = sqrt(prev); // not a hundred percent sure about this one
+        for (int n = 0; n < layer->nodeCount * prev; n++)
+        {
+            layer->weights[n] = randn() / scale;
+        }
+
+        for (int n = 0; n < layer->nodeCount; n++)
+        {
+            layer->bias[n] = randn();
+        }
+    }
+}
+
+void network_print(Network *network)
+{
     printf("struct Network {\n");
     printf("\tentryCount -> %hi\n", network->entryCount);
     printf("\tlayerCount -> %hhi\n", network->layerCount);
     printf("\tnodesPerLayer -> [");
 
-    for (int i = 0; i < network->layerCount - 1; i++) {
+    for (int i = 0; i < network->layerCount - 1; i++)
+    {
         printf("%hi, ", network->layers[i]->nodeCount);
     }
 
     printf("%hi]\n", network->layers[network->layerCount - 1]->nodeCount);
     printf("}\n");
+}
+
+float *network_apply(Network *network, float *input)
+{
+    float *mat = input;
+    uint16_t prevSize;
+    for (char l = 0; l < network->layerCount; l++)
+    {
+        if (l == 0)
+        {
+            prevSize = network->entryCount;
+        }
+        else
+        {
+            prevSize = network->layers[l - 1]->nodeCount;
+        }
+
+        int nc = network->layers[l]->nodeCount;
+
+        float *tmp = matrix_multiply(
+            prevSize, 1, mat, nc, prevSize, network->layers[l]->weights
+        );
+
+        free(mat);
+        mat = tmp;
+
+        if (mat == NULL)
+            return NULL;
+
+        matrix_add(nc, 1, mat, nc, 1, network->layers[l]->bias);
+
+        if (l == network->layerCount - 1)
+        {
+            softmax(nc, mat, mat);
+        }
+        else
+        {
+            sigmoid(nc, mat, mat);
+        }
+    }
+
+    return mat;
 }
 
 void network_free(Network *network)
@@ -112,4 +191,9 @@ void network_free(Network *network)
 
     free(network->layers);
     free(network);
+}
+
+uint16_t network_last_layer_count(Network *network)
+{
+    return network->layers[network->layerCount - 1]->nodeCount;
 }

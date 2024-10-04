@@ -41,10 +41,27 @@ void network_print(Network *network);
 void network_init_flat(Network *network);
 
 /**
+ * Initialize the network using Gaussian distribution mean 0 and deviation 1
+ */
+void network_init_gaussian(Network *network);
+
+/**
+ * Apply the network on the input `in` in place.
+ * @param in The input value list (one dim matrix) of size `entryCount`
+ */
+float *network_apply(Network *network, float *input);
+
+/**
  * Frees the network. Freeing a network should not be made by hand and should
- * only occur with this method. 
- * 
+ * only occur with this method.
+ *
  * @note Using the network after it has been freed is
  * considered an undefined behavior.
  */
 void network_free(Network *network);
+
+/**
+ * Get the number of nodes in the last layer
+ * @return The node count in the last layer.
+ */
+uint16_t network_last_layer_count(Network *network);
