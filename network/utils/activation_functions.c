@@ -1,4 +1,5 @@
 #include "activation_functions.h"
+
 #include <math.h>
 #include <stdlib.h>
 
