@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 Network *
 network_new(char layerCount, uint16_t *nodesPerLayer, uint16_t entryCount)
@@ -90,6 +91,8 @@ void network_init_flat(Network *network)
 
 void network_init_gaussian(Network *network)
 {
+    // Set the seed
+    srand(time(NULL));
     for (char l = 0; l < network->layerCount; l++)
     {
         Layer *layer = network->layers[l];
@@ -110,20 +113,9 @@ void network_init_gaussian(Network *network)
             layer->weights[n] = randn() / scale;
         }
 
-        // By convention we do not set any biases for the input layer
-        if (l == 0)
+        for (int n = 0; n < layer->nodeCount; n++)
         {
-            for (int n = 0; n < layer->nodeCount; n++)
-            {
-                layer->bias[n] = 0;
-            }
-        }
-        else
-        {
-            for (int n = 0; n < layer->nodeCount; n++)
-            {
-                layer->bias[n] = randn();
-            }
+            layer->bias[n] = randn();
         }
     }
 }
@@ -173,9 +165,12 @@ float *network_apply(Network *network, float *input)
 
         matrix_add(nc, 1, mat, nc, 1, network->layers[l]->bias);
 
-        if (l == network->layerCount - 1) {
+        if (l == network->layerCount - 1)
+        {
             softmax(nc, mat, mat);
-        } else {
+        }
+        else
+        {
             sigmoid(nc, mat, mat);
         }
     }
