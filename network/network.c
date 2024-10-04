@@ -173,7 +173,11 @@ float *network_apply(Network *network, float *input)
 
         matrix_add(nc, 1, mat, nc, 1, network->layers[l]->bias);
 
-        sigmoid(nc, mat, mat);
+        if (l == network->layerCount - 1) {
+            softmax(nc, mat, mat);
+        } else {
+            sigmoid(nc, mat, mat);
+        }
     }
 
     return mat;
