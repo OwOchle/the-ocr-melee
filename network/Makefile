@@ -1,7 +1,7 @@
 CC = gcc
-OBJS = main.o network.o file_io.o utils/array.o utils/matrix.o
+OBJS = main.o network.o file_io.o utils/array.o utils/matrix.o utils/activation_functions.o
 TEST_OBJS = tests/tests.o utils/array.o utils/matrix.o
-CFLAGS =
+CFLAGS = -lm
 
 debug: CFLAGS += -g -fsanitize=address
 debug: $(OBJS)

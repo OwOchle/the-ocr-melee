@@ -159,9 +159,10 @@ float *network_apply(Network *network, float *input)
             prevSize = network->layers[l - 1]->nodeCount;
         }
 
+        int nc = network->layers[l]->nodeCount;
+
         float *tmp = matrix_multiply(
-            prevSize, 1, mat, network->layers[l]->nodeCount, prevSize,
-            network->layers[l]->weights
+            prevSize, 1, mat, nc, prevSize, network->layers[l]->weights
         );
 
         free(mat);
@@ -170,10 +171,9 @@ float *network_apply(Network *network, float *input)
         if (mat == NULL)
             return NULL;
 
-        matrix_add(
-            network->layers[l]->nodeCount, 1, mat,
-            network->layers[l]->nodeCount, 1, network->layers[l]->bias
-        );
+        matrix_add(nc, 1, mat, nc, 1, network->layers[l]->bias);
+
+        sigmoid(nc, mat, mat);
     }
 
     return mat;
