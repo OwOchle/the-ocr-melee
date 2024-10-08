@@ -57,3 +57,17 @@ void matrix_add(
         }
     }
 }
+
+void matrix_transpose(
+    size_t width, size_t height, const float *mat_input, float *mat_output
+)
+{
+    for (size_t y = 0; y < height; y++)
+    {
+        for (size_t x = 0; x < width; x++)
+        {
+            *array_get_as_matrix_ptr(mat_output, height, y, x) =
+                array_get_as_matrix(mat_input, width, x, y);
+        }
+    }
+}
