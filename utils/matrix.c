@@ -71,3 +71,41 @@ void matrix_transpose(
         }
     }
 }
+
+float *matrix_multiply_array(
+    size_t width1, size_t height1, float *mat1, size_t vec_len, float *vec
+)
+{
+    if (width1 != vec_len)
+    {
+        return NULL;
+    }
+
+    float *res = calloc(height1, sizeof(float));
+    if (res == NULL)
+    {
+        return NULL;
+    }
+
+    for (size_t y = 0; y < height1; y++)
+    {
+        for (size_t x = 0; x < width1; x++)
+        {
+            res[y] += array_get_as_matrix(mat1, width1, x, y) * vec[x];
+        }
+    }
+
+    return res;
+}
+
+void matrix_add_array(size_t width, size_t height, float *mat, const float *vec)
+{
+    for (size_t y = 0; y < height; y++)
+    {
+        for (size_t x = 0; x < width; x++)
+        {
+            float *ptr = array_get_as_matrix_ptr(mat, width, x, y);
+            *ptr += vec[x];
+        }
+    }
+}
