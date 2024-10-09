@@ -5,8 +5,8 @@
 #include <stdlib.h>
 
 float *matrix_multiply(
-    size_t width1, size_t height1, float *mat1, size_t width2, size_t height2,
-    float *mat2
+    const size_t width1, const size_t height1, const float *mat1, const size_t width2,
+    const size_t height2, const float *mat2
 )
 {
     if (width1 != height2)
@@ -34,7 +34,7 @@ float *matrix_multiply(
 }
 
 void matrix_add(
-    size_t width1, size_t height1, float *mat1, size_t width2, size_t height2,
+    const size_t width1, const size_t height1, float *mat1, const size_t width2, const size_t height2,
     const float *mat2
 )
 {
@@ -59,7 +59,7 @@ void matrix_add(
 }
 
 void matrix_transpose(
-    size_t width, size_t height, const float *mat_input, float *mat_output
+    const size_t width, const size_t height, const float *mat_input, float *mat_output
 )
 {
     for (size_t y = 0; y < height; y++)
@@ -73,7 +73,7 @@ void matrix_transpose(
 }
 
 float *matrix_multiply_array(
-    size_t width1, size_t height1, float *mat1, size_t vec_len, float *vec
+    const size_t width1, const size_t height1, const float *mat1, const size_t vec_len, const float *vec
 )
 {
     if (width1 != vec_len)
@@ -98,7 +98,7 @@ float *matrix_multiply_array(
     return res;
 }
 
-void matrix_add_array(size_t width, size_t height, float *mat, const float *vec)
+void matrix_add_array(const size_t width, const size_t height, float *mat, const float *vec)
 {
     for (size_t y = 0; y < height; y++)
     {
