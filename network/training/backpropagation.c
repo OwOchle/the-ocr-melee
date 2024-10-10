@@ -1,10 +1,10 @@
 #include "backpropagation.h"
 
+#include "../../utils/array.h"
+#include "../../utils/matrix.h"
 #include "../network.h"
-#include "../utils/activation_functions.h"
-#include "../utils/array.h"
-#include "../utils/cost_functions.h"
-#include "../utils/matrix.h"
+#include "../network_utils/activation_functions.h"
+#include "../network_utils/cost_functions.h"
 
 #include <stdint.h>
 #include <stdlib.h>
