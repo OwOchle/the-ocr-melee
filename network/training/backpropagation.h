@@ -26,6 +26,6 @@ typedef struct GradiantData
  * returns a tuple that can be used by the gradiant
  */
 GradiantData *backprop(
-    Network *network, size_t size, const float training_input[],
+    const Network *network, const size_t width, const float training_input[],
     const float desired_outputs[]
 );

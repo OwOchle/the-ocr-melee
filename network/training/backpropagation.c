@@ -3,8 +3,8 @@
 #include "../network.h"
 #include "../utils/activation_functions.h"
 #include "../utils/array.h"
+#include "../utils/cost_functions.h"
 #include "../utils/matrix.h"
-#include "cost_functions.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -110,28 +110,36 @@ GradiantData *backprop(
      * which is used to propagate the error backward through the network. */
     float *delta = calloc(outputNodeCount, sizeof(float));
 
-    const float *lastActivation = array_get_as_matrix_ptr(activations, width, 0, layerCount - 1);
-    cross_entropy_delta(outputNodeCount, lastActivation, desired_outputs, delta);
+    const float *lastActivation =
+        array_get_as_matrix_ptr(activations, width, 0, layerCount - 1);
+    cross_entropy_delta(
+        outputNodeCount, lastActivation, desired_outputs, delta
+    );
 
     gradiant->layers[layerCount - 1]->bias = delta;
 
-    const float *beforeLastActivation = array_get_as_matrix_ptr(activations, width, 0, layerCount - 2);
+    const float *beforeLastActivation =
+        array_get_as_matrix_ptr(activations, width, 0, layerCount - 2);
 
     for (size_t i = 0; i < outputNodeCount; i++)
     {
-        float *ptr = array_get_as_matrix_ptr(gradiant->layers[layerCount - 1]->weights, outputNodeCount, i, 0);
+        float *ptr = array_get_as_matrix_ptr(
+            gradiant->layers[layerCount - 1]->weights, outputNodeCount, i, 0
+        );
         *ptr = delta[i] * beforeLastActivation[i];
     }
 
-    for (size_t y = 0; y < outputNodeCount; y++) {
-        for (size_t x = 0; x < pastLayerCount; x++) {
-            float *ptr = array_get_as_matrix_ptr(gradiant->layers[layerCount - 1]->weights, pastLayerCount, x, y);
+    for (size_t y = 0; y < outputNodeCount; y++)
+    {
+        for (size_t x = 0; x < pastLayerCount; x++)
+        {
+            float *ptr = array_get_as_matrix_ptr(
+                gradiant->layers[layerCount - 1]->weights, pastLayerCount, x, y
+            );
 
             *ptr = delta[y] * beforeLastActivation[x];
         }
     }
-
-
 
     return NULL;
 }
