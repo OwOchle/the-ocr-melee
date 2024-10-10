@@ -15,7 +15,7 @@ int main()
         errx(1, "Network read failed with error %d", error);
     }
 
-    array_float_print(network->layers[1]->nodeCount, network->layers[1]->bias);
+    array_print(network->layers[1]->nodeCount, network->layers[1]->bias);
 
     float *input = calloc(2, sizeof(float));
 
@@ -24,7 +24,7 @@ int main()
 
     float *out = network_apply(network, input);
 
-    array_float_print(network_last_layer_count(network), out);
+    array_print(network_last_layer_count(network), out);
     network_free(network);
     free(out);
 

@@ -3,9 +3,16 @@
 #include <stdlib.h>
 
 /**
+ * Prints an array using the appropriate method for type
+ */
+#define array_print(size, array) _Generic((array), \
+                                          uint16_t *: array_uint16t_print, \
+                                          float *: array_float_print)(size, array)
+
+/**
  * Prints an array of uint16_t
  */
-void array_print(size_t size, const uint16_t array[]);
+void array_uint16t_print(size_t size, const uint16_t array[]);
 
 /**
  * Prints an array of float

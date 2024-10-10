@@ -1,5 +1,5 @@
 #include "network.h"
-#include "utils/activation_functions.h"
+#include "network_utils/activation_functions.h"
 #include "utils/matrix.h"
 
 #include <errno.h>

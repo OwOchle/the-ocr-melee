@@ -1,8 +1,8 @@
 CC = gcc
-OBJS = network.o file_io.o utils/array.o utils/matrix.o utils/activation_functions.o
+OBJS = network.o file_io.o ../utils/array.o ../utils/matrix.o network_utils/activation_functions.o
 TEST_DIRECTORY = tests
 TEST_SRC = $(wildcard $(TEST_DIRECTORY)/*.c)
-CFLAGS = -lm
+CFLAGS = -lm -I..
 
 debug: CFLAGS += -g -fsanitize=address
 debug: $(OBJS) main.o

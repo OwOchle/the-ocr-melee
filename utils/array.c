@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void array_print(size_t size, const uint16_t array[])
+void array_uint16t_print(size_t size, const uint16_t array[])
 {
     if (size == 0)
     {
