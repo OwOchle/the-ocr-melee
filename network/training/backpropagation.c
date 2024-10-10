@@ -9,6 +9,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+typedef float *Vector;
+typedef float *Matrix;
+
 GradiantData *backprop(
     const Network *network, const size_t width, const float training_input[],
     const float desired_outputs[]
@@ -50,25 +53,29 @@ GradiantData *backprop(
             return NULL;
     }
 
+
     // feedforward
-    float *activation = calloc(width, sizeof(float));
+
+    Vector activation = calloc(width, sizeof(float));
     for (size_t i = 0; i < width; i++)
     {
         activation[i] = training_input[i];
     }
 
-    float *activations = calloc(width * layerCount, sizeof(float));
+    Matrix activations = calloc(width * layerCount, sizeof(float));
     for (size_t i = 0; i < width; i++)
     {
-        float *ptr = array_get_as_matrix_ptr(activations, width, i, 0);
+        Matrix ptr = array_get_as_matrix_ptr(activations, width, i, 0);
         *ptr = training_input[0];
     }
+
+    float **z_values = calloc(width * layerCount, sizeof(float *));
 
     for (size_t x = 0; x < layerCount; x++)
     {
         const Layer *layer = network->layers[x];
-        const float *bias = layer->bias;
-        float *weights = layer->weights;
+        const Vector bias = layer->bias;
+        Matrix weights = layer->weights;
         const int nodeCount = layer->nodeCount;
 
         int pastLayerCount;
@@ -81,7 +88,7 @@ GradiantData *backprop(
             pastLayerCount = network->layers[x - 1]->nodeCount;
         }
 
-        float *vector_z = matrix_multiply_array(
+        Vector vector_z = matrix_multiply_array(
             pastLayerCount, nodeCount, weights, width, activation
         );
 
@@ -89,16 +96,19 @@ GradiantData *backprop(
             pastLayerCount, 1, vector_z, bias
         ); // could also do a simple loop since z is a vector
 
+        z_values[x] = vector_z;
+
         free(activation);
         activation = calloc(nodeCount, sizeof(float));
         sigmoid(nodeCount, vector_z, activation);
 
         for (size_t y = 0; y < nodeCount; y++)
         {
-            float *ptr = array_get_as_matrix_ptr(activations, width, x, y);
+            Matrix ptr = array_get_as_matrix_ptr(activations, width, x, y);
             *ptr = activation[y];
         }
     }
+
 
     // backward pass
 
@@ -108,22 +118,23 @@ GradiantData *backprop(
     /* The size of delta is the number of nodes in the output layer.
      * Because delta represents the error in the output layer,
      * which is used to propagate the error backward through the network. */
-    float *delta = calloc(outputNodeCount, sizeof(float));
+    Vector delta = calloc(outputNodeCount, sizeof(float));
 
-    const float *lastActivation =
+    const Vector lastActivation =
         array_get_as_matrix_ptr(activations, width, 0, layerCount - 1);
+
     cross_entropy_delta(
         outputNodeCount, lastActivation, desired_outputs, delta
     );
 
     gradiant->layers[layerCount - 1]->bias = delta;
 
-    const float *beforeLastActivation =
+    const Vector beforeLastActivation =
         array_get_as_matrix_ptr(activations, width, 0, layerCount - 2);
 
     for (size_t i = 0; i < outputNodeCount; i++)
     {
-        float *ptr = array_get_as_matrix_ptr(
+        Matrix ptr = array_get_as_matrix_ptr(
             gradiant->layers[layerCount - 1]->weights, outputNodeCount, i, 0
         );
         *ptr = delta[i] * beforeLastActivation[i];
@@ -133,7 +144,7 @@ GradiantData *backprop(
     {
         for (size_t x = 0; x < pastLayerCount; x++)
         {
-            float *ptr = array_get_as_matrix_ptr(
+            Matrix ptr = array_get_as_matrix_ptr(
                 gradiant->layers[layerCount - 1]->weights, pastLayerCount, x, y
             );
 
@@ -141,5 +152,59 @@ GradiantData *backprop(
         }
     }
 
-    return NULL;
+    // Warning: Math ahead
+    for (size_t i = layerCount - 2; i > 0; i--)
+    {
+        const Layer *layer = network->layers[i];
+        const Layer *nextLayer = network->layers[i + 1];
+        const uint16_t nodeCount = layer->nodeCount;
+        const uint16_t nextNodeCount = nextLayer->nodeCount;
+
+        const Matrix nextWeights = nextLayer->weights;
+
+        Vector z = z_values[i];
+
+        Vector sigma_prime = calloc(nodeCount, sizeof(float));
+        sigmoid_prime(nodeCount, z, sigma_prime);
+
+        Vector nextDelta = calloc(nextNodeCount, sizeof(float));
+        Matrix transposedNextWeights =
+            calloc(nextNodeCount * nodeCount, sizeof(float));
+        matrix_transpose(
+            nextNodeCount, nodeCount, nextWeights, transposedNextWeights
+        );
+
+        nextDelta = matrix_multiply_array(
+            nextNodeCount, nodeCount, transposedNextWeights, nodeCount, delta
+        );
+        for (size_t j = 0; j < nodeCount; j++)
+        {
+            delta[j] = nextDelta[j] * sigma_prime[j];
+        }
+
+        free(sigma_prime);
+        free(transposedNextWeights);
+
+        free(delta);
+        delta = nextDelta;
+
+        gradiant->layers[i]->bias = delta;
+
+        Vector beforeActivation =
+            array_get_as_matrix_ptr(activations, width, 0, i - 1);
+        for (size_t j = 0; j < nodeCount; j++)
+        {
+            Matrix ptr = array_get_as_matrix_ptr(
+                gradiant->layers[i]->weights, nodeCount, j, 0
+            );
+            *ptr = delta[j] * beforeActivation[j];
+        }
+    }
+
+    free(activation);
+    free(activations);
+    free(z_values);
+    free(delta);
+
+    return gradiant;
 }
