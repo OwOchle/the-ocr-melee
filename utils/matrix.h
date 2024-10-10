@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 
+
 float *matrix_multiply(
     size_t width1, size_t height1, const float *mat1, size_t width2, size_t height2, const float *mat2
 );
@@ -15,7 +16,7 @@ void matrix_transpose(
 );
 
 float *matrix_multiply_array(
-    size_t width1, size_t height1, float *mat1, size_t vec_len, float *vec
+    size_t width1, size_t height1, const float *mat1, size_t vec_len, const float *vec
 );
 
 void matrix_add_array(
