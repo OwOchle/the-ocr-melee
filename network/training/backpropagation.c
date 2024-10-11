@@ -53,7 +53,6 @@ GradiantData *backprop(
             return NULL;
     }
 
-
     // feedforward
 
     Vector activation = calloc(width, sizeof(float));
@@ -108,7 +107,6 @@ GradiantData *backprop(
             *ptr = activation[y];
         }
     }
-
 
     // backward pass
 
