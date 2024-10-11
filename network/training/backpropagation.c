@@ -65,7 +65,7 @@ GradiantData *backprop(
     Matrix activations = calloc(width * layerCount, sizeof(float));
     for (size_t i = 0; i < width; i++)
     {
-        Matrix ptr = array_get_as_matrix_ptr(activations, width, i, 0);
+        float *ptr = array_get_as_matrix_ptr(activations, width, i, 0);
         *ptr = training_input[0];
     }
 
@@ -104,7 +104,7 @@ GradiantData *backprop(
 
         for (size_t y = 0; y < nodeCount; y++)
         {
-            Matrix ptr = array_get_as_matrix_ptr(activations, width, x, y);
+            float *ptr = array_get_as_matrix_ptr(activations, width, x, y);
             *ptr = activation[y];
         }
     }
@@ -134,7 +134,7 @@ GradiantData *backprop(
 
     for (size_t i = 0; i < outputNodeCount; i++)
     {
-        Matrix ptr = array_get_as_matrix_ptr(
+        float *ptr = array_get_as_matrix_ptr(
             gradiant->layers[layerCount - 1]->weights, outputNodeCount, i, 0
         );
         *ptr = delta[i] * beforeLastActivation[i];
@@ -144,7 +144,7 @@ GradiantData *backprop(
     {
         for (size_t x = 0; x < pastLayerCount; x++)
         {
-            Matrix ptr = array_get_as_matrix_ptr(
+            float *ptr = array_get_as_matrix_ptr(
                 gradiant->layers[layerCount - 1]->weights, pastLayerCount, x, y
             );
 
@@ -194,7 +194,7 @@ GradiantData *backprop(
             array_get_as_matrix_ptr(activations, width, 0, i - 1);
         for (size_t j = 0; j < nodeCount; j++)
         {
-            Matrix ptr = array_get_as_matrix_ptr(
+            float *ptr = array_get_as_matrix_ptr(
                 gradiant->layers[i]->weights, nodeCount, j, 0
             );
             *ptr = delta[j] * beforeActivation[j];
