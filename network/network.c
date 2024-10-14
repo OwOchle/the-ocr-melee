@@ -1,8 +1,8 @@
 #include "network.h"
+#include "../utils/matrix.h"
 #include "network_utils/activation_functions.h"
-#include "utils/matrix.h"
 
-#include <errno.h>
+#include <err.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>

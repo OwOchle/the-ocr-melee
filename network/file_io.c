@@ -1,6 +1,6 @@
 #include "file_io.h"
+#include "../utils/array.h"
 #include "network.h"
-#include "utils/array.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
