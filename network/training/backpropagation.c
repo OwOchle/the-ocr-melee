@@ -13,7 +13,8 @@ typedef float *Vector;
 typedef float *Matrix;
 
 GradiantData *backprop(
-    const Network *network, const size_t width, const float training_input[],
+    const Network *network, const size_t input_size,
+    const float training_input[], const size_t output_size,
     const float desired_outputs[]
 )
 {
@@ -55,20 +56,20 @@ GradiantData *backprop(
 
     // feedforward
 
-    Vector activation = calloc(width, sizeof(float));
-    for (size_t i = 0; i < width; i++)
+    Vector activation = calloc(input_size, sizeof(float));
+    for (size_t i = 0; i < input_size; i++)
     {
         activation[i] = training_input[i];
     }
 
-    Matrix activations = calloc(width * layerCount, sizeof(float));
-    for (size_t i = 0; i < width; i++)
+    Matrix activations = calloc(input_size * layerCount, sizeof(float));
+    for (size_t i = 0; i < input_size; i++)
     {
-        Matrix ptr = array_get_as_matrix_ptr(activations, width, i, 0);
+        Matrix ptr = array_get_as_matrix_ptr(activations, input_size, i, 0);
         *ptr = training_input[0];
     }
 
-    float **z_values = calloc(width * layerCount, sizeof(float *));
+    float **z_values = create_z_matrix(network);
 
     for (size_t x = 0; x < layerCount; x++)
     {
@@ -88,7 +89,7 @@ GradiantData *backprop(
         }
 
         Vector vector_z = matrix_multiply_array(
-            pastLayerCount, nodeCount, weights, width, activation
+            pastLayerCount, nodeCount, weights, input_size, activation
         );
 
         matrix_add_array(
@@ -103,7 +104,7 @@ GradiantData *backprop(
 
         for (size_t y = 0; y < nodeCount; y++)
         {
-            Matrix ptr = array_get_as_matrix_ptr(activations, width, x, y);
+            Matrix ptr = array_get_as_matrix_ptr(activations, input_size, x, y);
             *ptr = activation[y];
         }
     }
@@ -119,7 +120,7 @@ GradiantData *backprop(
     Vector delta = calloc(outputNodeCount, sizeof(float));
 
     const Vector lastActivation =
-        array_get_as_matrix_ptr(activations, width, 0, layerCount - 1);
+        array_get_as_matrix_ptr(activations, input_size, 0, layerCount - 1);
 
     cross_entropy_delta(
         outputNodeCount, lastActivation, desired_outputs, delta
@@ -128,7 +129,7 @@ GradiantData *backprop(
     gradiant->layers[layerCount - 1]->bias = delta;
 
     const Vector beforeLastActivation =
-        array_get_as_matrix_ptr(activations, width, 0, layerCount - 2);
+        array_get_as_matrix_ptr(activations, input_size, 0, layerCount - 2);
 
     for (size_t i = 0; i < outputNodeCount; i++)
     {
@@ -189,7 +190,7 @@ GradiantData *backprop(
         gradiant->layers[i]->bias = delta;
 
         Vector beforeActivation =
-            array_get_as_matrix_ptr(activations, width, 0, i - 1);
+            array_get_as_matrix_ptr(activations, input_size, 0, i - 1);
         for (size_t j = 0; j < nodeCount; j++)
         {
             Matrix ptr = array_get_as_matrix_ptr(
@@ -220,4 +221,36 @@ void gradiant_free(GradiantData *gradiant)
 
     free(gradiant->layers);
     free(gradiant);
+}
+
+float **create_z_matrix(const Network *network)
+{
+    size_t layerCount = network->layerCount;
+
+    float **z_matrix = calloc(layerCount, sizeof(float *));
+    if (z_matrix == NULL)
+    {
+        return NULL;
+    }
+
+    for (size_t i = 0; i < layerCount; i++)
+    {
+        z_matrix[i] = calloc(network->layers[i]->nodeCount, sizeof(float));
+        if (z_matrix[i] == NULL)
+        {
+            return NULL;
+        }
+    }
+
+    return z_matrix;
+}
+
+void free_z_matrix(float **z_matrix, const Network *network)
+{
+    size_t layerCount = network->layerCount;
+    for (size_t i = 0; i < layerCount; i++)
+    {
+        free(z_matrix[i]);
+    }
+    free(z_matrix);
 }

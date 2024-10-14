@@ -26,8 +26,13 @@ typedef struct GradiantData
  * returns a tuple that can be used by the gradiant
  */
 GradiantData *backprop(
-    const Network *network, const size_t width, const float training_input[],
+    const Network *network, const size_t input_size,
+    const float training_input[], const size_t output_size,
     const float desired_outputs[]
 );
 
 void gradiant_free(GradiantData *gradiant);
+
+float **create_z_matrix(const Network *network);
+
+void free_z_matrix(float **z_matrix, const Network *network);
