@@ -64,7 +64,7 @@ GradiantData *backprop(
     Matrix activations = calloc(width * layerCount, sizeof(float));
     for (size_t i = 0; i < width; i++)
     {
-        float *ptr = array_get_as_matrix_ptr(activations, width, i, 0);
+        Matrix ptr = array_get_as_matrix_ptr(activations, width, i, 0);
         *ptr = training_input[0];
     }
 
@@ -103,7 +103,7 @@ GradiantData *backprop(
 
         for (size_t y = 0; y < nodeCount; y++)
         {
-            float *ptr = array_get_as_matrix_ptr(activations, width, x, y);
+            Matrix ptr = array_get_as_matrix_ptr(activations, width, x, y);
             *ptr = activation[y];
         }
     }
@@ -132,7 +132,7 @@ GradiantData *backprop(
 
     for (size_t i = 0; i < outputNodeCount; i++)
     {
-        float *ptr = array_get_as_matrix_ptr(
+        Matrix ptr = array_get_as_matrix_ptr(
             gradiant->layers[layerCount - 1]->weights, outputNodeCount, i, 0
         );
         *ptr = delta[i] * beforeLastActivation[i];
@@ -142,7 +142,7 @@ GradiantData *backprop(
     {
         for (size_t x = 0; x < pastLayerCount; x++)
         {
-            float *ptr = array_get_as_matrix_ptr(
+            Matrix ptr = array_get_as_matrix_ptr(
                 gradiant->layers[layerCount - 1]->weights, pastLayerCount, x, y
             );
 
@@ -192,7 +192,7 @@ GradiantData *backprop(
             array_get_as_matrix_ptr(activations, width, 0, i - 1);
         for (size_t j = 0; j < nodeCount; j++)
         {
-            float *ptr = array_get_as_matrix_ptr(
+            Matrix ptr = array_get_as_matrix_ptr(
                 gradiant->layers[i]->weights, nodeCount, j, 0
             );
             *ptr = delta[j] * beforeActivation[j];
@@ -205,4 +205,19 @@ GradiantData *backprop(
     free(delta);
 
     return gradiant;
+}
+
+void gradiant_free(GradiantData *gradiant)
+{
+    for (char l = 0; l < gradiant->layerCount; l++)
+    {
+        GradiantLayer *layer = gradiant->layers[l];
+
+        free(layer->bias);
+        free(layer->weights);
+        free(layer);
+    }
+
+    free(gradiant->layers);
+    free(gradiant);
 }

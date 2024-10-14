@@ -29,3 +29,5 @@ GradiantData *backprop(
     const Network *network, const size_t width, const float training_input[],
     const float desired_outputs[]
 );
+
+void gradiant_free(GradiantData *gradiant);
