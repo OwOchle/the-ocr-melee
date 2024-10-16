@@ -32,6 +32,8 @@ GradiantData *backprop(
 
 void gradiant_free(GradiantData *gradiant);
 
-float **create_layered_matrix(const Network *network);
+float **alloc_z_matrix(const Network *network);
+float **alloc_activation_matrix(const Network *network);
 
-void free_layered_matrix(float **layerd_matrix, const Network *network);
+void free_z_matrix(float **z_matrix, const Network *network);
+void free_activation_matrix(float **activation_matrix, const Network *network);

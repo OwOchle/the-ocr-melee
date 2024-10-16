@@ -6,7 +6,7 @@
 #include "../network_utils/activation_functions.h"
 #include "../network_utils/cost_functions.h"
 
-#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef float *Vector;
@@ -21,18 +21,25 @@ GradiantData *backprop(
     const uint16_t input_size = network->entryCount;
     const uint16_t output_size = network->layers[layerCount - 1]->nodeCount;
 
+    printf("Beginning alloc gradiant.\n");
     // Init Gradiant data (by passing values from the network)
 
     GradiantData *gradiant = malloc(sizeof(GradiantData));
     if (gradiant == NULL)
+    {
+        printf("  ~ Error while alloc gradiant\n");
         return NULL;
+    }
 
-    gradiant->entryCount = network->entryCount;
+    gradiant->entryCount = input_size;
     gradiant->layerCount = layerCount;
-    gradiant->layers = calloc(layerCount, sizeof(Layer *));
+    gradiant->layers = calloc(layerCount, sizeof(GradiantLayer *));
 
     if (network->layers == NULL)
+    {
+        printf("  ~ Error while alloc layers\n");
         return NULL;
+    }
 
     for (char i = 0; i < layerCount; i++)
     {
@@ -40,7 +47,10 @@ GradiantData *backprop(
         GradiantLayer *layer = malloc(sizeof(GradiantLayer));
 
         if (layer == NULL)
+        {
+            printf("  ~ Error while alloc a layer for gradiant\n");
             return NULL;
+        }
 
         gradiant->layers[i] = layer;
 
@@ -48,13 +58,21 @@ GradiantData *backprop(
 
         layer->weights = calloc(network->layers[i]->nodeCount, sizeof(float));
         if (layer->weights == NULL)
+        {
+            printf("  ~ Error while alloc layer for gradiant\n");
             return NULL;
+        }
 
         layer->bias = calloc(nodeCount, sizeof(float));
         if (layer->bias == NULL)
+        {
+            printf("  ~ Error while alloc layer for gradiant\n");
             return NULL;
+        }
     }
 
+    printf("  - Allocation of gradiant successfull\n\nBeginning feedforward.\n"
+    );
     // feedforward
 
     // Contain the activation function, sigmoid in our case.
@@ -69,21 +87,25 @@ GradiantData *backprop(
     }
 
     // Used to store the netwoks values after applying the activation function
-    float **activation_matrix = create_layered_matrix(network);
+    float **activation_matrix = alloc_activation_matrix(network);
     if (activation_matrix == NULL)
     {
         return NULL;
     }
 
+    activation_matrix[0] = activation;
+
     // Used to store intermediary values before the activation
-    float **z_matrix = create_layered_matrix(network);
+    float **z_matrix = alloc_z_matrix(network);
     if (z_matrix == NULL)
     {
         return NULL;
     }
 
+    printf("  - Allocation of matrixes successfull.\n");
     for (size_t x = 0; x < layerCount; x++)
     {
+        printf("  - Beginning layer %zu.\n", x);
         Layer *layer = network->layers[x];
 
         Vector bias = layer->bias;
@@ -103,36 +125,45 @@ GradiantData *backprop(
 
         // Creating a z vector which is : weight[layer] * activation +
         // bias[layer]
-        Vector vector_z = matrix_multiply_array(
-            pastNodeCount, nodeCount, weights, input_size, activation
+        Vector z_vector = matrix_multiply(
+            pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
         );
-        if (vector_z == NULL)
+        if (z_vector == NULL)
         {
+            printf("  ~ Error while mult matrix.\n");
             return NULL;
         }
-        matrix_add_array(pastNodeCount, 1, vector_z, bias);
+        matrix_add(1, nodeCount, z_vector, 1, nodeCount, bias);
 
         // Storing the z vector to use later to calculate the delta
-        z_matrix[x] = vector_z;
+        z_matrix[x] = z_vector;
+        printf("    - Created a z vector.\n");
 
         // Creating the next activation vector : sigmoid(vector_z)
-        free(activation);
         activation = calloc(nodeCount, sizeof(float));
         if (activation == NULL)
         {
+            printf("  ~ Error while allocating new activation.\n");
             return NULL;
         }
         sigmoid(
-            nodeCount, vector_z, activation
+            nodeCount, z_vector, activation
         ); // TODO: we need to use softmax for the output layer
 
         // Storing the activation to use later in the backward pass
-        activation_matrix[x] = activation;
+        activation_matrix[x + 1] = activation;
+        printf("    - Created an activation vector.\n");
     }
 
+    printf("  - Feedforward successfull!\n\nBeginning backward pass!\n");
     // backward pass
 
-    const uint16_t pastLayerCount = network->layers[layerCount - 2]->nodeCount;
+    printf(
+        "  - Beginning layer %hhi with node count %u\n", layerCount - 1,
+        output_size
+    );
+    const uint16_t beforeOutputLayerCount =
+        network->layers[layerCount - 2]->nodeCount;
 
     /* The size of delta is the number of nodes in the output layer.
      * Because delta represents the error in the output layer :
@@ -143,90 +174,135 @@ GradiantData *backprop(
     Vector delta = calloc(output_size, sizeof(float));
     if (delta == NULL)
     {
+        printf("    ~ Error while allocating the output delta.\n");
         return NULL;
     }
     float *lastActivation = activation_matrix[layerCount - 1];
     cross_entropy_delta(output_size, lastActivation, desired_outputs, delta); //
 
+    printf("    - Created the output delta vector.\n");
+
     // Saving the delta as the last bias layer of the gradiant
     free(gradiant->layers[layerCount - 1]->bias);
     gradiant->layers[layerCount - 1]->bias = delta;
 
-    // Saving (delta * activations[layerCount-2]) as the last weight layer of
-    // the gradiant
-    for (size_t y = 0; y < output_size; y++)
-    {
-        for (size_t x = 0; x < pastLayerCount; x++)
-        {
-            float *ptr = array_get_as_matrix_ptr(
-                gradiant->layers[layerCount - 1]->weights, pastLayerCount, x, y
-            );
+    printf("    - Saved the output delta vector to gradiant output bias.\n");
 
-            *ptr = delta[y] * activation_matrix[layerCount - 2][x];
-        }
+    // Saving (delta * activations[-1]) as the last weight layer of
+    // the gradiant
+    Matrix activated_delta = matrix_multiply(
+        1, output_size, delta, output_size, 1, activation_matrix[layerCount - 2]
+    );
+    if (activated_delta == NULL)
+    {
+        printf("    ~ Error while mult the activated delta.\n");
+        return NULL;
     }
+    free(gradiant->layers[layerCount - 1]->weights);
+    gradiant->layers[layerCount - 1]->weights = activated_delta;
+    printf("    - Saved the output delta vector to gradiant output weights.\n");
 
     // Warning: Math ahead, I won't be of any help
 
     // backward pass so we are doing layers backwards
-    for (size_t i = layerCount - 2; i > 0; i--)
+    for (char l = layerCount - 2; l >= 0; l--)
     {
-        const Layer *layer = network->layers[i];
-        const Layer *nextLayer = network->layers[i + 1];
+        const Layer *layer = network->layers[l];
         const uint16_t nodeCount = layer->nodeCount;
-        const uint16_t nextNodeCount = nextLayer->nodeCount;
 
+        const Layer *nextLayer = network->layers[l + 1];
+        const uint16_t nextNodeCount = nextLayer->nodeCount;
         const Matrix nextWeights = nextLayer->weights;
 
-        Vector z = z_matrix[i];
+        uint16_t pastNodeCount;
+        if (l == 0)
+        {
+            pastNodeCount = network->entryCount;
+        }
+        else
+        {
+            pastNodeCount = network->layers[l - 1]->nodeCount;
+        }
 
+        printf("  - Beginning layer %hhi with node count %u\n", l, nodeCount);
+
+        Vector z = z_matrix[l];
+
+        // array_print(nodeCount, z);
         Vector sp = calloc(nodeCount, sizeof(float));
         if (sp == NULL)
         {
+            printf("    ~ Error while alloc sigmoid prime.\n");
             return NULL;
         }
         sigmoid_prime(nodeCount, z, sp);
 
+        printf("    - Created sigmoid prime vector.\n");
+
         // delta = (weights[i + 1].transposed() * delta) * sp
         Vector newDelta = calloc(nextNodeCount, sizeof(float));
+        if (newDelta == NULL)
+        {
+            printf("    ~ Error while alloc delta vector.\n");
+            return NULL;
+        }
         Matrix transposedNextWeights =
             calloc(nextNodeCount * nodeCount, sizeof(float));
+        if (transposedNextWeights == NULL)
+        {
+            printf("    ~ Error while alloc transposed weights.\n");
+            return NULL;
+        }
         matrix_transpose(
             nextNodeCount, nodeCount, nextWeights, transposedNextWeights
         );
-        newDelta = matrix_multiply_array(
-            nextNodeCount, nodeCount, transposedNextWeights, nodeCount, delta
+        printf("    - Successfully transposed weights.\n");
+        newDelta = matrix_multiply(
+            nextNodeCount, nodeCount, transposedNextWeights, 1, nextNodeCount,
+            delta
         );
+        if (newDelta == NULL)
+        {
+            printf("    ~ Error while mult delta vector.\n");
+            return NULL;
+        }
+        printf("    - Successfully mult delta vector.\n");
         for (size_t j = 0; j < nodeCount; j++)
         {
             newDelta[j] = newDelta[j] * sp[j];
         }
+        printf("    - Successfully created delta vector.\n");
 
         free(sp);
         free(transposedNextWeights);
 
-        free(delta);
         delta = newDelta;
 
         // Saving to gradiant bias
-        free(gradiant->layers[i]->bias);
-        gradiant->layers[i]->bias = delta;
+        free(gradiant->layers[l]->bias);
+        gradiant->layers[l]->bias = delta;
+        printf("    - Saved delta vector to gradiant bias.\n");
 
         // Saving to gradiant weights
-        for (size_t j = 0; j < nodeCount; j++)
+        Matrix activated_delta = matrix_multiply(
+            1, nodeCount, delta, pastNodeCount, 1, activation_matrix[l]
+        );
+        if (activated_delta == NULL)
         {
-            float *ptr = array_get_as_matrix_ptr(
-                gradiant->layers[i]->weights, nodeCount, j, 0
-            );
-            *ptr = delta[j] * activation_matrix[i - 1][j];
+            printf("  ~ Error while mult the activated delta.\n");
+            return NULL;
         }
+        free(gradiant->layers[layerCount - 1]->weights);
+        gradiant->layers[layerCount - 1]->weights = activated_delta;
+
+        printf("    - Saved delta vector to gradiant weights.\n");
     }
 
-    free(activation);
-    free_layered_matrix(activation_matrix, network);
-    free_layered_matrix(z_matrix, network);
-    free(delta);
+    printf("  - Backward pass successfull!\n\nFreeing pointers...\n");
+    free_activation_matrix(activation_matrix, network);
+    free_z_matrix(z_matrix, network);
 
+    printf("  - Freeing Pointers successfull!\n\nBack Prop done!\n");
     return gradiant;
 }
 
@@ -245,7 +321,7 @@ void gradiant_free(GradiantData *gradiant)
     free(gradiant);
 }
 
-float **create_layered_matrix(const Network *network)
+float **alloc_z_matrix(const Network *network)
 {
     size_t layerCount = network->layerCount;
 
@@ -267,12 +343,46 @@ float **create_layered_matrix(const Network *network)
     return z_matrix;
 }
 
-void free_layered_matrix(float **layered_matrix, const Network *network)
+float **alloc_activation_matrix(const Network *network)
+{
+    size_t layerCount = network->layerCount;
+
+    float **act_matrix = calloc(layerCount + 1, sizeof(float *));
+    if (act_matrix == NULL)
+    {
+        return NULL;
+    }
+
+    act_matrix[0] = calloc(network->entryCount, sizeof(float));
+    for (size_t i = 0; i < layerCount; i++)
+    {
+        act_matrix[i + 1] =
+            calloc(network->layers[i]->nodeCount, sizeof(float));
+        if (act_matrix[i + 1] == NULL)
+        {
+            return NULL;
+        }
+    }
+
+    return act_matrix;
+}
+
+void free_z_matrix(float **z_matrix, const Network *network)
 {
     size_t layerCount = network->layerCount;
     for (size_t i = 0; i < layerCount; i++)
     {
-        free(layered_matrix[i]);
+        free(z_matrix[i]);
     }
-    free(layered_matrix);
+    free(z_matrix);
+}
+
+void free_activation_matrix(float **activation_matrix, const Network *network)
+{
+    size_t layerCount = network->layerCount;
+    for (size_t i = 0; i < layerCount + 1; i++)
+    {
+        free(activation_matrix[i]);
+    }
+    free(activation_matrix);
 }
