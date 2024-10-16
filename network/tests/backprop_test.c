@@ -9,9 +9,9 @@
 
 int main()
 {
-    uint16_t nodesPerLayers[] = {10, 2};
+    uint16_t nodesPerLayers[] = {8, 10, 6, 3};
 
-    Network *network = network_new(2, nodesPerLayers, 2);
+    Network *network = network_new(4, nodesPerLayers, 6);
 
     if (network == NULL)
     {
@@ -21,8 +21,8 @@ int main()
     network_init_gaussian(network);
     network_print(network);
 
-    float input[] = {4, 8};
-    float output[] = {2, 4};
+    float input[] = {4, 8, 6, 1, 9, 3, 4, 2.5};
+    float output[] = {2, 4, 12};
 
     GradiantData *grad = backprop(network, input, output);
 
@@ -37,7 +37,7 @@ int main()
     array_print(grad->layers[0]->nodeCount, grad->layers[0]->bias);
     printf("gradiant bias of layer 1 : \n");
     array_print(grad->layers[1]->nodeCount, grad->layers[1]->bias);
-    // gradiant_free(grad);
+    gradiant_free(grad);
 
     return EXIT_SUCCESS;
 }
