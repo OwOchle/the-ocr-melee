@@ -14,24 +14,24 @@ def get_sobel_operator() -> Tuple[:]:
 
 def apply_sobel(image: np.ndarray, radius: int = 1) -> np.ndarray:        
         x_sobel, y_sobel = get_sobel_operator()
+        
+        print(image.shape)
+        height, width = image.shape
 
-        height, width, channels = image.shape
-
-        output_image = np.zeros((height,width,channels), np.uint8)
+        output_image = np.zeros((height,width), np.uint8)
 
         for x in range(radius, width - radius):
             print(f"{x}/{width-radius}")
             for y in range(radius, height - radius):
-                for c in range(channels):  
-                    gx = 0.0
-                    gy = 0.0
-                    for i in range(-radius, radius + 1):
-                        for j in range(-radius, radius + 1):
-                            pixel_value = image[y + j, x + i, c]
-                            gx += pixel_value * x_sobel[i + radius, j + radius]
-                            gy += pixel_value * y_sobel[i + radius, j + radius]
+                gx = 0.0
+                gy = 0.0
+                for i in range(-radius, radius + 1):
+                    for j in range(-radius, radius + 1):
+                        pixel_value = image[y + j, x + i]
+                        gx += pixel_value * x_sobel[i + radius, j + radius]
+                        gy += pixel_value * y_sobel[i + radius, j + radius]
 
-                    weighted_sum = np.sqrt(gx ** 2 + gy ** 2)
-                    output_image[y, x, c] = min(max(int(weighted_sum), 0), 255)
+                weighted_sum = np.sqrt(gx ** 2 + gy ** 2)
+                output_image[y, x] = min(max(int(weighted_sum), 0), 255)
 
         return output_image
