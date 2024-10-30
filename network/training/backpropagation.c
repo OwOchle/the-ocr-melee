@@ -57,7 +57,19 @@ GradiantData *backprop(
 
         layer->nodeCount = nodeCount;
 
-        layer->weights = calloc(network->layers[i]->nodeCount, sizeof(float));
+        int pastLayerCount;
+        if (i == 0)
+        {
+            pastLayerCount = input_size;
+        }
+        else
+        {
+            pastLayerCount = network->layers[i - 1]->nodeCount;
+        }
+
+        layer->weights = calloc(
+            network->layers[i]->nodeCount * pastLayerCount, sizeof(float)
+        );
         if (layer->weights == NULL)
         {
             printf("  ~ Error while alloc layer for gradiant\n");
