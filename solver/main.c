@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "solver.h"
+
 int BUFFER_SIZE = 1;
 
 char **read_file(char **filename)
@@ -61,10 +63,43 @@ char **read_file(char **filename)
 
 int main(int argc, char **argv)
 {
+    const int rows = 14;
+    const int columns = 12;
+
+    struct word_coord* arr = malloc(4 * sizeof(int));
+
+    char matrix[14 * 12] = { 
+                        'M', 'S', 'W', 'A', 'T', 'E', 'R', 'M', 'E', 'L', 'O', 'N',
+                        'Y', 'T', 'B', 'N', 'E', 'P', 'E', 'W', 'R', 'M', 'A', 'E',
+                        'R', 'R', 'L', 'W', 'P', 'A', 'P', 'A', 'Y', 'A', 'N', 'A',
+                        'R', 'A', 'N', 'L', 'E', 'M', 'O', 'N', 'A', 'N', 'E', 'P',
+                        'E', 'W', 'L', 'E', 'A', 'P', 'R', 'I', 'A', 'B', 'P', 'R',
+                        'B', 'B', 'I', 'L', 'B', 'B', 'W', 'B', 'R', 'L', 'A', 'Y',
+                        'K', 'E', 'M', 'P', 'M', 'A', 'W', 'L', 'R', 'A', 'R', 'B',
+                        'C', 'R', 'E', 'P', 'R', 'N', 'R', 'E', 'R', 'R', 'G', 'R',
+                        'A', 'R', 'Y', 'A', 'Y', 'A', 'O', 'A', 'N', 'L', 'A', 'M',
+                        'L', 'Y', 'Y', 'A', 'R', 'N', 'E', 'R', 'K', 'I', 'W', 'I',
+                        'B', 'E', 'B', 'A', 'A', 'A', 'N', 'A', 'A', 'P', 'R', 'T',
+                        'Y', 'R', 'R', 'E', 'B', 'P', 'S', 'A', 'R', 'N', 'N', 'W',
+                        'Y', 'R', 'R', 'E', 'B', 'E', 'U', 'L', 'B', 'L', 'G', 'I',
+                        'T', 'Y', 'P', 'A', 'T', 'E', 'A', 'E', 'P', 'A', 'C', 'E',
+                            };
+
+    char* pointer;
+    pointer = matrix;
+
+    if (find_word_matrix(pointer, rows, columns, argv[1], atoi(argv[2]), arr) == 1){
+        printf("\n (1) The word has been found at index [%i][%i] to [%i][%i]\n", arr->xstart,arr->ystart,arr->xend,arr->yend);
+        free(arr);
+    }
+    else{
+        printf("\n (0) The word is not in the grid\n");
+    }
+   
     if (argc < 2)
     {
         err(1, "Solver usage : ./solver <filename>");
     }
-    const char **gridLines = read_file(argv[1]);
+    // const char **gridLines = read_file(argv[1]);
     return 0;
 }
