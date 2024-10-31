@@ -1,6 +1,5 @@
 #include "backpropagation.h"
 
-// #include "../../utils/array.h"
 #include "../../utils/matrix.h"
 #include "../network.h"
 #include "../network_utils/activation_functions.h"
@@ -23,65 +22,10 @@ GradiantData *backprop(
 
     printf("Beginning alloc gradiant.\n");
 
-    // Init Gradiant data (by passing values from the network)
-
-    GradiantData *gradiant = malloc(sizeof(GradiantData));
+    GradiantData *gradiant = gradiant_new(network);
     if (gradiant == NULL)
     {
-        printf("  ~ Error while alloc gradiant\n");
         return NULL;
-    }
-
-    gradiant->entryCount = input_size;
-    gradiant->layerCount = layerCount;
-    gradiant->layers = calloc(layerCount, sizeof(GradiantLayer *));
-
-    if (network->layers == NULL)
-    {
-        printf("  ~ Error while alloc layers\n");
-        return NULL;
-    }
-
-    for (char i = 0; i < layerCount; i++)
-    {
-        const int nodeCount = network->layers[i]->nodeCount;
-        GradiantLayer *layer = malloc(sizeof(GradiantLayer));
-
-        if (layer == NULL)
-        {
-            printf("  ~ Error while alloc a layer for gradiant\n");
-            return NULL;
-        }
-
-        gradiant->layers[i] = layer;
-
-        layer->nodeCount = nodeCount;
-
-        int pastLayerCount;
-        if (i == 0)
-        {
-            pastLayerCount = input_size;
-        }
-        else
-        {
-            pastLayerCount = network->layers[i - 1]->nodeCount;
-        }
-
-        layer->weights = calloc(
-            network->layers[i]->nodeCount * pastLayerCount, sizeof(float)
-        );
-        if (layer->weights == NULL)
-        {
-            printf("  ~ Error while alloc layer for gradiant\n");
-            return NULL;
-        }
-
-        layer->bias = calloc(nodeCount, sizeof(float));
-        if (layer->bias == NULL)
-        {
-            printf("  ~ Error while alloc layer for gradiant\n");
-            return NULL;
-        }
     }
 
     printf("  - Allocation of gradiant successfull\n\nBeginning feedforward.\n"

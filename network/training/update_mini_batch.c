@@ -24,59 +24,7 @@ int update_mini_batch(
 
     printf("Beginning alloc gradiant.\n");
 
-    GradiantData *gradiant = malloc(sizeof(GradiantData));
-    if (gradiant == NULL)
-    {
-        return 0;
-    }
-
-    gradiant->entryCount = input_size;
-    gradiant->layerCount = layerCount;
-    gradiant->layers = calloc(layerCount, sizeof(GradiantLayer *));
-
-    if (network->layers == NULL)
-    {
-        return 0;
-    }
-
-    for (char i = 0; i < layerCount; i++)
-    {
-        const int nodeCount = network->layers[i]->nodeCount;
-        GradiantLayer *layer = malloc(sizeof(GradiantLayer));
-
-        if (layer == NULL)
-        {
-            return 0;
-        }
-
-        gradiant->layers[i] = layer;
-
-        layer->nodeCount = nodeCount;
-
-        int pastLayerCount;
-        if (i == 0)
-        {
-            pastLayerCount = input_size;
-        }
-        else
-        {
-            pastLayerCount = network->layers[i - 1]->nodeCount;
-        }
-
-        layer->weights = calloc(
-            network->layers[i]->nodeCount * pastLayerCount, sizeof(float)
-        );
-        if (layer->weights == NULL)
-        {
-            return 0;
-        }
-
-        layer->bias = calloc(nodeCount, sizeof(float));
-        if (layer->bias == NULL)
-        {
-            return 0;
-        }
-    }
+    GradiantData *gradiant = gradiant_new(network);
 
     printf("  - Allocation of gradiant successfull\n\nBeginning Accumulation.\n"
     );
