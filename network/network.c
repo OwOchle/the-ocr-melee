@@ -107,7 +107,7 @@ void network_init_gaussian(Network *network)
             prev = network->layers[l - 1]->nodeCount;
         }
 
-        float scale = sqrt(prev); // not a hundred percent sure about this one
+        float scale = sqrt(prev);
         for (int n = 0; n < layer->nodeCount * prev; n++)
         {
             layer->weights[n] = randn() / scale;
