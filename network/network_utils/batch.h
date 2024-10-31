@@ -25,8 +25,7 @@ typedef struct Batch
  * Should be the size of the last element of the network `nodePerlayers`.
  * @return A pointer to the newly created batch.
  */
-Batch *
-mini_batch_new(uint16_t batchSize, size_t input_size, size_t output_size);
+Batch *batch_new(uint16_t batchSize, size_t input_size, size_t output_size);
 
 /**
  * Frees the batch.
@@ -34,4 +33,6 @@ mini_batch_new(uint16_t batchSize, size_t input_size, size_t output_size);
  * @note Using the batch after it has been freed is
  * considered an undefined behavior.
  */
-void mini_batch_free(Batch *mini_batch);
+void batch_free(Batch *batch);
+
+void batch_shuffle(Batch *batch);

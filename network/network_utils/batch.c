@@ -4,74 +4,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Batch *mini_batch_new(uint16_t batchSize, size_t input_size, size_t output_size)
+Batch *batch_new(uint16_t batchSize, size_t input_size, size_t output_size)
 {
-    Batch *mini_batch = malloc(sizeof(Batch));
-    if (!mini_batch)
+    Batch *batch = malloc(sizeof(Batch));
+    if (!batch)
         return NULL;
 
-    mini_batch->batchSize = batchSize;
-    mini_batch->layers = malloc(batchSize * sizeof(BatchLayer *));
-    if (!mini_batch->layers)
+    batch->batchSize = batchSize;
+    batch->layers = malloc(batchSize * sizeof(BatchLayer *));
+    if (!batch->layers)
     {
-        free(mini_batch);
+        free(batch);
         return NULL;
     }
 
     for (size_t i = 0; i < batchSize; i++)
     {
-        mini_batch->layers[i] = malloc(sizeof(BatchLayer));
-        if (!mini_batch->layers[i])
+        batch->layers[i] = malloc(sizeof(BatchLayer));
+        if (!batch->layers[i])
         {
             // Libérer les couches déjà alloué si probs
             for (size_t j = 0; j < i; j++)
             {
-                free(mini_batch->layers[j]->inputData);
-                free(mini_batch->layers[j]->outputData);
-                free(mini_batch->layers[j]);
+                free(batch->layers[j]->inputData);
+                free(batch->layers[j]->outputData);
+                free(batch->layers[j]);
             }
-            free(mini_batch->layers);
-            free(mini_batch);
+            free(batch->layers);
+            free(batch);
             return NULL;
         }
 
-        mini_batch->layers[i]->inputData = malloc(input_size * sizeof(float));
-        mini_batch->layers[i]->outputData = malloc(output_size * sizeof(float));
-        if (!mini_batch->layers[i]->inputData ||
-            !mini_batch->layers[i]->outputData)
+        batch->layers[i]->inputData = malloc(input_size * sizeof(float));
+        batch->layers[i]->outputData = malloc(output_size * sizeof(float));
+        if (!batch->layers[i]->inputData || !batch->layers[i]->outputData)
         {
             // Encore, libérer en cas de malloc qui rate
-            free(mini_batch->layers[i]->inputData);
-            free(mini_batch->layers[i]->outputData);
-            free(mini_batch->layers[i]);
+            free(batch->layers[i]->inputData);
+            free(batch->layers[i]->outputData);
+            free(batch->layers[i]);
             for (size_t j = 0; j < i; j++)
             {
-                free(mini_batch->layers[j]->inputData);
-                free(mini_batch->layers[j]->outputData);
-                free(mini_batch->layers[j]);
+                free(batch->layers[j]->inputData);
+                free(batch->layers[j]->outputData);
+                free(batch->layers[j]);
             }
-            free(mini_batch->layers);
-            free(mini_batch);
+            free(batch->layers);
+            free(batch);
             return NULL;
         }
     }
-    return mini_batch;
+    return batch;
 }
 
-void mini_batch_free(Batch *mini_batch)
+void batch_free(Batch *batch)
 {
-    if (!mini_batch)
+    if (!batch)
         return;
 
-    for (size_t i = 0; i < mini_batch->batchSize; i++)
+    for (size_t i = 0; i < batch->batchSize; i++)
     {
-        if (mini_batch->layers[i])
+        if (batch->layers[i])
         {
-            free(mini_batch->layers[i]->inputData);
-            free(mini_batch->layers[i]->outputData);
-            free(mini_batch->layers[i]);
+            free(batch->layers[i]->inputData);
+            free(batch->layers[i]->outputData);
+            free(batch->layers[i]);
         }
     }
-    free(mini_batch->layers);
-    free(mini_batch);
+    free(batch->layers);
+    free(batch);
+}
+
+void batch_shuffle(Batch *batch)
+{
+    for (uint16_t i = batch->batchSize - 1; i > 0; i--)
+    {
+        uint16_t j = (uint16_t)(rand() % (i + 1));
+
+        BatchLayer *temp = batch->layers[i];
+        batch->layers[i] = batch->layers[j];
+        batch->layers[j] = temp;
+    }
 }
