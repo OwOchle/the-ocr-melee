@@ -13,7 +13,7 @@ typedef float *Vector;
 typedef float *Matrix;
 
 int update_mini_batch(
-    Network *network, MiniBatch *mini_batch, float eta, float lambda,
+    Network *network, Batch *mini_batch, float eta, float lambda,
     int total_training_size
 )
 {
@@ -194,77 +194,4 @@ int update_mini_batch(
     gradiant_free(gradiant);
 
     return 1;
-}
-
-MiniBatch *
-mini_batch_new(uint16_t batchSize, size_t input_size, size_t output_size)
-{
-    MiniBatch *mini_batch = malloc(sizeof(MiniBatch));
-    if (!mini_batch)
-        return NULL;
-
-    mini_batch->batchSize = batchSize;
-    mini_batch->layers = malloc(batchSize * sizeof(MiniBatchLayer *));
-    if (!mini_batch->layers)
-    {
-        free(mini_batch);
-        return NULL;
-    }
-
-    for (size_t i = 0; i < batchSize; i++)
-    {
-        mini_batch->layers[i] = malloc(sizeof(MiniBatchLayer));
-        if (!mini_batch->layers[i])
-        {
-            // Libérer les couches déjà alloué si probs
-            for (size_t j = 0; j < i; j++)
-            {
-                free(mini_batch->layers[j]->inputData);
-                free(mini_batch->layers[j]->outputData);
-                free(mini_batch->layers[j]);
-            }
-            free(mini_batch->layers);
-            free(mini_batch);
-            return NULL;
-        }
-
-        mini_batch->layers[i]->inputData = malloc(input_size * sizeof(float));
-        mini_batch->layers[i]->outputData = malloc(output_size * sizeof(float));
-        if (!mini_batch->layers[i]->inputData ||
-            !mini_batch->layers[i]->outputData)
-        {
-            // Encore, libérer en cas de malloc qui rate
-            free(mini_batch->layers[i]->inputData);
-            free(mini_batch->layers[i]->outputData);
-            free(mini_batch->layers[i]);
-            for (size_t j = 0; j < i; j++)
-            {
-                free(mini_batch->layers[j]->inputData);
-                free(mini_batch->layers[j]->outputData);
-                free(mini_batch->layers[j]);
-            }
-            free(mini_batch->layers);
-            free(mini_batch);
-            return NULL;
-        }
-    }
-    return mini_batch;
-}
-
-void mini_batch_free(MiniBatch *mini_batch)
-{
-    if (!mini_batch)
-        return;
-
-    for (size_t i = 0; i < mini_batch->batchSize; i++)
-    {
-        if (mini_batch->layers[i])
-        {
-            free(mini_batch->layers[i]->inputData);
-            free(mini_batch->layers[i]->outputData);
-            free(mini_batch->layers[i]);
-        }
-    }
-    free(mini_batch->layers);
-    free(mini_batch);
 }
