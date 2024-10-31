@@ -13,7 +13,7 @@ typedef float *Vector;
 typedef float *Matrix;
 
 int update_mini_batch(
-    Network *network, Batch *mini_batch, float eta, float lambda,
+    Network *network, const Batch *mini_batch, float eta, float lambda,
     int total_training_size
 )
 {
