@@ -2,8 +2,6 @@ import math
 import numpy as np
 import cv2
 
-import math
-import numpy as np
 
 rho_step = 9
 theta_step = 0.261
