@@ -1,4 +1,4 @@
-#include "mini_batch.h"
+#include "update_mini_batch.h"
 #include "backpropagation.h"
 
 #include "../../utils/array.h"
