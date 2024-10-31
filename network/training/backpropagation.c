@@ -268,21 +268,6 @@ GradiantData *backprop(
     return gradiant;
 }
 
-void gradiant_free(GradiantData *gradiant)
-{
-    for (char l = 0; l < gradiant->layerCount; l++)
-    {
-        GradiantLayer *layer = gradiant->layers[l];
-
-        free(layer->bias);
-        free(layer->weights);
-        free(layer);
-    }
-
-    free(gradiant->layers);
-    free(gradiant);
-}
-
 float **alloc_z_matrix(const Network *network)
 {
     size_t layerCount = network->layerCount;

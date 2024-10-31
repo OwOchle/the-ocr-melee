@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-GradiantData *gradiant_new(Network *network)
+GradiantData *gradiant_new(const Network *network)
 {
 
     const char layerCount = network->layerCount;
