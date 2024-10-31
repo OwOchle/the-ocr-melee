@@ -1,6 +1,6 @@
 // #include "../../utils/array.h"
 #include "../network.h"
-#include "../training/mini_batch.h"
+#include "../training/update_mini_batch.h"
 // #include "../../utils/matrix.h"
 
 #include <err.h>
@@ -21,7 +21,7 @@ int main()
     network_init_gaussian(network);
     network_print(network);
 
-    MiniBatch *mini_batch = mini_batch_new(2, 2, 2);
+    Batch *mini_batch = mini_batch_new(2, 2, 2);
     if (mini_batch == NULL)
     {
         errx(1, "Error creating mini batch");
