@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = main.o
+OBJS = main.o solver.o
 CFLAGS = 
 
 debug: CFLAGS += -g -fsanitize=address

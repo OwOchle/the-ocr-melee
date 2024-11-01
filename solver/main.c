@@ -67,6 +67,7 @@ int main(int argc, char **argv)
     const int columns = 12;
 
     struct word_coord* arr = malloc(4 * sizeof(int));
+    char* mal = malloc(14 * 12 * sizeof(char));
 
     char matrix[14 * 12] = { 
                         'M', 'S', 'W', 'A', 'T', 'E', 'R', 'M', 'E', 'L', 'O', 'N',
@@ -85,21 +86,31 @@ int main(int argc, char **argv)
                         'T', 'Y', 'P', 'A', 'T', 'E', 'A', 'E', 'P', 'A', 'C', 'E',
                             };
 
-    char* pointer;
-    pointer = matrix;
+    for (int x = 0; x < rows; x++)
+    {   
+        mal[x * columns + 0] = matrix[x * columns + 0]; 
+        // printf("%c",mal[x * columns + 0]);
+        for (int y = 1; y < columns; y++)
+        {
+            mal[x * columns + y] = matrix[x * columns + y];
+            // printf(" %c",mal[x * columns + y]);
+        }
+        // printf("\n");
+    }
 
-    if (find_word_matrix(pointer, rows, columns, argv[1], atoi(argv[2]), arr) == 1){
+    if (find_word_matrix(mal, rows, columns, argv[1], atoi(argv[2]), arr) == 1){
         printf("\n (1) The word has been found at index [%i][%i] to [%i][%i]\n", arr->xstart,arr->ystart,arr->xend,arr->yend);
+        free(mal);
         free(arr);
     }
-    else{
-        printf("\n (0) The word is not in the grid\n");
-    }
+    // else{
+    //    printf("\n (0) The word is not in the grid\n");
+    // }
    
-    if (argc < 2)
-    {
-        err(1, "Solver usage : ./solver <filename>");
-    }
+    // if (argc < 2)
+    // {
+    //    err(1, "Solver usage : ./solver <filename>");
+    // }
     // const char **gridLines = read_file(argv[1]);
-    return 0;
+    //return 0;
 }
