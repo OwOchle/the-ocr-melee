@@ -3,7 +3,7 @@
 #include "../network.h"
 
 #include "../network_utils/batch.h"
-#include "../network_utils/gradiant.h"
+// #include "../network_utils/gradiant.h"
 
 #include "update_mini_batch.h"
 
@@ -40,9 +40,12 @@ int stochastic_gradiant_descent(
             update_mini_batch(
                 network, mini_batches[i], eta, lambda, total_training_size
             );
+
+            batch_free(mini_batches[i]);
         }
 
-        printf("Epoch %zu training complete\n", epoch);
+        printf("\n\nEpoch %zu training complete\n\n\n", epoch);
+        free(mini_batches);
     }
 
     return 1;
