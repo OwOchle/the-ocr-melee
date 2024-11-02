@@ -53,6 +53,11 @@ void surface_to_sobel(SDL_Surface *surface){
             for (int i = -radius; i <= radius; i++)
             {
                 for (int j = -radius; j <= radius; j++) {
+                    if ((y+j) >= height || (x+i) >= width)
+                    {
+                        break;
+                    }
+                    
                     Uint32 pixel_val = *((Uint32 *)((Uint8 *)surface->pixels +
                                                     (y + j) * surface->pitch +
                                                     (x + i) * surface->format->BytesPerPixel));
@@ -60,7 +65,6 @@ void surface_to_sobel(SDL_Surface *surface){
                     Uint8 r, g, b;
                     SDL_GetRGB(pixel_val, surface->format, &r, &g, &b);
 
-                    // Accumulate gradients for each color channel
                     gx_r += r * kernel_x[i + radius][j + radius];
                     gy_r += r * kernel_y[i + radius][j + radius];
                     gx_g += g * kernel_x[i + radius][j + radius];
@@ -77,15 +81,16 @@ void surface_to_sobel(SDL_Surface *surface){
             Uint8 final_g = (Uint8)MIN(MAX((int)gradient_g, 0), 255);
             Uint8 final_b = (Uint8)MIN(MAX((int)gradient_b, 0), 255);
 
-            // Set the pixel in the temporary surface
             Uint32 new_pixel = SDL_MapRGB(surface->format, final_r, final_g, final_b);
-            Uint32 *target_pixel = (Uint32 *)((Uint8 *)temp_surface->pixels +
+            
+            if (x < width && y < height){
+                Uint32 *target_pixel = (Uint32 *)((Uint8 *)temp_surface->pixels +
                                               y * temp_surface->pitch +
                                               x * temp_surface->format->BytesPerPixel);
             *target_pixel = new_pixel;
+            }
         }
     }
-    // Copy blurred pixels back to the original surface
     SDL_BlitSurface(temp_surface, NULL, surface, NULL);
     SDL_FreeSurface(temp_surface);
 }

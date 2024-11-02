@@ -6,8 +6,9 @@ LDFLAGS = $(PKGCONFIG)
 CFLAGS = $(PKGCONFIG)
 OBJS = main.o grayscale.o gaussian_blur.o sobel.o line_detection.o
 
+debug: CFLAGS += -g -fsanitize=address
 debug: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o main
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o main 
     
 .PHONY: clean
 

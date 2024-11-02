@@ -54,6 +54,7 @@ void surface_to_blur(SDL_Surface *surface, int radius, double sigma){
     int width = surface->w;
 
 
+
     SDL_Surface *temp_surface = SDL_CreateRGBSurface(0, width, height, 32,
                                                      surface->format->Rmask,
                                                      surface->format->Gmask,
@@ -71,6 +72,10 @@ void surface_to_blur(SDL_Surface *surface, int radius, double sigma){
             // Apply the kernel to each channel
             for (int i = -radius; i <= radius; i++) {
                 for (int j = -radius; j <= radius; j++) {
+                    if ((y+j) >= height || (x+i) >= width)
+                    {
+                        break;
+                    }
                     Uint32 *pixel_ptr = (Uint32 *) ((Uint8 *) surface->pixels +
                                                     (y + j) * surface->pitch +
                                                     (x + i) * surface->format->BytesPerPixel);
@@ -86,6 +91,7 @@ void surface_to_blur(SDL_Surface *surface, int radius, double sigma){
                 }
             }
 
+            if (x < width && y < height){
             Uint32 new_pixel = SDL_MapRGB(surface->format,
                                           MIN(MAX((int)weighted_sum_r, 0), 255),
                                           MIN(MAX((int)weighted_sum_g, 0), 255),
@@ -93,7 +99,7 @@ void surface_to_blur(SDL_Surface *surface, int radius, double sigma){
             Uint32 *target_pixel = (Uint32 *) ((Uint8 *) temp_surface->pixels +
                                                y * temp_surface->pitch +
                                                x * temp_surface->format->BytesPerPixel);
-            *target_pixel = new_pixel;
+            *target_pixel = new_pixel;}
         }
     }
 
