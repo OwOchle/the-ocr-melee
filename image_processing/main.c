@@ -4,12 +4,10 @@
 
 #include "grayscale.h"
 #include "gaussian_blur.h"
+#include "sobel.h"
 
 int main(int argc, char** argv)
 {
-    //double **ker = get_kernel_mat(3,0.84089642);
-    double val = get_gaussian_value(0,1, 0.84089642);
-    printf("%f\n", val);
     if (argc != 2)
         errx(EXIT_FAILURE, "Usage: image-file");
 
@@ -35,7 +33,8 @@ int main(int argc, char** argv)
     SDL_SetWindowSize(window,  surface->w, surface->h);
 
     surface_to_grayscale(surface);
-    surface_to_blur(surface, 3, 3);
+    surface_to_blur(surface, 3, 5);
+    surface_to_sobel(surface);
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 

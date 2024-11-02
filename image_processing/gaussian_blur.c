@@ -21,7 +21,7 @@ double** get_kernel_mat(int radius, double sigma){
     int size = (2*radius)+1;
     double** kernel = calloc(size, sizeof(double*)); // Init the first row of the kernel
 
-    for (size_t i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
         kernel[i] = (double*)calloc(size, sizeof(double));
     }
@@ -62,9 +62,9 @@ void surface_to_blur(SDL_Surface *surface, int radius, double sigma){
 
     double** kernel_mat = get_kernel_mat(radius, sigma);
 
-    for (size_t x = radius; x < width-radius; x++)
+    for (int x = radius; x < width-radius; x++)
     {
-        for (size_t y = radius; y < width-radius; y++)
+        for (int y = radius; y < width-radius; y++)
         {
             double weighted_sum_r = 0.0, weighted_sum_g = 0.0, weighted_sum_b = 0.0;
 

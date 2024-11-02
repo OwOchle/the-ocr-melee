@@ -1,5 +1,16 @@
-CC = gcc 
-CFLAGS = -lSDL2 -lSDL2_image -Wall -lm
+CC = gcc
 
-main: main.o
-	$(CC) $(CFLAGS) $^ -o main
+PKGS = sdl2 SDL2_image
+PKGCONFIG = `pkg-config --cflags --libs $(PKGS)`
+LDFLAGS = $(PKGCONFIG)
+CFLAGS = $(PKGCONFIG)
+OBJS = main.o grayscale.o gaussian_blur.o sobel.o
+
+debug: CFLAGS += -g -fsanitize=address
+debug: $(OBJS)
+	$(CC) $(LDFLAGS) $^ -o main
+    
+.PHONY: clean
+
+clean:
+	$(RM) $(OBJS) main
