@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #include "file_reader.h"
+#include "utils/verbose.h"
 
 #define BUFFER_SIZE 4
 
@@ -33,7 +34,7 @@ struct Grid *__load_grid_file(FILE *file)
 
     height++;
 
-    printf("width: %d, height: %d\n", width, height);
+    verbose_printf("width: %d, height: %d\n", width, height);
 
     struct Grid *result = malloc(sizeof(struct Grid));
     result->width = width;

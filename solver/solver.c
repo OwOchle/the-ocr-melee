@@ -1,4 +1,5 @@
 #include "solver.h"
+#include "utils/verbose.h"
 
 int find_word_matrix(char* matrix, int rows, int columns, char* word, int word_size, struct word_coord* arr)
 {
@@ -8,7 +9,7 @@ int find_word_matrix(char* matrix, int rows, int columns, char* word, int word_s
         for (int y = 0; y < columns; y++) // Traversing columns
         {   
             arr->ystart = y;
-            printf("reading matrix[%i][%i] = %c\n",x,y,matrix[x*columns + y]); // Reading the corresponding letter in the grid
+            verbose_printf("reading matrix[%i][%i] = %c\n",x,y,matrix[x*columns + y]); // Reading the corresponding letter in the grid
             fflush(stdout);
             int up = 0; // 0 => can't proceed downwards for the diags
             int down = 0; // 0 => can't proceed upwards for the diags
@@ -67,13 +68,13 @@ int find_word_matrix(char* matrix, int rows, int columns, char* word, int word_s
 
 int find_word_matrix_l(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking left\n");
+    verbose_printf("checking left\n");
     int i = y - 1;
     int word_index = 1;
     while (i >= 0 && matrix[x*columns + i]== word[word_index]){
         i--;
         word_index++;
-        printf("word index = %i\n", word_index);
+        verbose_printf("word index = %i\n", word_index);
     }
     if (word_index == word_size){
         arr->xend = x;
@@ -86,13 +87,13 @@ int find_word_matrix_l(char* matrix, int rows, int columns, char* word, int word
 
 int find_word_matrix_r(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking right\n");
+    verbose_printf("checking right\n");
     int i = y + 1;
     int word_index = 1;
     while (i < columns && matrix[x*columns + i] == word[word_index]){
         i++;
         word_index++;
-        printf("word index = %i\n", word_index);
+        verbose_printf("word index = %i\n", word_index);
     }
     if (word_index == word_size){
         arr->xend = x;
@@ -105,13 +106,13 @@ int find_word_matrix_r(char* matrix, int rows, int columns, char* word, int word
 
 int find_word_matrix_u(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking up\n");
+    verbose_printf("checking up\n");
     int i = x - 1;
     int word_index = 1;
     while (i >= 0 && matrix[i*columns + y] == word[word_index]){
         i--;
         word_index++;
-        printf("word index = %i\n", word_index);
+        verbose_printf("word index = %i\n", word_index);
     }
     if (word_index == word_size){
         arr->xend = i + 1;
@@ -124,13 +125,13 @@ int find_word_matrix_u(char* matrix, int rows, int columns, char* word, int word
 
 int find_word_matrix_d(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking below\n");
+    verbose_printf("checking below\n");
     int i = x + 1;
     int word_index = 1;
     while (i < rows && matrix[i*columns + y] == word[word_index]){
         i++;
         word_index++;
-        printf("word index = %i\n", word_index);
+        verbose_printf("word index = %i\n", word_index);
     }
     if (word_index == word_size){
         arr->xend = i;
@@ -143,7 +144,7 @@ int find_word_matrix_d(char* matrix, int rows, int columns, char* word, int word
 
 int find_word_matrix_ru(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking right-up\n");
+    verbose_printf("checking right-up\n");
     int i = x - 1;
     int j = y + 1;
     int word_index = 1;
@@ -163,7 +164,7 @@ int find_word_matrix_ru(char* matrix, int rows, int columns, char* word, int wor
 
 int find_word_matrix_lu(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking left-up\n");
+    verbose_printf("checking left-up\n");
     int i = x - 1;
     int j = y - 1;
     int word_index = 1;
@@ -183,7 +184,7 @@ int find_word_matrix_lu(char* matrix, int rows, int columns, char* word, int wor
 
 int find_word_matrix_rd(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking right-down\n");
+    verbose_printf("checking right-down\n");
     int i = x + 1;
     int j = y + 1;
     int word_index = 1;
@@ -203,7 +204,7 @@ int find_word_matrix_rd(char* matrix, int rows, int columns, char* word, int wor
 
 int find_word_matrix_ld(char* matrix, int rows, int columns, char* word, int word_size, int x, int y, struct word_coord* arr)
 {
-    printf("checking left-down\n");
+    verbose_printf("checking left-down\n");
     int i = x + 1;
     int j = y - 1;
     int word_index = 1;

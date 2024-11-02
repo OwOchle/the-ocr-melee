@@ -13,7 +13,7 @@ int main(int argc, char **argv)
 {
     if (argc < 3)
     {
-        errx(1, "Invalid number of argument. expected 4, got : %d\n", argc);
+        errx(1, "Invalid number of argument. expected 4, got : %d", argc);
         return 1;
     }
 
