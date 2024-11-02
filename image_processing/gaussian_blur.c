@@ -97,11 +97,9 @@ void surface_to_blur(SDL_Surface *surface, int radius, double sigma){
         }
     }
 
-    // Copy blurred pixels back to the original surface
     SDL_BlitSurface(temp_surface, NULL, surface, NULL);
     SDL_FreeSurface(temp_surface);
 
-    // Free kernel matrix
     for (int i = 0; i < (2 * radius + 1); i++) {
         free(kernel_mat[i]);
     }

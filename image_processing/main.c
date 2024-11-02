@@ -5,6 +5,7 @@
 #include "grayscale.h"
 #include "gaussian_blur.h"
 #include "sobel.h"
+#include "line_detection.h"
 
 int main(int argc, char** argv)
 {
@@ -33,8 +34,10 @@ int main(int argc, char** argv)
     SDL_SetWindowSize(window,  surface->w, surface->h);
 
     surface_to_grayscale(surface);
-    surface_to_blur(surface, 3, 5);
     surface_to_sobel(surface);
+    
+    detect_grid_lines_y(renderer, surface, surface, 3);
+    //detect_grid_lines_x(renderer, surface, surface, 3);
 
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
