@@ -21,7 +21,7 @@ int main()
     network_init_gaussian(network);
     network_print(network);
 
-    Batch *mini_batch = mini_batch_new(2, 2, 2);
+    Batch *mini_batch = batch_new(2, 2, 2);
     if (mini_batch == NULL)
     {
         errx(1, "Error creating mini batch");
@@ -53,7 +53,7 @@ int main()
         "\nbias[0], premier layer interne = %f\n", network->layers[0]->bias[0]
     );
     network_free(network);
-    mini_batch_free(mini_batch);
+    batch_free(mini_batch);
 
     return EXIT_SUCCESS;
 }
