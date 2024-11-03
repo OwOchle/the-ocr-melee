@@ -12,3 +12,4 @@
 .idea/
 .vscode/
 *.neuron
+*.DS_Store
