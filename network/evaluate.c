@@ -1,4 +1,7 @@
+#include "evaluate.h"
+
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "../utils/matrix.h"
@@ -8,9 +11,20 @@
 typedef float *Matrix;
 typedef float *Vector;
 
-float *feedforward(Network *network, float *input_data)
+float *feedforward(Network *network, const float *input_data)
 {
     uint16_t layerCount = network->layerCount;
+    size_t input_size = network->entryCount;
+    size_t output_size = network->layers[network->layerCount - 1]->nodeCount;
+
+    float *activation = calloc(input_size, sizeof(float));
+    if (activation == NULL)
+        return NULL;
+
+    for (uint16_t i = 0; i < input_size; i++)
+    {
+        activation[i] = input_data[i];
+    }
 
     for (size_t l = 0; l < layerCount; l++)
     {
@@ -29,7 +43,7 @@ float *feedforward(Network *network, float *input_data)
         }
 
         Vector dot = matrix_multiply(
-            pastNodeCount, nodeCount, weights, 1, pastNodeCount, input_data
+            pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
         );
         if (dot == NULL)
         {
@@ -38,10 +52,111 @@ float *feedforward(Network *network, float *input_data)
 
         matrix_add(1, nodeCount, dot, 1, nodeCount, bias);
 
-        free(input_data);
+        float *temp = realloc(activation, nodeCount * sizeof(float));
+        if (temp == NULL)
+        {
+            free(activation);
+            return NULL;
+        }
 
-        sigmoid(nodeCount, dot, input_data);
+        activation = temp;
+
+        if (l == layerCount - 1)
+        {
+            softmax(nodeCount, dot, activation);
+        }
+        else
+        {
+            sigmoid(nodeCount, dot, activation);
+        }
+
+        free(dot);
     }
 
-    return input_data;
+    return activation;
+}
+
+int argmax(const float *array, uint16_t length)
+{
+    int max = 0;
+    for (uint16_t i = 1; i < length; ++i)
+    {
+        if (array[i] > array[max])
+        {
+            max = i;
+        }
+    }
+    return max;
+}
+
+int accuracy(Network *network, Batch *training_data)
+{
+    int count = 0;
+
+    uint16_t output_size = network->layers[network->layerCount - 1]->nodeCount;
+
+    for (uint16_t i = 0; i < training_data->batchSize; ++i)
+    {
+        BatchLayer *layer = training_data->layers[i];
+
+        printf(
+            "Taking %.1f and %.1f as input:\n", layer->inputData[0],
+            layer->inputData[1]
+        );
+        printf(
+            "Expecting 'isFalse' = %.1f and 'isTrue' = %.1f\n",
+            layer->outputData[0], layer->outputData[1]
+        );
+
+        float *predicted_output = feedforward(network, layer->inputData);
+
+        int predicted_max = argmax(predicted_output, output_size);
+        printf("- output[%i] should be max\n", predicted_max);
+        int actual_max = argmax(layer->outputData, output_size);
+        printf("- output[%i] is max\n", actual_max);
+
+        printf(
+            "=> Actual 'isFalse' = %f and 'isTrue' = %f\n", predicted_output[0],
+            predicted_output[1]
+        );
+
+        if (predicted_max == actual_max)
+        {
+            ++count;
+        }
+
+        free(predicted_output);
+    }
+
+    return count;
+}
+
+float binary_accuracy(Network *network, Batch *batch)
+{
+    int count = 0;
+
+    for (uint16_t i = 0; i < batch->batchSize; i++)
+    {
+        BatchLayer *layer = batch->layers[i];
+
+        printf(
+            "Taking %.0f and %.0f as input => %.0f\n", layer->inputData[0],
+            layer->inputData[1], layer->outputData[0]
+        );
+        float *predicted_output = feedforward(network, layer->inputData);
+        printf("Network thinks it is %f\n", predicted_output[0]);
+
+        int predicted_proba = predicted_output[0] >= 0.5 ? 1 : 0;
+
+        int actual_proba = layer->outputData[0] >= 0.5 ? 1 : 0;
+
+        if (predicted_proba == actual_proba)
+        {
+            count++;
+        }
+
+        free(predicted_output);
+    }
+
+    return count;
 }
