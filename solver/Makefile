@@ -6,5 +6,8 @@ debug: CFLAGS += -g -fsanitize=address -D VERBOSE
 debug: $(OBJS)
 	$(CC) $^ $(CFLAGS) -o solver
 
+release: $(OBJS)
+	$(CC) $^ $(CFLGAS) -o solver
+
 clean:
 	rm -rf $(OBJS) solver

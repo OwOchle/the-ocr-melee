@@ -12,6 +12,9 @@ debug-no-asan: CFLAGS += -g
 debug-no-asan: $(OBJS) main.o
 	$(CC) $^ $(CFLAGS) -o network
 
+release: $(OBJS) main.o
+	$(CC) $^ $(CFLAGS) -o network
+
 tests_bin:
 	mkdir -p tests_bin
 

@@ -1,6 +1,9 @@
-TOPTARGETS := debug clean
+TOPTARGETS := debug release clean
 
 SUBDIRS := $(dir $(wildcard */Makefile))
+
+all:
+	$(MAKE) release
 
 $(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
