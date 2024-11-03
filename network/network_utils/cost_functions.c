@@ -24,9 +24,6 @@ float cross_entropy_cost(
     return cost;
 }
 
-/**
- * Prints an array using the appropriate method for type
- */
 void cross_entropy_delta(
     size_t size, const float *activation, const float *desired_data,
     float *output
