@@ -49,6 +49,10 @@ int main(int argc, char** argv)
 
     surface_to_threshold(surface, 240); // Adjust the threshold as needed
 
+    save_surface("../outputs/output_threshold.png", surface);
+
+    printf("image_processing: Saved threshold file in outputs folder.\n");
+
     float* gradient_magnitude = malloc(width * height * sizeof(float));
     float* gradient_direction = malloc(width * height * sizeof(float));
     
