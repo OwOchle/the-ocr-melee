@@ -6,6 +6,7 @@
 #include "gaussian_blur.h"
 #include "sobel.h"
 #include "line_detection.h"
+#include "threshold.h"
 
 void save_surface(const char* file_name, SDL_Surface* image) {
     IMG_SavePNG(image, file_name);
@@ -35,6 +36,8 @@ int main(int argc, char** argv)
     if (surface == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
+    int height = surface->h, width = surface->w;
+
     SDL_SetWindowSize(window,  surface->w, surface->h);
 
     surface_to_grayscale(surface);
@@ -44,30 +47,29 @@ int main(int argc, char** argv)
 
     printf("image_processing: Saved blured file in outputs folder.\n");
 
-    surface_to_sobel(surface);
+    surface_to_threshold(surface, 240); // Adjust the threshold as needed
+
+    float* gradient_magnitude = malloc(width * height * sizeof(float));
+    float* gradient_direction = malloc(width * height * sizeof(float));
+    
+    surface_to_sobel(surface, gradient_magnitude, gradient_direction);
 
     save_surface("../outputs/output_sobel.png", surface);
 
     printf("image_processing: Saved sobel file in outputs folder.\n");
     
-    SDL_Surface *temp_surface = SDL_CreateRGBSurface(0, surface->w, surface->h, 32,
-                                                     surface->format->Rmask,
-                                                     surface->format->Gmask,
-                                                     surface->format->Bmask,
-                                                     surface->format->Amask);
-
-    save_surface("../outputs/output_lines.png", surface);
-
-    printf("image_processing: Saved lines file in outputs folder.\n");
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
     detect_grid_lines_y(surface, surface, 5);
     detect_grid_lines_x(surface, surface, 4);
 
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-
-    SDL_RenderCopy(renderer,texture,NULL,NULL);
+    SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
+    SDL_RenderCopy(renderer, texture, NULL, NULL);
     SDL_RenderPresent(renderer);
+
+    free(gradient_magnitude);
+    free(gradient_direction);
+
 
     save_surface("../outputs/output_lines.png", surface);
 
