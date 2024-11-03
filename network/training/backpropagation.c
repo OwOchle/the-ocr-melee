@@ -1,5 +1,6 @@
 #include "backpropagation.h"
 
+#include "../../utils/array.h"
 #include "../../utils/matrix.h"
 #include "../network.h"
 #include "../network_utils/activation_functions.h"
@@ -20,7 +21,7 @@ GradiantData *backprop(
     const uint16_t input_size = network->entryCount;
     const uint16_t output_size = network->layers[layerCount - 1]->nodeCount;
 
-    printf("Beginning alloc gradiant.\n");
+    // printf("Beginning alloc gradiant.\n");
 
     GradiantData *gradiant = gradiant_new(network);
     if (gradiant == NULL)
@@ -28,8 +29,9 @@ GradiantData *backprop(
         return NULL;
     }
 
-    printf("  - Allocation of gradiant successfull\n\nBeginning feedforward.\n"
-    );
+    // printf("  - Allocation of gradiant successfull\n\nBeginning
+    // feedforward.\n"
+    // );
 
     // feedforward
 
@@ -61,13 +63,13 @@ GradiantData *backprop(
         return NULL;
     }
 
-    printf("  - Allocation of matrixes successfull.\n");
+    // printf("  - Allocation of matrixes successfull.\n");
 
-    for (size_t x = 0; x < layerCount; x++)
+    for (size_t l = 0; l < layerCount; l++)
     {
-        printf("  - Beginning layer %zu.\n", x);
+        // printf("  - Beginning layer %zu.\n", x);
 
-        Layer *layer = network->layers[x];
+        Layer *layer = network->layers[l];
 
         Vector bias = layer->bias;
         Matrix weights = layer->weights;
@@ -75,13 +77,13 @@ GradiantData *backprop(
         int nodeCount = layer->nodeCount;
 
         int pastNodeCount;
-        if (x == 0)
+        if (l == 0)
         {
             pastNodeCount = network->entryCount;
         }
         else
         {
-            pastNodeCount = network->layers[x - 1]->nodeCount;
+            pastNodeCount = network->layers[l - 1]->nodeCount;
         }
 
         // Creating a z vector which is : weight[layer] * activation +
@@ -97,10 +99,10 @@ GradiantData *backprop(
         matrix_add(1, nodeCount, z_vector, 1, nodeCount, bias);
 
         // Storing the z vector to use later to calculate the delta
-        free(z_matrix[x]);
-        z_matrix[x] = z_vector;
+        free(z_matrix[l]);
+        z_matrix[l] = z_vector;
 
-        printf("    - Created a z vector.\n");
+        // printf("    - Created a z vector.\n");
 
         // Creating the next activation vector : sigmoid(vector_z)
         activation = calloc(nodeCount, sizeof(float));
@@ -109,22 +111,30 @@ GradiantData *backprop(
             printf("  ~ Error while allocating new activation.\n");
             return NULL;
         }
-        sigmoid(
-            nodeCount, z_vector, activation
-        ); // TODO: we need to use softmax for the output layer
+
+        if (l == layerCount - 1)
+        {
+            softmax(nodeCount, z_vector, activation);
+        }
+        else
+        {
+            sigmoid(nodeCount, z_vector, activation);
+        }
 
         // Storing the activation to use later in the backward pass
-        free(activation_matrix[x + 1]);
-        activation_matrix[x + 1] = activation;
+        free(activation_matrix[l + 1]);
+        activation_matrix[l + 1] = activation;
+        // printf("activation[%zu] is of size %i\n", l + 1, nodeCount);
 
-        printf("    - Created an activation vector.\n");
+        // printf("    - Created an activation vector.\n");
     }
 
-    printf("  - Feedforward successfull!\n\nBeginning backward pass!\n");
+    // printf("  - Feedforward successfull!\n\nBeginning backward pass!\n");
 
     // backward pass
 
-    printf("  - Beginning the output layer with node count %u\n", output_size);
+    // printf("  - Beginning the output layer with node count %u\n",
+    // output_size);
 
     const uint16_t beforeOutputLayerCount =
         network->layers[layerCount - 2]->nodeCount;
@@ -141,22 +151,24 @@ GradiantData *backprop(
         printf("    ~ Error while allocating the output delta.\n");
         return NULL;
     }
-    float *lastActivation = activation_matrix[layerCount - 1];
-    cross_entropy_delta(output_size, lastActivation, desired_outputs, delta); //
+    float *lastActivation = activation_matrix[layerCount]; // + 1 offset
+    cross_entropy_delta(output_size, lastActivation, desired_outputs, delta);
 
-    printf("    - Created the output delta vector.\n");
+    // printf("    - Created the output delta vector.\n");
 
     // Saving the delta as the last bias layer of the gradiant
     free(gradiant->layers[layerCount - 1]->bias);
     gradiant->layers[layerCount - 1]->bias = delta;
 
-    printf("    - Saved the output delta vector to gradiant bias.\n");
+    // printf("    - Saved the output delta vector to gradiant bias.\n");
 
     // Saving (delta * activations[-1]) as the last weight layer of
     // the gradiant
     Matrix activated_delta = matrix_multiply(
-        1, output_size, delta, output_size, 1, activation_matrix[layerCount - 2]
-    );
+        1, beforeOutputLayerCount, activation_matrix[layerCount - 1],
+        output_size, 1, delta
+    ); // + 1 offset
+
     if (activated_delta == NULL)
     {
         printf("    ~ Error while mult the activated delta.\n");
@@ -165,7 +177,7 @@ GradiantData *backprop(
     free(gradiant->layers[layerCount - 1]->weights);
     gradiant->layers[layerCount - 1]->weights = activated_delta;
 
-    printf("    - Saved the output delta vector to gradiant weights.\n");
+    // printf("    - Saved the output delta vector to gradiant weights.\n");
 
     // Warning: Math ahead, I won't be of any help
     // backward pass so we are doing layers backwards
@@ -188,7 +200,8 @@ GradiantData *backprop(
             pastNodeCount = network->layers[l - 1]->nodeCount;
         }
 
-        printf("  - Beginning layer %hhi with node count %u\n", l, nodeCount);
+        // printf("  - Beginning layer %hhi with node count %u\n", l,
+        // nodeCount);
 
         Vector z = z_matrix[l];
 
@@ -201,7 +214,7 @@ GradiantData *backprop(
         }
         sigmoid_prime(nodeCount, z, sp);
 
-        printf("    - Created sigmoid prime vector.\n");
+        // printf("    - Created sigmoid prime vector.\n");
 
         // delta = (weights[i + 1].transposed() * delta) * sp
         // Vector newDelta = calloc(nextNodeCount, sizeof(float));
@@ -230,7 +243,7 @@ GradiantData *backprop(
             newDelta[j] = newDelta[j] * sp[j];
         }
 
-        printf("    - Successfully created delta vector.\n");
+        // printf("    - Successfully created delta vector.\n");
 
         free(sp);
         free(transposedNextWeights);
@@ -241,29 +254,33 @@ GradiantData *backprop(
         free(gradiant->layers[l]->bias);
         gradiant->layers[l]->bias = delta;
 
-        printf("    - Saved delta vector to gradiant bias.\n");
+        // printf("    - Saved delta vector to gradiant bias.\n");
 
         // Saving to gradiant weights
-        Matrix activated_delta = matrix_multiply(
+        /* Matrix activated_delta = matrix_multiply(
             1, nodeCount, delta, pastNodeCount, 1, activation_matrix[l]
+        ); */
+        Matrix activated_delta = matrix_multiply(
+            1, pastNodeCount, activation_matrix[l], nodeCount, 1, delta
         );
         if (activated_delta == NULL)
         {
             printf("  ~ Error while mult the activated delta.\n");
             return NULL;
         }
-        free(gradiant->layers[layerCount - 1]->weights);
-        gradiant->layers[layerCount - 1]->weights = activated_delta;
 
-        printf("    - Saved delta vector to gradiant weights.\n");
+        free(gradiant->layers[l]->weights);
+        gradiant->layers[l]->weights = activated_delta;
+
+        // printf("    - Saved delta vector to gradiant weights.\n");
     }
 
-    printf("  - Backward pass successfull!\n\nFreeing pointers...\n");
+    // printf("  - Backward pass successfull!\n\nFreeing pointers...\n");
 
     free_activation_matrix(activation_matrix, network);
     free_z_matrix(z_matrix, network);
 
-    printf("  - Freeing Pointers successfull!\n\nBack Prop done!\n");
+    // printf("  - Freeing Pointers successfull!\n\nBack Prop done!\n");
 
     return gradiant;
 }

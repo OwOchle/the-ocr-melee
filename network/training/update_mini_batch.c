@@ -17,37 +17,43 @@ int update_mini_batch(
     int total_training_size
 )
 {
+    if (mini_batch == NULL)
+    {
+        printf("Update_mini_batch Error: mini_batch is NULL\n");
+        return 0;
+    }
     const char layerCount = network->layerCount;
     const uint16_t input_size = network->entryCount;
     const uint16_t output_size = network->layers[layerCount - 1]->nodeCount;
     uint16_t batch_size = mini_batch->batchSize;
 
-    printf("Beginning alloc gradiant.\n");
+    // printf("Beginning alloc gradiant.\n");
 
     GradiantData *gradiant = gradiant_new(network);
 
-    printf("  - Allocation of gradiant successfull\n\nBeginning Accumulation.\n"
-    );
+    // printf("  - Allocation of gradiant successfull\n\nBeginning
+    // Accumulation.\n"
+    // );
     for (size_t tupleIdx = 0; tupleIdx < batch_size; tupleIdx++)
     {
-        printf("  - Beginning Summation of tuple[%zu]\n", tupleIdx);
+        // printf("  - Beginning Summation of tuple[%zu]\n", tupleIdx);
 
         Vector trainingData = mini_batch->layers[tupleIdx]->inputData;
         Vector desiredData = mini_batch->layers[tupleIdx]->outputData;
 
-        printf("  - Creating a gradiant using the backpropagation...\n");
-        printf("____________________________________________________\n\n");
+        // printf("  - Creating a gradiant using the backpropagation...\n");
+        // printf("____________________________________________________\n\n");
 
         // Create a new gradiant using a tuple from the mini batch
         GradiantData *deltaGradiant =
             backprop(network, trainingData, desiredData);
-        printf("____________________________________________________\n\n");
-        printf("  - Gradiant successfully created.\n");
+        // printf("____________________________________________________\n\n");
+        // printf("  - Gradiant successfully created.\n");
 
         // nabla = nabla + gradiant
         for (size_t l = 0; l < layerCount; l++)
         {
-            printf("    - Adding layer %zu\n", l);
+            // printf("    - Adding layer %zu\n", l);
             GradiantLayer *deltaGradiantLayer = deltaGradiant->layers[l];
             GradiantLayer *gradiantLayer = gradiant->layers[l];
             uint16_t nodeCount = gradiantLayer->nodeCount;
@@ -66,23 +72,24 @@ int update_mini_batch(
                 1, nodeCount, gradiantLayer->bias, 1, nodeCount,
                 deltaGradiantLayer->bias
             );
-            printf("      - nodeCount     = %hu\n", nodeCount);
+            // printf("      - nodeCount     = %hu\n", nodeCount);
+
             matrix_add(
-                nodeCount, pastNodeCount, gradiantLayer->weights, nodeCount,
-                pastNodeCount, deltaGradiantLayer->weights
+                pastNodeCount, nodeCount, gradiantLayer->weights, pastNodeCount,
+                nodeCount, deltaGradiantLayer->weights
             );
-            printf("      - Added weights\n");
+            // printf("      - Added weights\n");
         }
 
         gradiant_free(deltaGradiant);
     }
 
-    printf("\n  - Successfully finished the Accumulation.\n");
+    // printf("\n  - Successfully finished the Accumulation.\n");
 
-    printf("  - Beginning the training.\n");
+    // printf("  - Beginning the training.\n");
     for (size_t l = 0; l < layerCount; l++)
     {
-        printf("    - Training layer %zu\n", l);
+        // printf("    - Training layer %zu\n", l);
         uint16_t nodeCount = network->layers[l]->nodeCount;
         float learningRate = (eta / mini_batch->batchSize);
 
@@ -119,7 +126,7 @@ int update_mini_batch(
             }
         }
 
-        printf("      - Trained the weights\n");
+        // printf("      - Trained the weights\n");
 
         // Bias Update
 
@@ -134,11 +141,11 @@ int update_mini_batch(
 
             *bias = (*bias) - learningRate * (*gradiantBias);
         }
-        printf("      - Trained the bias\n");
+        // printf("      - Trained the bias\n");
     }
-    printf("  - Training done!\n");
+    // printf("  - Training done!\n");
 
-    printf("  - Freeing gradiant...\n");
+    // printf("  - Freeing gradiant...\n");
     gradiant_free(gradiant);
 
     return 1;

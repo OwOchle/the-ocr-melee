@@ -2,8 +2,8 @@
 
 #include "../network.h"
 
+#include "../evaluate.h"
 #include "../network_utils/batch.h"
-// #include "../network_utils/gradiant.h"
 
 #include "update_mini_batch.h"
 
@@ -37,15 +37,23 @@ int stochastic_gradiant_descent(
 
         for (size_t i = 0; i < num_mini_batches; i++)
         {
-            update_mini_batch(
+            int res = update_mini_batch(
                 network, mini_batches[i], eta, lambda, total_training_size
             );
+            if (!res)
+                return 0;
 
             batch_free(mini_batches[i]);
         }
 
-        printf("\n\nEpoch %zu training complete\n\n\n", epoch);
+        printf("Epoch %zu training complete\n", epoch);
+        printf(
+            "Accuracy on training data: %i / %i\n________________________\n",
+            accuracy(network, batch), total_training_size
+        );
+
         free(mini_batches);
+        mini_batches = NULL;
     }
 
     return 1;
@@ -90,7 +98,19 @@ Batch **create_mini_batches(
         // Copy the layers from the batch to the mini_batch
         for (uint16_t j = 0; j < current_batch_size; j++)
         {
-            mini_batches[k]->layers[j] = batch->layers[k * mini_batch_size + j];
+            float *input_ptr = mini_batches[k]->layers[j]->inputData;
+            for (uint16_t i = 0; i < input_size; i++)
+            {
+                input_ptr[i] =
+                    batch->layers[k * mini_batch_size + j]->inputData[i];
+            }
+
+            float *output_ptr = mini_batches[k]->layers[j]->outputData;
+            for (uint16_t i = 0; i < output_size; i++)
+            {
+                output_ptr[i] =
+                    batch->layers[k * mini_batch_size + j]->outputData[i];
+            }
         }
     }
 
