@@ -1,7 +1,9 @@
+TOPTARGETS := debug clean
+
 SUBDIRS := $(dir $(wildcard */Makefile))
 
-clean: $(SUBDIRS)
+$(TOPTARGETS): $(SUBDIRS)
 $(SUBDIRS):
-	-$(MAKE) -C $@
+	-$(MAKE) -C $@ $(MAKECMDGOALS)
 
-.PHONY: clean $(SUBDIRS)
+.PHONY: $(TOPTARGETS) $(SUBDIRS)
