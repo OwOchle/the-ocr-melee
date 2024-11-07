@@ -18,7 +18,7 @@ def main():
 
             d = ImageDraw.Draw(img)
 
-            font = ImageFont.truetype(f_file, 22)
+            font = ImageFont.truetype(f_file, 20)
 
             d.text((12,12), char, anchor="mm", fill=(0,0,0), font=font, align="center")
 
