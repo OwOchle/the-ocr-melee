@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "array.h"
+#include "verbose.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,5 +108,39 @@ void matrix_add_array(size_t width, size_t height, float *mat, const float *vec)
             float *ptr = array_get_as_matrix_ptr(mat, width, x, y);
             *ptr += vec[x];
         }
+    }
+}
+
+void verbose_print_matrix_uchar(unsigned char *mat, size_t width, size_t height)
+{
+    if (height == 1)
+    {
+        verbose_printf("[");
+        for (int x = 0; x < width-1; x++)
+        {
+            verbose_printf("%3d ", mat[x]);
+        }
+        verbose_printf("%3d]\n", mat[width-1]);
+    }
+    else
+    {
+        verbose_printf("┌");
+        for (size_t x = 0; x < (((width * 3) + width) - 1); x++) verbose_printf(" ");
+        verbose_printf("┐\n");
+        
+        for (size_t y = 0; y < height; y++)
+        {
+            verbose_printf("│");
+            for (size_t x = 0; x < width-1; x++)
+            {
+                verbose_printf("%3d ", mat[(y * width) + x]);
+            }
+            
+            verbose_printf("%3d│\n", mat[(y * width) + (width-1)]);
+        }
+        
+        verbose_printf("└");
+        for (size_t x = 0; x < (((width * 3) + width) - 1); x++) verbose_printf(" ");
+        verbose_printf("┘\n");
     }
 }

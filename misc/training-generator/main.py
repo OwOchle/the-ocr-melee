@@ -23,7 +23,7 @@ def main():
             d.text((12,12), char, anchor="mm", fill=(0,0,0), font=font, align="center")
 
             # img.show()
-            img.save(f"{OUTPUT}/{f_name}_{char}.png")
+            img.save(f"{OUTPUT}/{f_name}_{char}.bmp")
 
 
 if __name__ == "__main__":

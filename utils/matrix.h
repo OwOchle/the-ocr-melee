@@ -22,3 +22,6 @@ float *matrix_multiply_array(
 void matrix_add_array(
     size_t width, size_t height, float *mat, const float *vec
 );
+
+
+void verbose_print_matrix_uchar(unsigned char *mat, size_t width, size_t height);
