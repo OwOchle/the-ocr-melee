@@ -2,7 +2,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 fonts = {
     "roboto": "./fonts/Roboto-Regular.ttf",
-    "notoserif": "./fonts/NotoSerif-Regular.ttf"
+    "notoserif": "./fonts/NotoSerif-Regular.ttf",
+    "sourgummy": "./fonts/SourGummy-Regular.ttf",
+    "jbm": "./fonts/JetBrainsMono-Regular.ttf"
     }
 
 OUTPUT = "./outputs"
