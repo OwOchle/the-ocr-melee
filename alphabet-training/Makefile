@@ -8,10 +8,15 @@ debug: $(OBJS)
 
 
 debug-no-asan: CFLAGS += -g
-debug-no-asan: $(OBJS) main.o
+debug-no-asan: $(OBJS)
 	$(CC) $^ $(CFLAGS) -o training
 
-release: $(OBJS) main.o
+debug-optimized: CFLAGS += -O3 -D VERBOSE
+debug-optimized: $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) -o training
+
+release: CFLAGS += -O3
+release: $(OBJS)
 	$(CC) $^ $(CFLAGS) -o training
 
 

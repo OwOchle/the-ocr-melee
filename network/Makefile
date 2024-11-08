@@ -1,5 +1,5 @@
 CC = gcc
-OBJS = network.o file_io.o ../utils/array.o ../utils/matrix.o network_utils/activation_functions.o network_utils/cost_functions.o network_utils/batch.o network_utils/gradiant.o training/backpropagation.o training/update_mini_batch.o training/stochastic_gradient_descent.o evaluate.o
+OBJS = network.o file_io.o ../utils/array.o ../utils/matrix.o ../utils/verbose.o network_utils/activation_functions.o network_utils/cost_functions.o network_utils/batch.o network_utils/gradiant.o training/backpropagation.o training/update_mini_batch.o training/stochastic_gradient_descent.o evaluate.o
 TEST_DIRECTORY = tests
 TEST_SRC = $(wildcard $(TEST_DIRECTORY)/*.c)
 CFLAGS = -lm -I..
