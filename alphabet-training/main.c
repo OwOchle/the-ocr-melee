@@ -1,5 +1,6 @@
 #include "utils/matrix.h"
 #include "read_image.h"
+#include "utils/verbose.h"
 
 #include <err.h>
 #include <stdlib.h>
@@ -11,16 +12,21 @@ int main(int argc, char **argv)
         errx(1, "Usage: ./training <image_path>");
     }
 
-    uchar **img = load_directory(argv[1]);
+    size_t count;
+
+    InputImage *output = load_directory(argv[1], &count);
     
-    if (img == NULL)
+    if (output == NULL)
     {
-        errx(1, "img is null");
+        errx(1, "output is null");
     }
-    
-    verbose_print_matrix_uchar(img[0], IMAGE_SIZE, IMAGE_SIZE);
-    
-    free(img);
+
+
+    int index = 52;
+    verbose_printf("name: %s, character: %c, category: %d\n", output[index].name, output[index].character, output[index].category);
+    verbose_print_matrix_uchar(output[index].image, IMAGE_SIZE, IMAGE_SIZE);
+
+    free(output);
     
     return 0;
 }
