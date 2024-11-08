@@ -124,23 +124,23 @@ void verbose_print_matrix_uchar(unsigned char *mat, size_t width, size_t height)
     }
     else
     {
-        verbose_printf("┌");
+        verbose_printf("┏");
         for (size_t x = 0; x < (((width * 3) + width) - 1); x++) verbose_printf(" ");
-        verbose_printf("┐\n");
+        verbose_printf("┓\n");
         
         for (size_t y = 0; y < height; y++)
         {
-            verbose_printf("│");
+            verbose_printf("┃");
             for (size_t x = 0; x < width-1; x++)
             {
                 verbose_printf("%3d ", mat[(y * width) + x]);
             }
             
-            verbose_printf("%3d│\n", mat[(y * width) + (width-1)]);
+            verbose_printf("%3d┃\n", mat[(y * width) + (width-1)]);
         }
         
-        verbose_printf("└");
+        verbose_printf("┗");
         for (size_t x = 0; x < (((width * 3) + width) - 1); x++) verbose_printf(" ");
-        verbose_printf("┘\n");
+        verbose_printf("┛\n");
     }
 }
