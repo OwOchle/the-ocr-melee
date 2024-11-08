@@ -4,9 +4,14 @@
 #include <err.h>
 #include <stdlib.h>
 
-int main() 
+int main(int argc, char **argv)
 {
-    uchar *img = load_image("/disks/hdd2/epita/the-ocr-melee/misc/training-generator/outputs/sourgummy_y.bmp");
+    if (argc < 2)
+    {
+        errx(1, "Usage: ./training <image_path>");
+    }
+
+    uchar *img = load_image(argv[1]);
     
     if (img == NULL)
     {
