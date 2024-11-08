@@ -11,14 +11,14 @@ int main(int argc, char **argv)
         errx(1, "Usage: ./training <image_path>");
     }
 
-    uchar *img = load_image(argv[1]);
+    uchar **img = load_directory(argv[1]);
     
     if (img == NULL)
     {
         errx(1, "img is null");
     }
     
-    verbose_print_matrix_uchar(img, IMAGE_SIZE, IMAGE_SIZE);
+    verbose_print_matrix_uchar(img[0], IMAGE_SIZE, IMAGE_SIZE);
     
     free(img);
     

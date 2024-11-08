@@ -1,5 +1,8 @@
+#include <err.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "read_image.h"
 #include "utils/array.h"
@@ -59,4 +62,18 @@ uchar *load_image(char *path)
     fclose(file);
     
     return res;
+}
+
+uchar **load_directory(char *path)
+{
+    struct stat stats;
+
+    stat(path, &stats);
+
+    if (!S_ISDIR(stats.st_mode))
+    {
+        errx(1, "path '%s' does not point to a directory", path);
+    }
+
+    return NULL;
 }

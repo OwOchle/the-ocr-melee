@@ -5,3 +5,5 @@
 #define uchar unsigned char
 
 uchar *load_image(char *path);
+
+uchar **load_directory(char *path);
