@@ -99,26 +99,10 @@ int accuracy(Network *network, Batch *training_data)
     {
         BatchLayer *layer = training_data->layers[i];
 
-        printf(
-            "Taking %.1f and %.1f as input:\n", layer->inputData[0],
-            layer->inputData[1]
-        );
-        printf(
-            "Expecting 'isFalse' = %.1f and 'isTrue' = %.1f\n",
-            layer->outputData[0], layer->outputData[1]
-        );
-
         float *predicted_output = feedforward(network, layer->inputData);
 
         int predicted_max = argmax(predicted_output, output_size);
-        printf("- output[%i] should be max\n", predicted_max);
         int actual_max = argmax(layer->outputData, output_size);
-        printf("- output[%i] is max\n", actual_max);
-
-        printf(
-            "=> Actual 'isFalse' = %f and 'isTrue' = %f\n", predicted_output[0],
-            predicted_output[1]
-        );
 
         if (predicted_max == actual_max)
         {

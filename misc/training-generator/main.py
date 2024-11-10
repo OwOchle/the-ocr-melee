@@ -11,7 +11,7 @@ fonts = {
 
 OUTPUT = "./outputs"
 
-chars = [chr(c) for c in range(ord("A"), ord("Z")+1)] + [chr(c) for c in range(ord("a"), ord("z")+1)]
+chars = [chr(c) for c in range(ord("A"), ord("Z")+1)] # + [chr(c) for c in range(ord("a"), ord("z")+1)]
 
 def generate_plain(f_file, char) -> Image.Image:
     img = Image.new("RGB", (25, 25), (255, 255, 255))
