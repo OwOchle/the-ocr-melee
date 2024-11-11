@@ -6,7 +6,9 @@ fonts = {
     "roboto": ImageFont.truetype("./fonts/Roboto-Regular.ttf", 20),
     "notoserif": ImageFont.truetype("./fonts/NotoSerif-Regular.ttf", 20),
     "sourgummy": ImageFont.truetype("./fonts/SourGummy-Regular.ttf", 20),
-    "jbm": ImageFont.truetype("./fonts/JetBrainsMono-Regular.ttf", 20)
+    "jbm": ImageFont.truetype("./fonts/JetBrainsMono-Regular.ttf", 20),
+    "geist": ImageFont.truetype("./fonts/Geist-Regular.ttf", 20),
+    "crimson": ImageFont.truetype("./fonts/Geist-Regular.ttf", 20)
     }
 
 OUTPUT = "./outputs"
@@ -55,9 +57,9 @@ def main():
     for f_name, f in fonts.items():
         for char in chars:
             generate_plain(f, char).save(f"{OUTPUT}/{f_name}_plain_0_{char}.bmp")
-            for i in range(3):
+            for i in range(5):
                 generate_offcenter(f, char).save(f"{OUTPUT}/{f_name}_offcenter_{i}_{char}.bmp")
-                generate_rotated(f, char).save(f"{OUTPUT}/{f_name}_rotated_{i}_{char}.bmp")
+                # generate_rotated(f, char).save(f"{OUTPUT}/{f_name}_rotated_{i}_{char}.bmp")
 
 
 if __name__ == "__main__":

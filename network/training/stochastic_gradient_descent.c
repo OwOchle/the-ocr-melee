@@ -30,6 +30,7 @@ int stochastic_gradiant_descent(
         Batch **mini_batches = create_mini_batches(
             network, batch, mini_batch_size, &num_mini_batches
         );
+        
         if (mini_batches == NULL)
         {
             return 0;
