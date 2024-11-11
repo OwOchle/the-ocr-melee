@@ -1,12 +1,13 @@
 #include <err.h>
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
-#include "batch_conversion.h"
-#include "read_image.h"
+#include "../network/evaluate.h"
+#include "../network/training/stochastic_gradient_descent.h"
 #include "../utils/matrix.h"
 #include "../utils/verbose.h"
-#include "../network/training/stochastic_gradient_descent.h"
+#include "batch_conversion.h"
+#include "read_image.h"
 
 int main(int argc, char **argv)
 {
@@ -31,8 +32,6 @@ int main(int argc, char **argv)
     );
     verbose_print_matrix_uchar(output[index].image, IMAGE_SIZE, IMAGE_SIZE);
 
-    
-
     Batch *batch = images_to_batch(count, output);
 
     if (batch == NULL)
@@ -46,7 +45,30 @@ int main(int argc, char **argv)
 
     network_init_gaussian(network);
 
-    int res = stochastic_gradiant_descent(network, batch, 200, 32, 0.05f, 0.0f, NULL);
+
+    verbose_printf("\n_________START________\n\n");
+    verbose_printf(
+        "Accuracy on training data: %i / %i\n", accuracy(network, batch),
+        batch->batchSize
+    );
+    verbose_printf(
+        "Cost on training data: %f\n________________________\n",
+        total_cost(network, batch, 0.0f)
+    );
+
+    int res = stochastic_gradiant_descent(
+        network, batch, 750, 32, 0.01f, 0.001f, NULL
+    );
+
+    verbose_printf("\n_________RESULT________\n\n");
+    verbose_printf(
+        "Accuracy on training data: %i / %i\n", accuracy(network, batch),
+        batch->batchSize
+    );
+    verbose_printf(
+        "Cost on training data: %f\n________________________\n",
+        total_cost(network, batch, 0.0f)
+    );
 
     network_free(network);
     batch_free(batch);
