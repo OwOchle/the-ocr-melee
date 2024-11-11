@@ -48,11 +48,11 @@ int stochastic_gradiant_descent(
 
         printf("Epoch %zu training complete\n", epoch);
         printf(
-            "Accuracy on training data: %i / %i\n________________________\n",
+            "Accuracy on training data: %i / %i\n",
             accuracy(network, batch), total_training_size
         );
 
-        printf("Cost on training data: %f", total_cost(network, batch, lambda));
+        printf("Cost on training data: %f\n________________________\n", total_cost(network, batch, lambda));
 
 
         free(mini_batches);
