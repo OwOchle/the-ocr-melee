@@ -52,6 +52,9 @@ int stochastic_gradiant_descent(
             accuracy(network, batch), total_training_size
         );
 
+        printf("Cost on training data: %f", total_cost(network, batch, lambda));
+
+
         free(mini_batches);
         mini_batches = NULL;
     }

@@ -40,13 +40,13 @@ int main(int argc, char **argv)
         errx(3, "batch is null");
     }
 
-    uint16_t layers[] = {78, 26};
+    uint16_t layers[] = {60, 26};
 
     Network *network = network_new(2, layers, IMAGE_SIZE * IMAGE_SIZE);
 
     network_init_gaussian(network);
 
-    int res = stochastic_gradiant_descent(network, batch, 500, 10, 3.0f, 0, NULL);
+    int res = stochastic_gradiant_descent(network, batch, 200, 32, 0.05f, 0.0f, NULL);
 
     network_free(network);
     batch_free(batch);

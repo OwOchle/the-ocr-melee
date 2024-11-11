@@ -4,9 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../utils/array.h"
 #include "../utils/matrix.h"
 #include "network.h"
 #include "network_utils/activation_functions.h"
+#include "network_utils/cost_functions.h"
 
 typedef float *Matrix;
 typedef float *Vector;
@@ -143,4 +145,39 @@ float binary_accuracy(Network *network, Batch *batch)
     }
 
     return count;
+}
+
+float total_cost(Network *network, Batch *batch, float lambda)
+{
+    float cost = 0.0f;
+    uint16_t size = batch->batchSize;
+
+    uint16_t output_size = network->layers[network->layerCount - 1]->nodeCount;
+    for (size_t i = 0; i < size; i++)
+    {
+        float *desired_output = batch->layers[i]->outputData;
+        float *output = feedforward(network, batch->layers[i]->inputData);
+
+        cost += cross_entropy_cost(output_size, output, desired_output) / size;
+
+        free(output);
+    }
+
+    float linear_norm = 0.0f;
+    for (size_t i = 0; i < network->layerCount - 1; i++)
+    {
+        Layer *layer = network->layers[i];
+        Layer *nextLayer = network->layers[i + 1];
+        for (size_t j = 0; j < layer->nodeCount; j++)
+        {
+            for (size_t k = 0; k < nextLayer->nodeCount; k++)
+            {
+                float weight = array_get_as_matrix(layer->weights, nextLayer->nodeCount, j, k);
+                linear_norm += weight * weight;
+            }
+        }
+    }
+    cost += 0.5f * (lambda / size) * linear_norm;
+
+    return cost;
 }

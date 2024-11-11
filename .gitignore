@@ -15,3 +15,5 @@ cmake-build-debug/
 CMakeLists.txt
 *.neuron
 *.DS_Store
+
+data/
