@@ -4,9 +4,9 @@
 
 #include "batch_conversion.h"
 #include "read_image.h"
-#include "utils/matrix.h"
-#include "utils/verbose.h"
-#include "network/training/stochastic_gradient_descent.h"
+#include "../utils/matrix.h"
+#include "../utils/verbose.h"
+#include "../network/training/stochastic_gradient_descent.h"
 
 int main(int argc, char **argv)
 {
