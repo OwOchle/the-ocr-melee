@@ -5,100 +5,14 @@
 #include "../network.h"
 #include "../network_utils/activation_functions.h"
 #include "../network_utils/cost_functions.h"
-#include "utils/thpool.h"
-#include "utils/verbose.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#define THREAD_COUNT 12
-
 typedef float *Vector;
 typedef float *Matrix;
 
-struct Data 
-{
-    const Network *network;
-    size_t l;
-    Vector activation;
-    float **z_matrix;
-    float **activation_matrix;
-};
-
-void run_layer(void *data)
-{
-    // printf("  - Beginning layer %zu.\n", x);
-
-    struct Data *casted = (struct Data*) data;
-
-    const Network *network = casted->network;
-    size_t l = casted->l;
-    Vector activation = casted->activation;
-    float **z_matrix = casted->z_matrix;
-    float **activation_matrix = casted->activation_matrix;
-
-    Layer *layer = network->layers[l];
-
-    Vector bias = layer->bias;
-    Matrix weights = layer->weights;
-
-    int nodeCount = layer->nodeCount;
-
-    int pastNodeCount;
-    if (l == 0)
-    {
-        pastNodeCount = network->entryCount;
-    }
-    else
-    {
-        pastNodeCount = network->layers[l - 1]->nodeCount;
-    }
-
-    // Creating a z vector which is : weight[layer] * activation +
-    // bias[layer]
-    Vector z_vector = matrix_multiply(
-        pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
-    );
-    if (z_vector == NULL)
-    {
-        printf("  ~ Error while mult matrix.\n");
-    }
-    matrix_add(1, nodeCount, z_vector, 1, nodeCount, bias);
-
-    // Storing the z vector to use later to calculate the delta
-    free(z_matrix[l]);
-    z_matrix[l] = z_vector;
-
-    // printf("    - Created a z vector.\n");
-
-    // Creating the next activation vector : sigmoid(vector_z)
-    activation = calloc(nodeCount, sizeof(float));
-    if (activation == NULL)
-    {
-        printf("  ~ Error while allocating new activation.\n");
-    }
-
-    if (l == (network->layerCount) - 1)
-    {
-        softmax(nodeCount, z_vector, activation);
-    }
-    else
-    {
-        sigmoid(nodeCount, z_vector, activation);
-    }
-
-    // Storing the activation to use later in the backward pass
-    free(activation_matrix[l + 1]);
-    activation_matrix[l + 1] = activation;
-    // printf("activation[%zu] is of size %i\n", l + 1, nodeCount);
-
-    // printf("    - Created an activation vector.\n");
-
-    free(data);
-}
-
-GradiantData *
-backprop(
+GradiantData *backprop(
     const Network *network, const float training_input[],
     const float desired_outputs[]
 )
@@ -151,26 +65,69 @@ backprop(
 
     // printf("  - Allocation of matrixes successfull.\n");
 
-    threadpool tp = thpool_init(THREAD_COUNT);
-
     for (size_t l = 0; l < layerCount; l++)
     {
-        struct Data *data = malloc(sizeof(struct Data));
+        // printf("  - Beginning layer %zu.\n", x);
 
-        data->activation = activation;
-        data->activation_matrix = activation_matrix;
-        data->l = l;
-        data->network = network;
-        data->z_matrix = z_matrix;
+        Layer *layer = network->layers[l];
 
-        if (thpool_add_work(tp, run_layer, (void *) data))
+        Vector bias = layer->bias;
+        Matrix weights = layer->weights;
+
+        int nodeCount = layer->nodeCount;
+
+        int pastNodeCount;
+        if (l == 0)
         {
-            verbose_printf("Error adding work %z", l);
-            free(data);
+            pastNodeCount = network->entryCount;
         }
-    }
+        else
+        {
+            pastNodeCount = network->layers[l - 1]->nodeCount;
+        }
 
-    thpool_wait(tp);
+        // Creating a z vector which is : weight[layer] * activation +
+        // bias[layer]
+        Vector z_vector = matrix_multiply(
+            pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
+        );
+        if (z_vector == NULL)
+        {
+            printf("  ~ Error while mult matrix.\n");
+            return NULL;
+        }
+        matrix_add(1, nodeCount, z_vector, 1, nodeCount, bias);
+
+        // Storing the z vector to use later to calculate the delta
+        free(z_matrix[l]);
+        z_matrix[l] = z_vector;
+
+        // printf("    - Created a z vector.\n");
+
+        // Creating the next activation vector : sigmoid(vector_z)
+        activation = calloc(nodeCount, sizeof(float));
+        if (activation == NULL)
+        {
+            printf("  ~ Error while allocating new activation.\n");
+            return NULL;
+        }
+
+        if (l == layerCount - 1)
+        {
+            softmax(nodeCount, z_vector, activation);
+        }
+        else
+        {
+            sigmoid(nodeCount, z_vector, activation);
+        }
+
+        // Storing the activation to use later in the backward pass
+        free(activation_matrix[l + 1]);
+        activation_matrix[l + 1] = activation;
+        // printf("activation[%zu] is of size %i\n", l + 1, nodeCount);
+
+        // printf("    - Created an activation vector.\n");
+    }
 
     // printf("  - Feedforward successfull!\n\nBeginning backward pass!\n");
 

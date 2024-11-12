@@ -1,40 +1,13 @@
 #include <err.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 
 #include "../network/evaluate.h"
 #include "../network/training/stochastic_gradient_descent.h"
 #include "../utils/matrix.h"
 #include "../utils/verbose.h"
-#include "network/file_io.h"
 #include "batch_conversion.h"
 #include "read_image.h"
-
-Network *get_network(char *path)
-{
-    Network *out;
-    if (path == NULL || access(path, F_OK) == 0)
-    {
-        NETWORK_ERRNO result = network_read(&out, path);
-
-        if (result != NO_ERROR)
-        {
-            uint16_t layers[] = { 60, 26 };
-            out = network_new(2, layers, IMAGE_SIZE * IMAGE_SIZE);
-            network_init_gaussian(out);
-        }
-    }
-    else
-    {
-        uint16_t layers[] = { 60, 26 };
-        out = network_new(2, layers, IMAGE_SIZE * IMAGE_SIZE);
-        network_init_gaussian(out);
-    }
-
-    return out;
-}
 
 int main(int argc, char **argv)
 {
@@ -68,7 +41,10 @@ int main(int argc, char **argv)
 
     uint16_t layers[] = {60, 26};
 
-    Network *network = get_network(argc < 3 ? NULL : argv[2]);
+    Network *network = network_new(2, layers, IMAGE_SIZE * IMAGE_SIZE);
+
+    network_init_gaussian(network);
+
 
     verbose_printf("\n_________START________\n\n");
     verbose_printf(
@@ -93,11 +69,6 @@ int main(int argc, char **argv)
         "Cost on training data: %f\n________________________\n",
         total_cost(network, batch, 0.0f)
     );
-
-    if (argc > 2)
-    {
-        network_write(network, argv[2]);
-    }
 
     network_free(network);
     batch_free(batch);
