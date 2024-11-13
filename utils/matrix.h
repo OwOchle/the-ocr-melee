@@ -25,3 +25,5 @@ void matrix_add_array(
 
 
 void verbose_print_matrix_uchar(unsigned char *mat, size_t width, size_t height);
+
+void verbose_print_matrix_float(float *mat, size_t width, size_t height);
