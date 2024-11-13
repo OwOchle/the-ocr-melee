@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         errx(1, "invalid epoch count: %s", argv[3]);
     }
 
-    mat_th_init_threadpool(8);
+    mat_th_init_threadpool(2);
 
     size_t count;
 
