@@ -57,13 +57,3 @@ void array_float_print(size_t size, const float array[])
 
     printf("%f]\n", array[size - 1]);
 }
-
-float array_get_as_matrix(const float array[], size_t width, size_t x, size_t y)
-{
-    return array[y * width + x];
-}
-
-float *array_get_as_matrix_ptr(float array[], size_t width, size_t x, size_t y)
-{
-    return array + (y * width) + x;
-}

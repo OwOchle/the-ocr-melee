@@ -9,6 +9,7 @@
 #include "network.h"
 #include "network_utils/activation_functions.h"
 #include "network_utils/cost_functions.h"
+#include "utils/threaded_matrix.h"
 
 typedef float *Matrix;
 typedef float *Vector;
@@ -44,7 +45,7 @@ float *feedforward(Network *network, const float *input_data)
             pastNodeCount = network->layers[l - 1]->nodeCount;
         }
 
-        Vector dot = matrix_multiply(
+        Vector dot = mat_th_multiply(
             pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
         );
         if (dot == NULL)

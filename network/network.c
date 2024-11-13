@@ -1,6 +1,7 @@
 #include "network.h"
 #include "../utils/matrix.h"
 #include "network_utils/activation_functions.h"
+#include "utils/threaded_matrix.h"
 
 #include <err.h>
 #include <math.h>
@@ -153,7 +154,7 @@ float *network_apply(Network *network, float *input)
 
         int nc = network->layers[l]->nodeCount;
 
-        float *tmp = matrix_multiply(
+        float *tmp = mat_th_multiply(
             prevSize, 1, mat, nc, prevSize, network->layers[l]->weights
         );
 

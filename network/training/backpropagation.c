@@ -5,6 +5,7 @@
 #include "../network.h"
 #include "../network_utils/activation_functions.h"
 #include "../network_utils/cost_functions.h"
+#include "utils/threaded_matrix.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -88,7 +89,7 @@ GradiantData *backprop(
 
         // Creating a z vector which is : weight[layer] * activation +
         // bias[layer]
-        Vector z_vector = matrix_multiply(
+        Vector z_vector = mat_th_multiply(
             pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
         );
         if (z_vector == NULL)
@@ -229,7 +230,7 @@ GradiantData *backprop(
             nextNodeCount, nodeCount, nextWeights, transposedNextWeights
         );
 
-        Vector newDelta = matrix_multiply(
+        Vector newDelta = mat_th_multiply(
             nextNodeCount, nodeCount, transposedNextWeights, 1, nextNodeCount,
             delta
         );

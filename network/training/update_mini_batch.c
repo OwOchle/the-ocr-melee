@@ -4,6 +4,7 @@
 #include "../../utils/array.h"
 #include "../../utils/matrix.h"
 #include "../network.h"
+#include "utils/threaded_matrix.h"
 
 #include <stdint.h>
 #include <stdio.h>
