@@ -13,6 +13,8 @@
 #include "network/file_io.h"
 #include "network/network.h"
 
+#define THREAD_COUNT 2
+
 Network *get_network(char *path)
 {
     Network *net = NULL;
@@ -46,7 +48,7 @@ int main(int argc, char **argv)
         errx(1, "invalid epoch count: %s", argv[3]);
     }
 
-    mat_th_init_threadpool(2);
+    mat_th_init_threadpool(THREAD_COUNT);
 
     size_t count;
 

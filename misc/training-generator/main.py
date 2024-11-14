@@ -6,7 +6,10 @@ fonts = {
     "roboto": ImageFont.truetype("./fonts/Roboto-Regular.ttf", 20),
     "notoserif": ImageFont.truetype("./fonts/NotoSerif-Regular.ttf", 20),
     "sourgummy": ImageFont.truetype("./fonts/SourGummy-Regular.ttf", 20),
-    "jbm": ImageFont.truetype("./fonts/JetBrainsMono-Regular.ttf", 20)
+    "jbm": ImageFont.truetype("./fonts/JetBrainsMono-Regular.ttf", 20),
+    "mavenpro": ImageFont.truetype("./fonts/MavenPro-Regular.ttf", 20),
+    "garamond": ImageFont.truetype("./fonts/EBGaramond-Regular.ttf", 20),
+    "cinzel": ImageFont.truetype("./fonts/Cinzel-Regular.ttf", 20)
     }
 
 OUTPUT = "./outputs"
@@ -28,8 +31,8 @@ def generate_offcenter(font, char) -> Image.Image:
 
     d = ImageDraw.Draw(img)
 
-    x = random.randint(7, 17)
-    y = random.randint(7, 17)
+    x = random.randint(10, 14)
+    y = random.randint(10, 14)
 
     d.text((x, y), char, anchor="mm", fill=(0,0,0), font=font, align="center")
 
@@ -54,10 +57,10 @@ def main():
 
     for f_name, f in fonts.items():
         for char in chars:
-            generate_plain(f, char).save(f"{OUTPUT}/{f_name}_plain_0_{char}.bmp")
-            for i in range(3):
+            for i in range(5):
+                generate_plain(f, char).save(f"{OUTPUT}/{f_name}_plain_{i}_{char}.bmp")
                 generate_offcenter(f, char).save(f"{OUTPUT}/{f_name}_offcenter_{i}_{char}.bmp")
-                generate_rotated(f, char).save(f"{OUTPUT}/{f_name}_rotated_{i}_{char}.bmp")
+                # generate_rotated(f, char).save(f"{OUTPUT}/{f_name}_rotated_{i}_{char}.bmp")
 
 
 if __name__ == "__main__":
