@@ -12,6 +12,7 @@
 #include "utils/threaded_matrix.h"
 #include "network/file_io.h"
 #include "network/network.h"
+#include "progress.h"
 
 #define THREAD_COUNT 2
 
@@ -48,6 +49,7 @@ int main(int argc, char **argv)
         errx(1, "invalid epoch count: %s", argv[3]);
     }
 
+    pb_init(epochs, 0);
     mat_th_init_threadpool(THREAD_COUNT);
 
     size_t count;
@@ -73,6 +75,7 @@ int main(int argc, char **argv)
         errx(3, "batch is null");
     }
 
+    pb_start();
     uint16_t layers[] = {60, 26};
 
     Network *network = get_network(argv[2]);
@@ -116,6 +119,7 @@ int main(int argc, char **argv)
     }
 
     mat_th_destroy_threadpool();
+    pb_destroy();
     network_free(network);
     batch_free(batch);
     free(output);
