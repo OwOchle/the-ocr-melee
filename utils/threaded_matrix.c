@@ -98,7 +98,7 @@ struct MatrixAddData
     size_t height2;
     const float *mat2;
 
-    size_t row;
+    size_t i;
 };
 
 void __mat_th_add_row(void *vdata)
@@ -107,11 +107,20 @@ void __mat_th_add_row(void *vdata)
 
     for (size_t x = 0; x < data->width1; x++)
     {
-        *(array_get_as_matrix_ptr(data->mat1, data->width1, x, data->row)) += \
-        array_get_as_matrix(data->mat2, data->width2, x, data->row);
+        *(array_get_as_matrix_ptr(data->mat1, data->width1, x, data->i)) += \
+        array_get_as_matrix(data->mat2, data->width2, x, data->i);
     }
+}
 
-    free(vdata);
+void __mat_th_add_column(void *vdata)
+{
+    struct MatrixAddData *data = vdata;
+
+    for (size_t y = 0; y < data->height1; y++)
+    {
+        *(array_get_as_matrix_ptr(data->mat1, data->width1, data->i, y)) += \
+            array_get_as_matrix(data->mat2, data->width2, data->i, y);
+    }
 }
 
 void mat_th_add(
@@ -143,15 +152,15 @@ void mat_th_add(
     template.mat1 = mat1;
     template.mat2 = mat2;
 
-    for (size_t y = 0; y < height1; y++)
+    struct MatrixAddData *datas = malloc((height1 < width1 ? width1 : height1) * sizeof(struct MatrixAddData));
+
+    for (size_t i = 0; i < (height1 < width1 ? width1 : height1); i++)
     {
-        struct MatrixAddData *d = malloc(sizeof(struct MatrixAddData));
+        memcpy(&datas[i], &template, sizeof(struct MatrixAddData));
 
-        memcpy(d, &template, sizeof(struct MatrixAddData));
+        datas[i].i = i;
 
-        d->row = y;
-
-        thpool_add_work(gAddTp, __mat_th_add_row, d);
+        thpool_add_work(gAddTp, (height1 < width1 ? __mat_th_add_column : __mat_th_add_row), &datas[i]);
     }
 
     thpool_wait(gAddTp);
