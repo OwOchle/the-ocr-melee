@@ -7,6 +7,9 @@
 
 #include "update_mini_batch.h"
 
+#include "utils/progress.h"
+#include "utils/verbose.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,13 +49,14 @@ int stochastic_gradiant_descent(
             batch_free(mini_batches[i]);
         }
 
-        printf("Epoch %zu training complete\n", epoch);
-        printf(
+        pb_update_current(epoch);
+        verbose_printf("Epoch %zu training complete\n", epoch);
+        verbose_printf(
             "Accuracy on training data: %i / %i\n",
             accuracy(network, batch), total_training_size
         );
 
-        printf("Cost on training data: %f\n________________________\n", total_cost(network, batch, lambda));
+        verbose_printf("Cost on training data: %f\n________________________\n", total_cost(network, batch, lambda));
 
 
         free(mini_batches);

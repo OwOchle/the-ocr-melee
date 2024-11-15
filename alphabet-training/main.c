@@ -12,7 +12,7 @@
 #include "utils/threaded_matrix.h"
 #include "network/file_io.h"
 #include "network/network.h"
-#include "progress.h"
+#include "utils/progress.h"
 
 #define THREAD_COUNT 2
 
@@ -75,9 +75,6 @@ int main(int argc, char **argv)
         errx(3, "batch is null");
     }
 
-    pb_start();
-    uint16_t layers[] = {60, 26};
-
     Network *network = get_network(argv[2]);
 
     if (network == NULL)
@@ -97,9 +94,13 @@ int main(int argc, char **argv)
         total_cost(network, batch, 0.0f)
     );
 
+    pb_start();
+
     int res = stochastic_gradiant_descent(
         network, batch, epochs, 32, 0.01f, 0.001f, NULL
     );
+
+    pb_destroy();
 
     printf("\n_________RESULT________\n\n");
     printf(
@@ -119,7 +120,6 @@ int main(int argc, char **argv)
     }
 
     mat_th_destroy_threadpool();
-    pb_destroy();
     network_free(network);
     batch_free(batch);
     free(output);

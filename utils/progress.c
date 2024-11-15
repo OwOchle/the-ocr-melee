@@ -8,9 +8,13 @@
 #include <err.h>
 #include <math.h>
 #include <string.h>
+#include <signal.h>
 
 #include "progress.h"
 #include "utils/verbose.h"
+#include "colors.h"
+
+char *animation[] = { "⣷", "⣯", "⣟", "⡿", "⢿", "⣻", "⣽", "⣾" };
 
 struct ProgressBarData
 {
@@ -34,6 +38,12 @@ struct ProgressBarData
      */
     unsigned long refresh_rate;
 
+    time_t last_update;
+    unsigned long value_last_update;
+    unsigned long itps;
+
+    char loading_state;
+
     pthread_t progress_thread;
 };
 
@@ -45,6 +55,14 @@ unsigned short __get_terminal_width()
     ioctl(0, TIOCGWINSZ, &w);
 
     return w.ws_col;
+}
+
+void reshow_pointer()
+{
+    fprintf(stderr, "\n\e[1;33m/!\\ Interrupt: network will not be saved. Stopping /!\\\e[0m\n");
+    pb_stop();
+    printf("\e[?25h");
+    exit(0);
 }
 
 float __remap(float old_min, float old_max, float new_min, float new_max, float value)
@@ -73,38 +91,38 @@ bool pb_init(unsigned long max, unsigned long refresh_rate)
 
     gData->running = false;
 
-    gData->current = 0;
+    gData->loading_state = 0;
 
     return true;
 }
 
 char *__get_closest_block(float value)
 {
-    if (value <= 1/8)
+    if (value <= 0.125)
     {
         return " ";
-    }
-    if (value <= 2/8)
+    } 
+    else if (value <= 0.25)
     {
         return "▏";
     }
-    else if (value <= 3/8)
+    else if (value <= 0.375)
     {
         return "▎";
     }
-    else if (value <= 4/8)
+    else if (value <= 0.5)
     {
         return "▍";
     }
-    else if (value <= 5/8)
+    else if (value <= 0.625)
     {
         return "▌";
     }
-    else if (value <= 6/8)
+    else if (value <= 0.75)
     {
         return "▋";
     }
-    else if (value <= 7/8)
+    else if (value <= 0.875)
     {
         return "▊";
     }
@@ -127,7 +145,7 @@ void __get_bar(float width, unsigned short total_width, char *out)
         strcat(out, "█");
     }
 
-    float res;    
+    float res;
     strcat(out, __get_closest_block(modff(width, &res)));
 
     for (unsigned long i = 0; i < space_width; i++)
@@ -136,29 +154,37 @@ void __get_bar(float width, unsigned short total_width, char *out)
     }
 }
 
-void *__update_bar(void *none)
+void *__update_bar()
 {
     unsigned long sleep_time = gData->refresh_rate * 1000;
     unsigned short progress_width = gData->width - 40;
-    char *out = calloc(1000, sizeof(char));
+    char *bar = calloc(1000, sizeof(char));
 
     verbose_printf("progress width: %hu", progress_width);
 
-    printf("\e[?25l");
-
     while (gData->running)
     {
+        time_t cur = time(NULL);
+
+        if (cur > gData->last_update)
+        {
+            gData->last_update = cur;
+            gData->itps = gData->current > gData->value_last_update ? gData->current - gData->value_last_update : 0;
+
+            gData->value_last_update = gData->current;
+        }
+
         float width = __remap(0, gData->max, 0, progress_width, gData->current);
-        __get_bar(width, progress_width, out);
-        printf("\r");
-        printf("%6lu/%lu [%s]", gData->current, gData->max, out);
+        __get_bar(width, progress_width, bar);
+        printf("\33[2K\r");
+        printf("%s%6lu/%lu%s [%s] %s%4lu it/s %s%s%s", BLU, gData->current, gData->max, BRED, bar, YEL, gData->itps, GRN, animation[gData->loading_state], reset);
 
         fflush(stdout);
+        gData->loading_state = (gData->loading_state + 1) % 8;
         usleep(sleep_time);
     }
 
-    printf("\e[?25h");
-    free(out);
+    free(bar);
     return NULL;
 }
 
@@ -174,8 +200,13 @@ bool pb_start()
         return false;
     }
 
+    signal(SIGINT, reshow_pointer);
+    printf("\e[?25l");
+    gData->current = 0;
     gData->running = true;
     pthread_create(&(gData->progress_thread), NULL, __update_bar, NULL);
+
+    return true;
 }
 
 void pb_update_current(unsigned long value)
@@ -205,6 +236,7 @@ bool pb_stop()
         return false;
     }
 
+    printf("\e[?25h");
     gData->running = false;
     pthread_join(gData->progress_thread, NULL);
 

@@ -1,8 +1,8 @@
 CC = gcc
-OBJS = main.o read_image.o batch_conversion.o progress.o ../utils/verbose.o ../utils/matrix.o ../utils/array.o ../network/network_utils/cost_functions.o ../network/network_utils/batch.o $\
+OBJS = main.o read_image.o batch_conversion.o ../utils/progress.o ../utils/verbose.o ../utils/matrix.o ../utils/array.o ../network/network_utils/cost_functions.o ../network/network_utils/batch.o $\
  ../network/network_utils/gradiant.o ../network/training/backpropagation.o ../network/training/update_mini_batch.o ../network/training/stochastic_gradient_descent.o $\
  ../network/evaluate.o ../network/network_utils/activation_functions.o ../network/network.o ../utils/thpool.o ../utils/threaded_matrix.o ../network/file_io.o
-CFLAGS = -lm -I..
+CFLAGS = -lm -I.. -Wall -Wextra
 
 debug: CFLAGS += -g -fsanitize=address -D VERBOSE
 debug: $(OBJS)
