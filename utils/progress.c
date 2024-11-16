@@ -176,14 +176,13 @@ void __get_bar(float width, unsigned short total_width, char *out)
 void *__update_bar()
 {
     unsigned long sleep_time = gData->refresh_rate * 1000;
-    unsigned short progress_width = gData->width - 60;
     char *bar = calloc(1000, sizeof(char));
     char *str_data = calloc(1000, sizeof(char));
 
-    verbose_printf("progress width: %hu", progress_width);
-
     while (gData->running)
     {
+        unsigned short progress_width = gData->width - 60;
+
         bar[0] = 0;
         str_data[0] = 0;
 
@@ -195,6 +194,8 @@ void *__update_bar()
             gData->itps = gData->current > gData->value_last_update ? gData->current - gData->value_last_update : 0;
 
             gData->value_last_update = gData->current;
+
+            gData->width = __get_terminal_width();
         }
 
         if (gData->data_printer && gData->data)
