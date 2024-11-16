@@ -14,6 +14,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct BarData {
+    int accuracy;
+    int total_training_size;
+    float cost;
+};
+
+void __progress_printer(void *data, char *out)
+{
+    struct BarData *bdata = data;
+    sprintf(out, "Acc: %4d/%d | Cost: %.5f", bdata->accuracy, bdata->total_training_size, bdata->cost);
+}
+
 int stochastic_gradiant_descent(
     Network *network, Batch *batch, size_t epochs, uint16_t mini_batch_size,
     float eta, float lambda, Batch *validation_batch
@@ -23,6 +35,9 @@ int stochastic_gradiant_descent(
     uint16_t total_evaluation_size = 0;
     if (validation_batch != NULL)
         total_evaluation_size = validation_batch->batchSize;
+    
+    pb_set_data_print_function(__progress_printer);
+    struct BarData *bdata = malloc(sizeof(struct BarData));
 
     for (size_t epoch = 0; epoch < epochs; epoch++)
     {
@@ -35,6 +50,7 @@ int stochastic_gradiant_descent(
         );
         if (mini_batches == NULL)
         {
+            free(bdata);
             return 0;
         }
 
@@ -49,19 +65,28 @@ int stochastic_gradiant_descent(
             batch_free(mini_batches[i]);
         }
 
-        pb_update_current(epoch);
-        verbose_printf("Epoch %zu training complete\n", epoch);
+        bdata->accuracy = accuracy(network, batch);
+        bdata->total_training_size = total_training_size;
+        bdata->cost = total_cost(network, batch, lambda);
+
+        pb_update_current(epoch, bdata);
+        
+        /* verbose_printf("Epoch %zu training complete\n", epoch);
         verbose_printf(
             "Accuracy on training data: %i / %i\n",
             accuracy(network, batch), total_training_size
         );
 
-        verbose_printf("Cost on training data: %f\n________________________\n", total_cost(network, batch, lambda));
+        verbose_printf("Cost on training data: %f\n________________________\n", total_cost(network, batch, lambda)); */
 
 
         free(mini_batches);
         mini_batches = NULL;
     }
+
+    pb_update_current(epochs, NULL);
+    free(bdata);
+    bdata = NULL;
 
     return 1;
 }

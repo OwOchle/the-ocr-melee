@@ -33,6 +33,11 @@ struct ProgressBarData
     unsigned long current;
 
     /**
+     * Data to pass to the data printer
+     */
+    void *data;
+
+    /**
      * Time to wait between each refresh
      * @note In miliseconds
      */
@@ -45,6 +50,8 @@ struct ProgressBarData
     char loading_state;
 
     pthread_t progress_thread;
+
+    DataPrinter data_printer;
 };
 
 struct ProgressBarData *gData = NULL;
@@ -93,7 +100,21 @@ bool pb_init(unsigned long max, unsigned long refresh_rate)
 
     gData->loading_state = 0;
 
+    gData->data_printer = NULL;
+
+    gData->data = NULL;
+
     return true;
+}
+
+void pb_set_data_print_function(DataPrinter dp)
+{
+    if (gData == NULL)
+    {
+        errx(1, "progress bar is not initialized");
+    }
+
+    gData->data_printer = dp;
 }
 
 char *__get_closest_block(float value)
@@ -138,8 +159,6 @@ void __get_bar(float width, unsigned short total_width, char *out)
     unsigned long block_width = ceilf(width);
     unsigned long space_width = total_width - block_width;
 
-    out[0] = 0;
-
     for (unsigned long i = 0; i < full_block_width; i++)
     {
         strcat(out, "█");
@@ -157,13 +176,17 @@ void __get_bar(float width, unsigned short total_width, char *out)
 void *__update_bar()
 {
     unsigned long sleep_time = gData->refresh_rate * 1000;
-    unsigned short progress_width = gData->width - 40;
+    unsigned short progress_width = gData->width - 60;
     char *bar = calloc(1000, sizeof(char));
+    char *str_data = calloc(1000, sizeof(char));
 
     verbose_printf("progress width: %hu", progress_width);
 
     while (gData->running)
     {
+        bar[0] = 0;
+        str_data[0] = 0;
+
         time_t cur = time(NULL);
 
         if (cur > gData->last_update)
@@ -174,16 +197,30 @@ void *__update_bar()
             gData->value_last_update = gData->current;
         }
 
+        if (gData->data_printer && gData->data)
+        {
+            gData->data_printer(gData->data, str_data);
+        }
+        else if (gData->current == gData->max)
+        {
+            strcat(str_data, "Done");
+        }
+        else
+        {
+            strcat(str_data, "No data");
+        }
+
         float width = __remap(0, gData->max, 0, progress_width, gData->current);
         __get_bar(width, progress_width, bar);
         printf("\33[2K\r");
-        printf("%s%6lu/%lu%s [%s] %s%4lu it/s %s%s%s", BLU, gData->current, gData->max, BRED, bar, YEL, gData->itps, GRN, animation[gData->loading_state], reset);
+        printf(BLU "%6lu/%lu" BRED " [%s]" YEL " %4lu it/s" GRN " %s" MAG " %s" reset, gData->current, gData->max, bar, gData->itps, animation[gData->loading_state], str_data);
 
         fflush(stdout);
         gData->loading_state = (gData->loading_state + 1) % 8;
         usleep(sleep_time);
     }
 
+    free(str_data);
     free(bar);
     return NULL;
 }
@@ -209,7 +246,7 @@ bool pb_start()
     return true;
 }
 
-void pb_update_current(unsigned long value)
+void pb_update_current(unsigned long value, void *data)
 {
     if (gData == NULL)
     {
@@ -222,6 +259,7 @@ void pb_update_current(unsigned long value)
     }
 
     gData->current = value;
+    gData->data = data;
 }
 
 bool pb_stop()
