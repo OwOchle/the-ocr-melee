@@ -17,3 +17,4 @@ CMakeLists.txt
 *.DS_Store
 
 data/
+.env/
