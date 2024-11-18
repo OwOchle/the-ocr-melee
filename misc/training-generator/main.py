@@ -17,11 +17,14 @@ OUTPUT = "./outputs"
 chars = [chr(c) for c in range(ord("A"), ord("Z")+1)] # + [chr(c) for c in range(ord("a"), ord("z")+1)]
 
 def generate_plain(font, char) -> Image.Image:
-    img = Image.new("RGB", (25, 25), (255, 255, 255))
+    img = Image.new("RGBA", (20, 20), (255, 255, 255))
+
+    gray = img.convert('1')
+    img = gray.point(lambda x: 0 if x<128 else 255, '1')
 
     d = ImageDraw.Draw(img)
 
-    d.text((12, 12), char, anchor="mm", fill=(0,0,0), font=font, align="center")
+    d.text((10, 10), char, anchor="mm", fill=0, font=font, align="center")
 
     return img
 
