@@ -13,3 +13,5 @@
 .vscode/
 *.neuron
 *.DS_Store
+
+.env
