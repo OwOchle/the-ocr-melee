@@ -40,14 +40,14 @@ Batch *images_to_batch(size_t image_count, InputImage *images)
 
         char expected_index = images[i].character - 'A';
 
-        verbose_printf("Expecting '%c' at index '%hhu'\n", images[i].character, expected_index);
+        // verbose_printf("Expecting '%c' at index '%hhu'\n", images[i].character, expected_index);
 
         batch->layers[i]->outputData = calloc(26, sizeof(float));
 
         batch->layers[i]->outputData[expected_index] = 1.0f;
     }
 
-    verbose_printf("Batch conversion done\n");
+    // verbose_printf("Batch conversion done\n");
 
     return batch;
 }
