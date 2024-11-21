@@ -61,7 +61,7 @@ def main():
     for f_name, f in fonts.items():
         for char in chars:
             for i in range(5):
-                generate_plain(f, char).save(f"{OUTPUT}/{f_name}_plain_{i}_{char}.bmp")
+                generate_plain(f, char).convert("RGB").save(f"{OUTPUT}/{f_name}_plain_{i}_{char}.bmp")
                 # generate_offcenter(f, char).save(f"{OUTPUT}/{f_name}_offcenter_{i}_{char}.bmp")
                 # generate_rotated(f, char).save(f"{OUTPUT}/{f_name}_rotated_{i}_{char}.bmp")
 

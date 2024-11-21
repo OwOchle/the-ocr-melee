@@ -22,8 +22,9 @@ uchar buf_avg(uchar buf[3])
 
 int __load_image(FILE *file, uchar *out)
 {
-    if (fseek(file, 0x36, SEEK_CUR))
+    if (fseek(file, 0x36, SEEK_SET))
     {
+        verbose_printf("failed to seek with errno %d\n", errno);
         return 1;
     }
 
@@ -35,13 +36,17 @@ int __load_image(FILE *file, uchar *out)
         {
             if (!fread(buf, sizeof(uchar), 3, file))
             {
+                verbose_printf("failed to read with errno %d\n", errno);
                 return 1;
             }
 
             out[(y * IMAGE_SIZE) + x] = buf_avg(buf);
         }
 
-        fseek(file, 1, SEEK_CUR);
+        if (IMAGE_SIZE % 2 != 0)
+        {
+            fseek(file, 1, SEEK_CUR);
+        }
     }
 
     return 0;
@@ -158,6 +163,7 @@ InputImage *load_directory(char *path, size_t *count)
 
         if (load_image(f_path, output + i))
         {
+            verbose_printf("failed to load image %s\n", f_path);
             file_count--;
         }
 
