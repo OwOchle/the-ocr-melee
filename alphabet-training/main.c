@@ -9,12 +9,18 @@
 #include "../utils/verbose.h"
 #include "batch_conversion.h"
 #include "read_image.h"
-#include "utils/threaded_matrix.h"
-#include "network/file_io.h"
-#include "network/network.h"
-#include "utils/progress.h"
+#include "../utils/threaded_matrix.h"
+#include "../network/file_io.h"
+#include "../network/network.h"
+#include "../utils/progress.h"
 
 #define THREAD_COUNT 2
+
+// Hyper parameters
+#define ETA 5.0f
+#define LAMBDA 0.001f
+#define HIDDEN_LAYER_COUNT 30
+#define MINI_BATCH_SIZE 8
 
 Network *get_network(char *path)
 {
@@ -24,7 +30,7 @@ Network *get_network(char *path)
     if (err != NO_ERROR)
     {
         fprintf(stderr, "\e[1;33m/!\\ error while reading network. Creating new one /!\\\e[0m\n");
-        uint16_t layers[] = { 60, 26 };
+        uint16_t layers[] = { HIDDEN_LAYER_COUNT, 26 };
 
         net = network_new(2, layers, IMAGE_SIZE * IMAGE_SIZE);
 
@@ -70,6 +76,10 @@ int main(int argc, char **argv)
 
     Batch *batch = images_to_batch(count, output);
 
+    printf("TrainingData infos: imageSize=%ux%u, setSize=%zu\n", IMAGE_SIZE, IMAGE_SIZE, count);
+    printf("Hyperparameters   : miniBatchSize=%i, eta=%.3f, lambda=%.3f\n", MINI_BATCH_SIZE, ETA, LAMBDA);
+    printf("ThreadCount: %u\n", THREAD_COUNT);
+
     if (batch == NULL)
     {
         errx(3, "batch is null");
@@ -82,7 +92,7 @@ int main(int argc, char **argv)
         errx(4, "network is null (main.c:%d)", __LINE__);
     }
 
-    printf("========= Running %u epochs ========\n", epochs);
+    printf("========= Running %zu epochs ========\n", epochs);
 
     printf("\n_________START________\n\n");
     printf(
@@ -97,7 +107,7 @@ int main(int argc, char **argv)
     pb_start();
 
     int res = stochastic_gradiant_descent(
-        network, batch, epochs, 32, 0.01f, 0.001f, NULL
+        network, batch, epochs, MINI_BATCH_SIZE, ETA, LAMBDA, NULL
     );
 
     pb_destroy();
