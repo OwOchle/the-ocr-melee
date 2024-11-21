@@ -17,10 +17,11 @@
 #define THREAD_COUNT 2
 
 // Hyper parameters
-#define ETA 5.0f
+#define ETA 0.05f
 #define LAMBDA 0.001f
-#define HIDDEN_LAYER_COUNT 30
-#define MINI_BATCH_SIZE 8
+#define HIDDEN_LAYER_COUNT1 100
+#define HIDDEN_LAYER_COUNT2 100
+#define MINI_BATCH_SIZE 32
 
 Network *get_network(char *path)
 {
@@ -30,9 +31,9 @@ Network *get_network(char *path)
     if (err != NO_ERROR)
     {
         fprintf(stderr, "\e[1;33m/!\\ error while reading network. Creating new one /!\\\e[0m\n");
-        uint16_t layers[] = { HIDDEN_LAYER_COUNT, 26 };
+        uint16_t layers[] = { HIDDEN_LAYER_COUNT1, HIDDEN_LAYER_COUNT2, 26 };
 
-        net = network_new(2, layers, IMAGE_SIZE * IMAGE_SIZE);
+        net = network_new(3, layers, IMAGE_SIZE * IMAGE_SIZE);
 
         network_init_gaussian(net);
     }
