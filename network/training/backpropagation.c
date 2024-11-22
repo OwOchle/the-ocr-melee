@@ -89,7 +89,7 @@ GradiantData *backprop(
 
         // Creating a z vector which is : weight[layer] * activation +
         // bias[layer]
-        Vector z_vector = mat_th_multiply(
+        Vector z_vector = matrix_multiply(
             pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
         );
         if (z_vector == NULL)
@@ -230,7 +230,7 @@ GradiantData *backprop(
             nextNodeCount, nodeCount, nextWeights, transposedNextWeights
         );
 
-        Vector newDelta = mat_th_multiply(
+        Vector newDelta = matrix_multiply(
             nextNodeCount, nodeCount, transposedNextWeights, 1, nextNodeCount,
             delta
         );

@@ -154,7 +154,7 @@ float *network_apply(Network *network, float *input)
 
         int nc = network->layers[l]->nodeCount;
 
-        float *tmp = mat_th_multiply(
+        float *tmp = matrix_multiply(
             prevSize, 1, mat, nc, prevSize, network->layers[l]->weights
         );
 

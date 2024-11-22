@@ -45,7 +45,7 @@ float *feedforward(Network *network, const float *input_data)
             pastNodeCount = network->layers[l - 1]->nodeCount;
         }
 
-        Vector dot = mat_th_multiply(
+        Vector dot = matrix_multiply(
             pastNodeCount, nodeCount, weights, 1, pastNodeCount, activation
         );
         if (dot == NULL)
