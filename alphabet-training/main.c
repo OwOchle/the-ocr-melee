@@ -1,20 +1,20 @@
 #include <err.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../network/evaluate.h"
+#include "../network/file_io.h"
+#include "../network/network.h"
 #include "../network/training/stochastic_gradient_descent.h"
 #include "../utils/matrix.h"
+#include "../utils/progress.h"
+#include "../utils/threaded_matrix.h"
 #include "../utils/verbose.h"
 #include "batch_conversion.h"
 #include "read_image.h"
-#include "../utils/threaded_matrix.h"
-#include "../network/file_io.h"
-#include "../network/network.h"
-#include "../utils/progress.h"
 
-#define THREAD_COUNT 1
+#define THREAD_COUNT 4
 
 // Hyper parameters
 #define ETA 0.05f
@@ -30,8 +30,11 @@ Network *get_network(char *path)
 
     if (err != NO_ERROR)
     {
-        fprintf(stderr, "\e[1;33m/!\\ error while reading network. Creating new one /!\\\e[0m\n");
-        uint16_t layers[] = { HIDDEN_LAYER_COUNT1, HIDDEN_LAYER_COUNT2, 26 };
+        fprintf(
+            stderr, "\e[1;33m/!\\ error while reading network. Creating new "
+                    "one /!\\\e[0m\n"
+        );
+        uint16_t layers[] = {HIDDEN_LAYER_COUNT1, HIDDEN_LAYER_COUNT2, 26};
 
         net = network_new(3, layers, IMAGE_SIZE * IMAGE_SIZE);
 
@@ -77,8 +80,14 @@ int main(int argc, char **argv)
 
     Batch *batch = images_to_batch(count, output);
 
-    printf("TrainingData infos: imageSize=%ux%u, setSize=%zu\n", IMAGE_SIZE, IMAGE_SIZE, count);
-    printf("Hyperparameters   : miniBatchSize=%i, eta=%.3f, lambda=%.3f\n", MINI_BATCH_SIZE, ETA, LAMBDA);
+    printf(
+        "TrainingData infos: imageSize=%ux%u, setSize=%zu\n", IMAGE_SIZE,
+        IMAGE_SIZE, count
+    );
+    printf(
+        "Hyperparameters   : miniBatchSize=%i, eta=%.3f, lambda=%.3f\n",
+        MINI_BATCH_SIZE, ETA, LAMBDA
+    );
     printf("ThreadCount: %u\n", THREAD_COUNT);
 
     if (batch == NULL)
@@ -127,7 +136,12 @@ int main(int argc, char **argv)
 
     if (err != NO_ERROR)
     {
-        fprintf(stderr, "\e[1;33m /!\\ error while reading network. error code: %d /!\\\e[0m\n", err);
+        fprintf(
+            stderr,
+            "\e[1;33m /!\\ error while reading network. error code: %d "
+            "/!\\\e[0m\n",
+            err
+        );
     }
 
     mat_th_destroy_threadpool();

@@ -16,7 +16,7 @@ debug-no-asan: CFLAGS += -g
 debug-no-asan: $(OBJS)
 	$(CC) $^ $(CFLAGS) -o training
 
-debug-optimized: CFLAGS += -O3 -D VERBOSE
+debug-optimized: CFLAGS += -O3 -D VERBOSE -g
 debug-optimized: $(OBJS)
 	$(CC) $(OBJS) $(CFLAGS) -o training
 
