@@ -14,7 +14,7 @@
 #include "../network/network.h"
 #include "../utils/progress.h"
 
-#define THREAD_COUNT 2
+#define THREAD_COUNT 1
 
 // Hyper parameters
 #define ETA 0.05f
