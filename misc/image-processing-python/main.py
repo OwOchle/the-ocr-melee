@@ -18,7 +18,7 @@ def load_image(filename : str, filepath : str = "../../assets/"):
 if __name__ == "__main__":
     # https://en.wikipedia.org/wiki/Gaussian_blur
     filepath = "../../assets/"
-    output_folder = "output/"
+    output_folder = "outputs/"
     filename = "image_lvl1_2.png"
 
     img = load_image(filename=filename)
