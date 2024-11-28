@@ -7,6 +7,7 @@
 #include "sobel.h"
 #include "line_detection.h"
 #include "threshold.h"
+#include "cutter.h"
 
 void save_surface(const char* file_name, SDL_Surface* image) {
     IMG_SavePNG(image, file_name);
@@ -61,6 +62,10 @@ int main(int argc, char** argv)
     save_surface("../outputs/output_sobel.png", surface);
 
     printf("image_processing: Saved sobel file in outputs folder.\n");
+
+    SDL_Surface *cropped = crop_surface(surface, 15, 15, 20, 20);
+
+    save_surface("../outputs/output_cropped.png", cropped);
     
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
