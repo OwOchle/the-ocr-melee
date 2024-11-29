@@ -19,14 +19,14 @@ if __name__ == "__main__":
     # https://en.wikipedia.org/wiki/Gaussian_blur
     filepath = "../../assets/"
     output_folder = "outputs/"
-    filename = "image_lvl1_2.png"
+    filename = "image_lvl4_1.png"
 
     img = load_image(filename=filename)
     
     
     
     # Radius is the size of the matrix
-    output_img = create_blurred_image(radius=3, sigma=1.5, image=img)
+    output_img = create_blurred_image(radius=2, sigma=1.5, image=img)
     cv2.imwrite(filename=f"{output_folder}output_grad_{filename}", img=output_img)
     
     
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     
     # Custom line detection algo. Takes the sobel and goes line by line to detect which lines have more than average number of white pixels.
     polar_lines_target = load_image(filename=f"output_sobel_{filename}", filepath=output_folder)
-    lines = detect_grid_lines_y(polar_lines_target, target=img)
-    lines = detect_grid_lines_x(polar_lines_target, target=lines)
+    lines = detect_grid_lines_y(polar_lines_target, target=img, line_width=5)
+    # lines = detect_grid_lines_x(polar_lines_target, target=lines,  line_width=3)
     
     cv2.imwrite(filename=f"{output_folder}output_lines_{filename}", img=lines)
 
