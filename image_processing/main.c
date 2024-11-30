@@ -2,12 +2,13 @@
 #include <SDL2/SDL_image.h>
 #include <err.h>
 
-#include "grayscale.h"
-#include "gaussian_blur.h"
-#include "sobel.h"
-#include "line_detection.h"
-#include "threshold.h"
 #include "gaussian_binary.h"
+#include "gaussian_blur.h"
+#include "grayscale.h"
+#include "line_detection.h"
+#include "objects_detection.h"
+#include "sobel.h"
+#include "threshold.h"
 
 void save_surface(const char* file_name, SDL_Surface* image) {
     IMG_SavePNG(image, file_name);
@@ -46,7 +47,7 @@ int main(int argc, char** argv)
 
     //surface_to_threshold(surface, 240); // Adjust the threshold as needed
     surface_to_gaussian_binary(surface, 2, 2, 3);
-    
+    surface_to_objects(surface);
 
     save_surface("../outputs/output_threshold.png", surface);
 
