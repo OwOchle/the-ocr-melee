@@ -7,6 +7,7 @@
 #include "sobel.h"
 #include "line_detection.h"
 #include "threshold.h"
+#include "gaussian_binary.h"
 
 void save_surface(const char* file_name, SDL_Surface* image) {
     IMG_SavePNG(image, file_name);
@@ -41,17 +42,22 @@ int main(int argc, char** argv)
     SDL_SetWindowSize(window,  surface->w, surface->h);
 
     surface_to_grayscale(surface);
+
+
+    //surface_to_threshold(surface, 240); // Adjust the threshold as needed
+    surface_to_gaussian_binary(surface, 2, 2, 3);
+    
+
+    save_surface("../outputs/output_threshold.png", surface);
+
+    printf("image_processing: Saved threshold file in outputs folder.\n");
+
     surface_to_blur(surface, 3, 2);
 
     save_surface("../outputs/output_blur.png", surface);
 
     printf("image_processing: Saved blured file in outputs folder.\n");
 
-    surface_to_threshold(surface, 240); // Adjust the threshold as needed
-
-    save_surface("../outputs/output_threshold.png", surface);
-
-    printf("image_processing: Saved threshold file in outputs folder.\n");
 
     float* gradient_magnitude = malloc(width * height * sizeof(float));
     float* gradient_direction = malloc(width * height * sizeof(float));
