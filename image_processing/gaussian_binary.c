@@ -85,3 +85,35 @@ void surface_to_gaussian_binary(SDL_Surface *surface, int maxValue, int radius, 
     SDL_BlitSurface(temp_surface, NULL, surface, NULL);
     SDL_FreeSurface(temp_surface);
 }
+
+void surface_to_simple_binary(SDL_Surface *surface, int threshold)
+{
+    int height = surface->h;
+    int width = surface->w;
+
+    // Process each pixel
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            Uint32 *pixel_ptr =
+                (Uint32 *)((Uint8 *)surface->pixels + y * surface->pitch +
+                           x * surface->format->BytesPerPixel);
+
+            Uint8 r, g, b;
+            SDL_GetRGB(*pixel_ptr, surface->format, &r, &g, &b);
+
+            // Simple averaging of RGB to get grayscale intensity
+            Uint8 intensity = (r + g + b) / 3;
+
+            // Simple binary threshold
+            Uint8 binary_value = (intensity > threshold) ? 255 : 0;
+
+            // Create binary pixel using the same color format
+            Uint32 new_pixel = SDL_MapRGB(
+                surface->format, binary_value, binary_value, binary_value
+            );
+            *pixel_ptr = new_pixel;
+        }
+    }
+}

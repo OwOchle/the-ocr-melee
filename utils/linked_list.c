@@ -1,7 +1,7 @@
 #include "linked_list.h"
 #include <stdlib.h>
 
-static Node *node_create(Pixel pixel)
+static Node *node_create(int x, int y)
 {
     Node *elm = malloc(sizeof(Node));
     elm->prev = malloc(sizeof(Node *));
@@ -9,14 +9,15 @@ static Node *node_create(Pixel pixel)
     elm->prev = NULL;
     elm->next = NULL;
 
-    elm->pixel = pixel;
+    elm->x = x;
+    elm->y = y;
 
     return elm;
 }
 
-void list_append(linkedList *li, Pixel pixel)
+void list_append(linkedList *li, int x, int y)
 {
-    Node *elm = node_create(pixel);
+    Node *elm = node_create(x, y);
 
     if (li->head == NULL && li->tail == NULL)
     { // Empty list

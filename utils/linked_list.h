@@ -11,14 +11,15 @@ struct Pixel
 {
     int x;
     int y;
-    Uint32 pixel;
+    Uint32 *pixel;
 };
 
 struct Node
 {
     Node *prev;
     Node *next;
-    Pixel pixel;
+    int x;
+    int y;
 };
 
 struct linkedList
@@ -27,9 +28,9 @@ struct linkedList
     Node *tail;
 };
 
-static Node *node_create(Pixel pixel);
+static Node *node_create(int x, int y);
 
-void list_append(linkedList *li, Pixel pixel);
+void list_append(linkedList *li, int x, int y);
 
 linkedList *list_create();
 
