@@ -5,7 +5,6 @@
 #include "gaussian_binary.h"
 #include "gaussian_blur.h"
 #include "grayscale.h"
-#include "line_detection.h"
 #include "objects_detection.h"
 #include "sobel.h"
 #include "threshold.h"
@@ -81,8 +80,6 @@ int main(int argc, char** argv)
     
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-    detect_grid_lines_y(surface, surface, 5);
-    detect_grid_lines_x(surface, surface, 4);
 
     SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
     SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -91,10 +88,6 @@ int main(int argc, char** argv)
     free(gradient_magnitude);
     free(gradient_direction);
 
-
-    save_surface("../outputs/output_lines.png", surface);
-
-    printf("image_processing: Saved lines file in outputs folder.");
 
     SDL_Event event;
     while (1)
