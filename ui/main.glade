@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkWindow" id="window0">
+    <property name="can-focus">False</property>
+    <property name="default-width">1080</property>
+    <property name="default-height">720</property>
+    <signal name="destroy" handler="exit_app" swapped="no"/>
+    <child>
+      <object class="GtkBox" id="box0">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="label0">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <attributes>
+              <attribute name="font-desc" value="Sans Bold 10"/>
+              <attribute name="style" value="oblique"/>
+              <attribute name="weight" value="bold"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button0">
+            <property name="label" translatable="yes">Click me for a cookie :3</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="margin-start">10</property>
+            <property name="margin-end">8</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">8</property>
+            <signal name="clicked" handler="button0_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="window1">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">YOOOOOOOOOOOO</property>
+    <property name="window-position">center</property>
+    <property name="default-width">900</property>
+    <property name="default-height">565</property>
+    <signal name="destroy" handler="exit_app" swapped="no"/>
+    <child>
+      <object class="GtkFixed" id="fixed1">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <child>
+          <object class="GtkButton">
+            <property name="label" translatable="yes">Solve!</property>
+            <property name="width-request">175</property>
+            <property name="height-request">45</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+          </object>
+          <packing>
+            <property name="x">15</property>
+            <property name="y">394</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label" translatable="yes">Automatic Rotation</property>
+            <property name="width-request">100</property>
+            <property name="height-request">45</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+          </object>
+          <packing>
+            <property name="x">15</property>
+            <property name="y">505</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton">
+            <property name="label" translatable="yes">Step by step</property>
+            <property name="width-request">175</property>
+            <property name="height-request">45</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+          </object>
+          <packing>
+            <property name="x">15</property>
+            <property name="y">450</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="height-request">80</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">THE OCR MELEE</property>
+            <attributes>
+              <attribute name="font-desc" value="Sans Bold 36"/>
+              <attribute name="style" value="normal"/>
+              <attribute name="weight" value="bold"/>
+              <attribute name="variant" value="title-caps"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">290</property>
+            <property name="y">14</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkFileChooserButton">
+            <property name="width-request">180</property>
+            <property name="height-request">35</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">
+</property>
+            <property name="title" translatable="yes"/>
+          </object>
+          <packing>
+            <property name="x">415</property>
+            <property name="y">450</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
