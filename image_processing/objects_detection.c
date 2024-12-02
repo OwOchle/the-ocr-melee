@@ -139,11 +139,16 @@ linkedList *surface_to_objects(SDL_Surface *surface)
     int height = surface->h;
     int width = surface->w;
 
+    linkedList *shape_list = list_create();
+
     // Create a temporary surface for the result
     SDL_Surface *marks_surface = SDL_CreateRGBSurface(
         0, width, height, 32, surface->format->Rmask, surface->format->Gmask,
         surface->format->Bmask, surface->format->Amask
     );
+
+    int sizes = 0;
+    int shapes_c = 0;
 
     // Process each pixel
     for (int y = 0; y < height; y++)
@@ -152,8 +157,6 @@ linkedList *surface_to_objects(SDL_Surface *surface)
         {
             if (is_valid(surface, marks_surface, x, y) == 1)
             {
-                // printf("x: %i y: %i | R: %i, G: %i, B: %i\n", x, y, r, g, b);
-
                 linkedList *list = list_create();
                 list_append(list, -42, -42);
                 if (x % 2 == 0)
@@ -168,9 +171,10 @@ linkedList *surface_to_objects(SDL_Surface *surface)
                         list, surface, marks_surface, x, y, 0, 36, 173, 164
                     );
                 }
-
+                // if not empty
                 if (list->tail->x != -42)
                 {
+                    list_append_shape(shape_list, list);
                     int max_x = -1;
                     int max_y = -1;
                     int min_x = -1;
@@ -200,16 +204,27 @@ linkedList *surface_to_objects(SDL_Surface *surface)
                         }
                         elm = elm->next;
                     }
-                    printf("(%i/%i)(%i/%i)\n", max_x, max_y, min_x, min_y);
+                    // Filtering 
+                    /*
+                    double ratio =  (double)((max_y-min_y) / (double)(max_x-min_x));
+                    if ( !((ratio >= 0.07 && ratio <= 2.0 ) && (double)(max_x-min_x) > 0.0)){
+                        printf("Width : %f\n", ratio);
+                    }
 
+                    
                     SDL_Color color = {255, 255, 255};
-
-                    if (max_x != -1)
+                    
+                    if (max_x != -1 && (ratio >= 0.07 && ratio <= 2. ))
                     {
-                        show_square(
+                        shapes_c +=1;
+                        sizes += max_x-min_x;
+                        //printf("Mean size : %i\n", (sizes/shapes_c));
+                        if(max_x - min_x <(sizes/shapes_c) + 20){
+                            show_square(
                             marks_surface, max_x, max_y, min_x, min_y, color
                         );
-                    }
+                        }
+                    }*/
                 }
             }
         }
@@ -218,4 +233,6 @@ linkedList *surface_to_objects(SDL_Surface *surface)
     // Copy back to original surface
     SDL_BlitSurface(marks_surface, NULL, surface, NULL);
     SDL_FreeSurface(marks_surface);
+
+    return shape_list;
 }

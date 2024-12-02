@@ -44,23 +44,30 @@ int main(int argc, char** argv)
 
     surface_to_grayscale(surface);
 
+    // Gaussian Blur
+    /*
+    surface_to_blur(surface, 2, 0.5); // 4 for lvl 2
+
+    save_surface("../outputs/output_blur.png", surface);
+
+    printf("image_processing: Saved blured file in outputs folder.\n");*/
+    
+    // Threshold
+
     // surface_to_threshold(surface, 240); // Adjust the threshold as needed
-    // surface_to_gaussian_binary(surface, 2, 2, 3);
+    //surface_to_gaussian_binary(surface, 2, 2, 3);
     surface_to_simple_binary(surface, 128);
 
     save_surface("../outputs/output_threshold.png", surface);
 
+    //Object detection
     surface_to_objects(surface);
 
     save_surface("../outputs/output_dfs.png", surface);
 
     printf("image_processing: Saved threshold file in outputs folder.\n");
 
-    surface_to_blur(surface, 3, 2);
 
-    save_surface("../outputs/output_blur.png", surface);
-
-    printf("image_processing: Saved blured file in outputs folder.\n");
 
 
     float* gradient_magnitude = malloc(width * height * sizeof(float));
