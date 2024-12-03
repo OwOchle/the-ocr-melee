@@ -8,6 +8,10 @@
 #include "objects_detection.h"
 #include "sobel.h"
 #include "threshold.h"
+#include "letter_filtering.h"
+
+#include "utils/shapes.h"
+#include "utils/linked_list.h"
 
 void save_surface(const char* file_name, SDL_Surface* image) {
     IMG_SavePNG(image, file_name);
@@ -58,13 +62,20 @@ int main(int argc, char** argv)
     surface_to_simple_binary(surface, 128);
 
     save_surface("../outputs/output_threshold.png", surface);
+    printf("image_processing: Saved threshold file in outputs folder.\n");
 
     //Object detection
-    surface_to_objects(surface);
+    linkedList* shapes = surface_to_objects(surface);
+    linkedList* filtered_shapes = filter_shapes(shapes);
+
+    SDL_Color color = {0,0,0};
+    show_shapes_boundings(surface, filtered_shapes, color);
+
 
     save_surface("../outputs/output_dfs.png", surface);
+    printf("image_processing: Saved DFS file in outputs folder.\n");
 
-    printf("image_processing: Saved threshold file in outputs folder.\n");
+    
 
 
 
@@ -88,7 +99,7 @@ int main(int argc, char** argv)
     free(gradient_magnitude);
     free(gradient_direction);
 
-
+    /*
     SDL_Event event;
     while (1)
     {
@@ -111,6 +122,6 @@ int main(int argc, char** argv)
                 }
                 break;
         }
-    }
+    }*/
     return EXIT_SUCCESS;
 }

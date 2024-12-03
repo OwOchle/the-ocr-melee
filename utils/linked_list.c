@@ -113,3 +113,18 @@ void list_free_shape(linkedList *li)
     free(li->head);
     free(li);
 }
+
+long get_shape_pixel_count(linkedList* shape){
+    long i = 0;
+    Node *elm = shape->head;
+
+    while (elm->next != NULL)
+    {
+        if (elm->x != -42 && elm->y != -42)
+        {
+            i++;   
+        }
+        elm = elm->next;
+    }
+    return i;
+}

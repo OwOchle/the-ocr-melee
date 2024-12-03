@@ -40,3 +40,5 @@ linkedList *list_create();
 
 void list_free(linkedList *li);
 void list_free_shape(linkedList *li);
+
+long get_shape_pixel_count(linkedList* shape);
