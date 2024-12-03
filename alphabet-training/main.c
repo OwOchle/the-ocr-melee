@@ -19,7 +19,7 @@
 // Hyper parameters
 #define ETA 0.025f
 #define LAMBDA 0.0f
-#define HIDDEN_LAYER_COUNT1 200
+#define HIDDEN_LAYER_COUNT1 100
 #define HIDDEN_LAYER_COUNT2 100
 #define MINI_BATCH_SIZE 64
 
@@ -81,11 +81,11 @@ int main(int argc, char **argv)
     Batch *batch = images_to_batch(count, output);
 
     printf(
-        "TrainingData infos: imageSize=%ux%u, setSize=%zu\n", IMAGE_SIZE,
+        "TrainingData infos:\n  imageSize=%ux%u\n  setSize=%zu\n", IMAGE_SIZE,
         IMAGE_SIZE, count
     );
     printf(
-        "Hyperparameters   : miniBatchSize=%i, eta=%.3f, lambda=%.3f\n",
+        "Hyperparameters:\n  miniBatchSize=%i\n  eta=%.3f\n  lambda=%.3f\n",
         MINI_BATCH_SIZE, ETA, LAMBDA
     );
     printf("ThreadCount: %u\n", THREAD_COUNT);
