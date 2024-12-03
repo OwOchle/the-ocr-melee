@@ -102,7 +102,7 @@ int accuracy(Network *network, Batch *training_data)
     {
         BatchLayer *layer = training_data->layers[i];
 
-        float *predicted_output = network_apply(network, layer->inputData);
+        float *predicted_output = feedforward(network, layer->inputData);
 
         int predicted_max = argmax(predicted_output, output_size);
         int actual_max = argmax(layer->outputData, output_size);
@@ -127,7 +127,7 @@ float total_cost(Network *network, Batch *batch, float lambda)
     for (size_t i = 0; i < batch_size; i++)
     {
         float *desired_output = batch->layers[i]->outputData;
-        float *output = network_apply(network, batch->layers[i]->inputData);
+        float *output = feedforward(network, batch->layers[i]->inputData);
 
         cost += cross_entropy_cost(output_size, output, desired_output) / batch_size;
 

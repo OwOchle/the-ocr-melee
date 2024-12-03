@@ -1,3 +1,4 @@
+#include "evaluate.h"
 #include "file_io.h"
 #include "network.h"
 #include "../utils/array.h"
@@ -41,7 +42,7 @@ int main()
     input[0] = 1.0f;
     input[1] = 0.0f;
 
-    float *out = network_apply(network, input);
+    float *out = feedforward(network, input);
 
     if (out == NULL)
     {
@@ -63,7 +64,7 @@ int main()
         errx(1, "Network reading failed with error %d", err);
     }
 
-    out = network_apply(networkX, input);
+    out = feedforward(networkX, input);
 
     if (out == NULL)
     {
