@@ -102,7 +102,7 @@ int accuracy(Network *network, Batch *training_data)
     {
         BatchLayer *layer = training_data->layers[i];
 
-        float *predicted_output = feedforward(network, layer->inputData);
+        float *predicted_output = network_apply(network, layer->inputData);
 
         int predicted_max = argmax(predicted_output, output_size);
         int actual_max = argmax(layer->outputData, output_size);
@@ -130,7 +130,7 @@ float binary_accuracy(Network *network, Batch *batch)
             "Taking %.0f and %.0f as input => %.0f\n", layer->inputData[0],
             layer->inputData[1], layer->outputData[0]
         );
-        float *predicted_output = feedforward(network, layer->inputData);
+        float *predicted_output = network_apply(network, layer->inputData);
         printf("Network thinks it is %f\n", predicted_output[0]);
 
         int predicted_proba = predicted_output[0] >= 0.5 ? 1 : 0;
@@ -157,7 +157,7 @@ float total_cost(Network *network, Batch *batch, float lambda)
     for (size_t i = 0; i < size; i++)
     {
         float *desired_output = batch->layers[i]->outputData;
-        float *output = feedforward(network, batch->layers[i]->inputData);
+        float *output = network_apply(network, batch->layers[i]->inputData);
 
         cost += cross_entropy_cost(output_size, output, desired_output) / size;
 

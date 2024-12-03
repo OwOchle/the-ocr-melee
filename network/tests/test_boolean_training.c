@@ -63,7 +63,7 @@ int main()
     test[0] = 1;
     test[1] = 0;
 
-    prediction = feedforward(network, test);
+    prediction = network_apply(network, test);
     if (!result)
     {
         errx(1, "Error evaluating the network");
