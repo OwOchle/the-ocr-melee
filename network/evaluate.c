@@ -121,15 +121,15 @@ int accuracy(Network *network, Batch *training_data)
 float total_cost(Network *network, Batch *batch, float lambda)
 {
     float cost = 0.0f;
-    uint16_t size = batch->batchSize;
+    uint16_t batch_size = batch->batchSize;
 
     uint16_t output_size = network->layers[network->layerCount - 1]->nodeCount;
-    for (size_t i = 0; i < size; i++)
+    for (size_t i = 0; i < batch_size; i++)
     {
         float *desired_output = batch->layers[i]->outputData;
         float *output = network_apply(network, batch->layers[i]->inputData);
 
-        cost += cross_entropy_cost(output_size, output, desired_output) / size;
+        cost += cross_entropy_cost(output_size, output, desired_output) / batch_size;
 
         free(output);
     }
@@ -148,7 +148,7 @@ float total_cost(Network *network, Batch *batch, float lambda)
             }
         }
     }
-    cost += 0.5f * (lambda / size) * linear_norm;
+    cost += 0.5f * (lambda / batch_size) * linear_norm;
 
     return cost;
 }
