@@ -34,11 +34,6 @@ SDL_Surface *crop_surface(SDL_Surface *input, size_t in_x, size_t in_y, size_t w
 
             *output_pixel = *input_pixel;
 
-            printf(
-                "replacing pixel of output %d-%d by pixel of input %d-%d\n",
-                x, y, x+in_x, y+in_y
-            );
-
             fflush(stdout);
         }
     }

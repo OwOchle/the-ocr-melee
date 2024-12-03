@@ -9,6 +9,7 @@
 #include "sobel.h"
 #include "threshold.h"
 #include "letter_filtering.h"
+#include "auto_rotate.h"
 
 #include "utils/shapes.h"
 #include "utils/linked_list.h"
@@ -39,7 +40,7 @@ int main(int argc, char** argv)
     if (t == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     SDL_Surface *surface = SDL_ConvertSurfaceFormat(t, SDL_PIXELFORMAT_RGB888, 0);
-    SDL_FreeSurface(t);
+    
     if (surface == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
@@ -68,6 +69,13 @@ int main(int argc, char** argv)
 
     //Object detection
     linkedList* shapes = surface_to_objects(surface);
+
+    printf("Should be rotated by %d\n", determine_rotation(surface, shapes));
+
+    SDL_FreeSurface(t);
+
+    return 0;
+
     linkedList* filtered_shapes = filter_shapes(shapes);
 
     SDL_Color color = {0,0,0};
@@ -76,10 +84,6 @@ int main(int argc, char** argv)
 
     save_surface("../outputs/output_dfs.png", surface);
     printf("image_processing: Saved DFS file in outputs folder.\n");
-
-    
-
-
 
 
     float* gradient_magnitude = malloc(width * height * sizeof(float));
