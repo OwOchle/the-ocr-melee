@@ -13,9 +13,9 @@ float cross_entropy_cost(
         float ai = activation[i];
         float yi = desired_data[i];
 
-        if (ai == 0.0)
+        if (ai <= 0.0)
             ai = 1e-10;
-        if (ai == 1.0)
+        if (ai >= 1.0)
             ai = 1.0 - 1e-10;
 
         float term1 = -yi * log(ai);
