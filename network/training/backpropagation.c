@@ -1,11 +1,11 @@
 #include "backpropagation.h"
 
-#include "../../utils/array.h"
+// #include "../../utils/array.h"
 #include "../../utils/matrix.h"
 #include "../network.h"
 #include "../network_utils/activation_functions.h"
 #include "../network_utils/cost_functions.h"
-#include "utils/threaded_matrix.h"
+// #include "../../utils/threaded_matrix.h"
 
 #include <stdio.h>
 #include <stdlib.h>

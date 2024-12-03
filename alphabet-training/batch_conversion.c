@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include "batch_conversion.h"
-#include "network/network_utils/batch.h"
-#include "utils/verbose.h"
+#include "../network/network_utils/batch.h"
+#include "../utils/verbose.h"
 
 float *to_float_array(size_t size, uchar *array)
 {

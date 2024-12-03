@@ -9,8 +9,8 @@
 #include <unistd.h>
 
 #include "read_image.h"
-#include "utils/array.h"
-#include "utils/verbose.h"
+// #include "../utils/array.h"
+#include "../utils/verbose.h"
 
 regex_t filename_regex;
 

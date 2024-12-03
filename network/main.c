@@ -1,7 +1,7 @@
 #include "file_io.h"
 #include "network.h"
-#include "utils/array.h"
-#include "utils/matrix.h"
+#include "../utils/array.h"
+// #include "../utils/matrix.h"
 
 #include <err.h>
 #include <errno.h>

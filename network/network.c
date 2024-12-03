@@ -1,7 +1,7 @@
 #include "network.h"
 #include "../utils/matrix.h"
 #include "network_utils/activation_functions.h"
-#include "utils/threaded_matrix.h"
+// #include "../utils/threaded_matrix.h"
 
 #include <err.h>
 #include <math.h>

@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <stdlib.h>
 
 #define IMAGE_SIZE 20
 #define uchar unsigned char

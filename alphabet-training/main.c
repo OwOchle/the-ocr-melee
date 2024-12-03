@@ -14,14 +14,14 @@
 #include "batch_conversion.h"
 #include "read_image.h"
 
-#define THREAD_COUNT 4
+#define THREAD_COUNT 1
 
 // Hyper parameters
-#define ETA 0.05f
-#define LAMBDA 0.001f
-#define HIDDEN_LAYER_COUNT1 100
+#define ETA 0.025f
+#define LAMBDA 0.0f
+#define HIDDEN_LAYER_COUNT1 200
 #define HIDDEN_LAYER_COUNT2 100
-#define MINI_BATCH_SIZE 32
+#define MINI_BATCH_SIZE 64
 
 Network *get_network(char *path)
 {

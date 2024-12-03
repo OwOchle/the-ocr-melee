@@ -7,8 +7,8 @@
 
 #include "update_mini_batch.h"
 
-#include "utils/progress.h"
-#include "utils/verbose.h"
+#include "../../utils/progress.h"
+// #include "../../utils/verbose.h"
 
 #include <stdint.h>
 #include <stdio.h>

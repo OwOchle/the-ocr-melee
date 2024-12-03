@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "utils/threaded_matrix.h"
-#include "utils/matrix.h"
+#include "../../utils/threaded_matrix.h"
+#include "../../utils/matrix.h"
 
 float float_rand( float min, float max )
 {
@@ -58,7 +58,7 @@ int main()
 
     clock_gettime(CLOCK_MONOTONIC, &start_th);
 
-    float *res_th = mat_th_multiply_matrix(width1, height1, mat1, width2, height2, mat2);
+    float *res_th = mat_th_multiply(width1, height1, mat1, width2, height2, mat2);
 
     struct timespec end_th;
 
