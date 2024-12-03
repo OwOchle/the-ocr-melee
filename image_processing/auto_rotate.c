@@ -8,6 +8,7 @@
 #include "auto_rotate.h"
 #include "cutter.h"
 #include "utils/array.h"
+#include "ht_line_detection.h"
 
 #define get_as_matrix_ptr(array, width, x, y) (array + (y * width) + x)
 #define get_as_matrix(array, width, x, y) array[((y) * width) + (x)]
@@ -109,8 +110,42 @@ int is_a_matching(linkedList *shape)
     return false;
 }
 
+uint8_t *to_list(SDL_Surface *image)
+{
+    uint8_t *result = malloc(image->w * image->h * sizeof(uint8_t));
+
+    for (size_t y = 0; y < image->h; y++)
+    {
+        for (size_t x = 0; x < image->w; x++)
+        {
+            Uint32 *input_pixel = image->pixels + 
+                (y) * image->pitch + 
+                (x) * sizeof(*input_pixel);
+
+            get_as_matrix(result, image->w, x, y) = *input_pixel > 0 ? 0 : 255;
+        }
+    }
+
+    return result;
+}
+
 int determine_rotation(SDL_Surface *image, linkedList *shapes)
 {
+    uint8_t *img = to_list(image);
+
+    struct line_parameter *lines = malloc(100000 * sizeof(struct line_parameter));
+    int line_count = 0;
+
+    HTLineDetection(img, &line_count, lines, image->w, image->h);
+
+    for (int i = 0; i < line_count; i++)
+    {
+        if (lines->distance == 0) continue;
+        printf("%d | angle: %f, distance: %f\n", i, lines->angle, lines->distance);
+    }
+    free(img);
+    free(lines);
+    return 0;
     ShapeBoundingBox *bouding_box;
 
     Node *p = shapes->head;

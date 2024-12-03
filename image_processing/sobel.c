@@ -102,6 +102,7 @@ void surface_to_sobel(SDL_Surface *surface, float* gradient_magnitude, float* gr
             }
         }
     }
+    
     SDL_BlitSurface(temp_surface, NULL, surface, NULL);
     SDL_FreeSurface(temp_surface);
 }
