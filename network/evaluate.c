@@ -118,36 +118,6 @@ int accuracy(Network *network, Batch *training_data)
     return count;
 }
 
-float binary_accuracy(Network *network, Batch *batch)
-{
-    int count = 0;
-
-    for (uint16_t i = 0; i < batch->batchSize; i++)
-    {
-        BatchLayer *layer = batch->layers[i];
-
-        printf(
-            "Taking %.0f and %.0f as input => %.0f\n", layer->inputData[0],
-            layer->inputData[1], layer->outputData[0]
-        );
-        float *predicted_output = network_apply(network, layer->inputData);
-        printf("Network thinks it is %f\n", predicted_output[0]);
-
-        int predicted_proba = predicted_output[0] >= 0.5 ? 1 : 0;
-
-        int actual_proba = layer->outputData[0] >= 0.5 ? 1 : 0;
-
-        if (predicted_proba == actual_proba)
-        {
-            count++;
-        }
-
-        free(predicted_output);
-    }
-
-    return count;
-}
-
 float total_cost(Network *network, Batch *batch, float lambda)
 {
     float cost = 0.0f;

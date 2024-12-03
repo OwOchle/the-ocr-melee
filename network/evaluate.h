@@ -11,9 +11,7 @@
  */
 float *feedforward(Network *network, const float *input_data);
 
-int accuracy(Network *network, Batch *training_data);
 int argmax(const float *array, uint16_t length);
-
-float binary_accuracy(Network *network, Batch *batch);
+int accuracy(Network *network, Batch *training_data);
 
 float total_cost(Network *network, Batch *batch, float lambda);
