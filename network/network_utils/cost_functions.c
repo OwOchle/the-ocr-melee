@@ -18,7 +18,15 @@ float cross_entropy_cost(
         if (ai == 1.0)
             ai = 1.0 - 1e-10;
 
-        cost += -yi * log(ai) - (1 - yi) * log(1 - ai);
+        float term1 = -yi * log(ai);
+        float term2 = -(1.0 - yi) * log(1.0 - ai);
+
+        if (isnan(term1) || isinf(term1))
+            term1 = 0.0;
+        if (isnan(term2) || isinf(term2))
+            term2 = 0.0;
+
+        cost += term1 + term2;
     }
 
     return cost;
