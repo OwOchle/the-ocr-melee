@@ -23,18 +23,21 @@ int update_mini_batch(
         printf("Update_mini_batch Error: mini_batch is NULL\n");
         return 0;
     }
+
+    // Constants
     const char layerCount = network->layerCount;
     const uint16_t input_size = network->entryCount;
     const uint16_t output_size = network->layers[layerCount - 1]->nodeCount;
     uint16_t batch_size = mini_batch->batchSize;
 
-    // printf("Beginning alloc gradiant.\n");
-
+    // Update Time
     GradiantData *gradiant = gradiant_new(network);
+    if (gradiant == NULL)
+    {
+        printf("An error occured: gradiant_new()\n");
+        return NULL;
+    }
 
-    // printf("  - Allocation of gradiant successfull\n\nBeginning
-    // Accumulation.\n"
-    // );
     for (size_t tupleIdx = 0; tupleIdx < batch_size; tupleIdx++)
     {
         // printf("  - Beginning Summation of tuple[%zu]\n", tupleIdx);
@@ -111,6 +114,11 @@ int update_mini_batch(
             pastNodeCount = network->layers[l - 1]->nodeCount;
         }
 
+        printf(
+            "Before weight[2][2]=%f\n",
+            array_get_as_matrix(weightLayer, nodeCount, 2, 2)
+        );
+
         for (size_t y = 0; y < nodeCount; y++)
         {
             for (size_t x = 0; x < pastNodeCount; x++)
@@ -126,11 +134,12 @@ int update_mini_batch(
                     weightDecayFactor * weight - learningRate * gradiantWeight;
             }
         }
-
-        // printf("      - Trained the weights\n");
+        printf(
+            "After weight[2][2]=%f\n",
+            array_get_as_matrix(weightLayer, nodeCount, 2, 2)
+        );
 
         // Bias Update
-
         Vector biasLayer = network->layers[l]->bias;
         Vector gradiantBiasLayer = gradiant->layers[l]->bias;
 

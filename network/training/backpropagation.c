@@ -23,14 +23,15 @@ GradiantData *backprop(
     const uint16_t input_size = network->entryCount;
     const uint16_t output_size = network->layers[layerCount - 1]->nodeCount;
 
-
     GradiantData *gradiant = gradiant_new(network);
     if (gradiant == NULL)
     {
         return NULL;
     }
 
-    verbose_printf("  - Allocation of gradiant successfull\n\nBeginning feedforward.\n");
+    verbose_printf(
+        "  - Allocation of gradiant successfull\n\nBeginning feedforward.\n"
+    );
 
     // feedforward
 
@@ -51,10 +52,9 @@ GradiantData *backprop(
     activation_matrix[0] = activation;
 
     // Used to store intermediary values before the activation
-        float **z_matrix = calloc(layerCount, sizeof(float *));
+    float **z_matrix = calloc(layerCount, sizeof(float *));
     if (z_matrix == NULL)
         return NULL;
-
 
     for (size_t l = 0; l < layerCount; l++)
     {
@@ -116,11 +116,14 @@ GradiantData *backprop(
         // printf("    - Created an activation vector.\n");
     }
 
-    verbose_printf("  - Feedforward successfull!\n\nBeginning backward pass!\n");
+    verbose_printf("  - Feedforward successfull!\n\nBeginning backward pass!\n"
+    );
 
     // backward pass
 
-    verbose_printf("  - Beginning the output layer with node count %u\n", output_size);
+    verbose_printf(
+        "  - Beginning the output layer with node count %u\n", output_size
+    );
 
     const uint16_t beforeOutputLayerCount =
         network->layers[layerCount - 2]->nodeCount;
@@ -161,11 +164,11 @@ GradiantData *backprop(
         return NULL;
     }
 
-
     free(gradiant->layers[layerCount - 1]->weights);
     gradiant->layers[layerCount - 1]->weights = activated_delta;
 
-    verbose_printf("    - Saved the output delta vector to gradiant weights.\n");
+    verbose_printf("    - Saved the output delta vector to gradiant weights.\n"
+    );
 
     // Warning: Math ahead, I won't be of any help
     // backward pass so we are doing layers backwards
@@ -188,19 +191,20 @@ GradiantData *backprop(
             pastNodeCount = network->layers[l - 1]->nodeCount;
         }
 
-        // printf("  - Beginning layer %hhi with node count %u\n", l,
-        // nodeCount);
+        verbose_printf(
+            "  - Beginning layer %hhi with node count %u\n", l, nodeCount
+        );
 
         Vector z = z_matrix[l];
 
         // array_print(nodeCount, z);
-        Vector sp = calloc(nodeCount, sizeof(float));
-        if (sp == NULL)
+        Vector sig_prime = calloc(nodeCount, sizeof(float));
+        if (sig_prime == NULL)
         {
             printf("    ~ Error while alloc sigmoid prime.\n");
             return NULL;
         }
-        sigmoid_prime(nodeCount, z, sp);
+        sigmoid_prime(nodeCount, z, sig_prime);
 
         // printf("    - Created sigmoid prime vector.\n");
 
@@ -217,32 +221,28 @@ GradiantData *backprop(
             nextNodeCount, nodeCount, nextWeights, transposedNextWeights
         );
 
-        Vector newDelta = matrix_multiply(
+        Vector new_delta = matrix_multiply(
             nextNodeCount, nodeCount, transposedNextWeights, 1, nextNodeCount,
             delta
         );
-        if (newDelta == NULL)
+        if (new_delta == NULL)
         {
             printf("    ~ Error while mult delta vector.\n");
             return NULL;
         }
         for (size_t j = 0; j < nodeCount; j++)
         {
-            newDelta[j] = newDelta[j] * sp[j];
+            new_delta[j] = new_delta[j] * sig_prime[j];
         }
 
-        // printf("    - Successfully created delta vector.\n");
-
-        free(sp);
+        free(sig_prime);
         free(transposedNextWeights);
 
-        delta = newDelta;
+        delta = new_delta;
 
         // Saving to gradiant bias
         free(gradiant->layers[l]->bias);
         gradiant->layers[l]->bias = delta;
-
-        // printf("    - Saved delta vector to gradiant bias.\n");
 
         // Saving to gradiant weights
         /* Matrix activated_delta = matrix_multiply(
@@ -271,52 +271,6 @@ GradiantData *backprop(
     // printf("  - Freeing Pointers successfull!\n\nBack Prop done!\n");
 
     return gradiant;
-}
-
-float **alloc_z_matrix(const Network *network)
-{
-    size_t layerCount = network->layerCount;
-
-    float **z_matrix = calloc(layerCount, sizeof(float *));
-    if (z_matrix == NULL)
-    {
-        return NULL;
-    }
-
-    for (size_t i = 0; i < layerCount; i++)
-    {
-        z_matrix[i] = calloc(network->layers[i]->nodeCount, sizeof(float));
-        if (z_matrix[i] == NULL)
-        {
-            return NULL;
-        }
-    }
-
-    return z_matrix;
-}
-
-float **alloc_activation_matrix(const Network *network)
-{
-    size_t layerCount = network->layerCount;
-
-    float **act_matrix = calloc(layerCount + 1, sizeof(float *));
-    if (act_matrix == NULL)
-    {
-        return NULL;
-    }
-
-    act_matrix[0] = calloc(network->entryCount, sizeof(float));
-    for (size_t i = 0; i < layerCount; i++)
-    {
-        act_matrix[i + 1] =
-            calloc(network->layers[i]->nodeCount, sizeof(float));
-        if (act_matrix[i + 1] == NULL)
-        {
-            return NULL;
-        }
-    }
-
-    return act_matrix;
 }
 
 void free_z_matrix(float **z_matrix, const Network *network)

@@ -109,7 +109,7 @@ int accuracy(Network *network, Batch *training_data)
 
         if (predicted_max == actual_max)
         {
-            ++count;
+            count++;
         }
 
         free(predicted_output);
@@ -129,7 +129,8 @@ float total_cost(Network *network, Batch *batch, float lambda)
         float *desired_output = batch->layers[i]->outputData;
         float *output = feedforward(network, batch->layers[i]->inputData);
 
-        cost += cross_entropy_cost(output_size, output, desired_output) / batch_size;
+        cost += cross_entropy_cost(output_size, output, desired_output) /
+                batch_size;
 
         free(output);
     }
@@ -143,7 +144,9 @@ float total_cost(Network *network, Batch *batch, float lambda)
         {
             for (size_t k = 0; k < nextLayer->nodeCount; k++)
             {
-                float weight = array_get_as_matrix(layer->weights, nextLayer->nodeCount, j, k);
+                float weight = array_get_as_matrix(
+                    layer->weights, nextLayer->nodeCount, j, k
+                );
                 linear_norm += weight * weight;
             }
         }
