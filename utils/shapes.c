@@ -51,13 +51,15 @@ void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color col
 
 void show_shapes_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color){
     Node *elm = shape->head;
-    while (elm->next != NULL)
+    if (shape-> head != NULL){
+        while (elm->next != NULL)
     {
         if (elm->x != -42 && elm->y != -42)
         {
             show_shape_boundings(surface, elm->shape, color);
         }
         elm = elm->next;
+    }
     }
 }
 
