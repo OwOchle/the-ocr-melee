@@ -1,6 +1,6 @@
 CC = gcc
 PKGS = gtk+-3.0
-CFLAGS = `pkg-config --cflags --libs $(PKGS)` -export-dynamic
+CFLAGS = `pkg-config --cflags --libs $(PKGS)` -export-dynamic -rdynamic
 OBJS = main.o
 
 debug: CFLAGS += -fsanitize=address -g

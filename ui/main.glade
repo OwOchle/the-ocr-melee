@@ -85,6 +85,7 @@
             <property name="tooltip-text" translatable="yes">
 </property>
             <property name="title" translatable="yes"/>
+            <signal name="file-set" handler="on_fileImport_set" swapped="no"/>
           </object>
           <packing>
             <property name="x">415</property>
@@ -97,7 +98,6 @@
             <property name="height-request">320</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="stock">gtk-missing-image</property>
           </object>
           <packing>
             <property name="x">270</property>

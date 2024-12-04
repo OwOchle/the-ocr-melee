@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 GtkWidget *mainWindow = NULL;
+// GtkWidget *mylabel = NULL;
+GtkImage *mainImage = NULL;
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +14,9 @@ int main(int argc, char *argv[])
     gtk_builder_add_from_file(builder, "main.glade", NULL);
 
     mainWindow = GTK_WIDGET(gtk_builder_get_object(builder, "mainWindow"));
+    // mylabel = GTK_WIDGET(gtk_builder_get_object(builder, "label0"));
+    mainImage = GTK_IMAGE(gtk_builder_get_object(builder, "mainImage"));
+
 
     gtk_builder_connect_signals(builder, NULL);
     g_object_unref(builder);
@@ -60,4 +65,11 @@ void stepButton_clicked() // Bouton qui solve en montrant chaque étape
     printf("------------------------------------------\n");
     printf("Solving:\nStep 1 : ...\nStep 2 : ...\nStep 3 : ...\n");
     printf("------------------------------------------\n");
+}
+
+void on_fileImport_set(GtkFileChooserButton *file)
+{
+    char *str = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
+    printf("imported file name = %s\n", str);
+    gtk_image_set_from_file(mainImage,str);
 }
