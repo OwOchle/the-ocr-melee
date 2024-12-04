@@ -70,15 +70,15 @@ int main(int argc, char** argv)
     //Object detection
     linkedList* shapes = surface_to_objects(surface);
 
-    printf("Should be rotated by %d\n", determine_rotation(surface, shapes));
+    /*printf("Should be rotated by %d\n", determine_rotation(surface, shapes));
 
     SDL_FreeSurface(t);
 
-    return 0;
+    return 0;*/
 
     linkedList* filtered_shapes = filter_shapes(shapes);
 
-    SDL_Color color = {0,0,0};
+    SDL_Color color = {89, 67, 167};
     show_shapes_boundings(surface, filtered_shapes, color);
 
 
