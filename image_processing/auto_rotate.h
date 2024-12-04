@@ -6,4 +6,4 @@
 #include "utils/shapes.h"
 
 
-int determine_rotation(SDL_Surface *image, linkedList *shapes);
+int determine_rotation(SDL_Surface *threasholded, linkedList *shapes);

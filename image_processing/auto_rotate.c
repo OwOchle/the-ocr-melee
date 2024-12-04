@@ -8,7 +8,8 @@
 #include "auto_rotate.h"
 #include "cutter.h"
 #include "utils/array.h"
-#include "ht_line_detection.h"
+#include "hough_lines.h"
+#include "sobel.h"
 
 #define get_as_matrix_ptr(array, width, x, y) (array + (y * width) + x)
 #define get_as_matrix(array, width, x, y) array[((y) * width) + (x)]
@@ -110,9 +111,9 @@ int is_a_matching(linkedList *shape)
     return false;
 }
 
-uint8_t *to_list(SDL_Surface *image)
+bool *to_list(SDL_Surface *image)
 {
-    uint8_t *result = malloc(image->w * image->h * sizeof(uint8_t));
+    bool *result = malloc(image->w * image->h * sizeof(bool));
 
     for (size_t y = 0; y < image->h; y++)
     {
@@ -122,27 +123,36 @@ uint8_t *to_list(SDL_Surface *image)
                 (y) * image->pitch + 
                 (x) * sizeof(*input_pixel);
 
-            get_as_matrix(result, image->w, x, y) = *input_pixel > 0 ? 0 : 255;
+            get_as_matrix(result, image->w, x, y) = *input_pixel > 0 ? true : false;
         }
     }
 
     return result;
 }
 
-int determine_rotation(SDL_Surface *image, linkedList *shapes)
+int determine_rotation(SDL_Surface *threasholded, linkedList *shapes)
 {
-    uint8_t *img = to_list(image);
+    SDL_Surface *sobel = SDL_CreateRGBSurface(0, threasholded->w, threasholded->h, 32,
+                                                threasholded->format->Rmask,
+                                                threasholded->format->Gmask,
+                                                threasholded->format->Bmask,
+                                                threasholded->format->Amask);
+    
 
-    struct line_parameter *lines = malloc(100000 * sizeof(struct line_parameter));
-    int line_count = 0;
+    SDL_BlitSurface(threasholded, NULL, sobel, NULL);
+    bool *img = to_list(sobel);
 
-    HTLineDetection(img, &line_count, lines, image->w, image->h);
+    SDL_FreeSurface(sobel);
+
+    line_t *lines;
+
+    size_t line_count = hough_lines(img, threasholded->w, threasholded->h, &lines);
 
     for (int i = 0; i < line_count; i++)
     {
-        if (lines->distance == 0) continue;
-        printf("%d | angle: %f, distance: %f\n", i, lines->angle, lines->distance);
+        printf("%03d | angle: %f, distance: %f\n", i, lines[i].theta, lines[i].rho);
     }
+
     free(img);
     free(lines);
     return 0;
@@ -157,7 +167,7 @@ int determine_rotation(SDL_Surface *image, linkedList *shapes)
             ShapeBoundingBox *bb = get_shape_boundings(p->shape);
             char *name;
             asprintf(&name, "../outputs/matching_a/%d-%d-%d-%d.png", bb->min_x, bb->min_y, bb->max_x, bb->max_y);
-            save_surface(name, crop_surface(image, bb->min_x, bb->min_y, bb->max_x - bb->min_x, bb->max_y - bb->min_y));
+            save_surface(name, crop_surface(threasholded, bb->min_x, bb->min_y, bb->max_x - bb->min_x, bb->max_y - bb->min_y));
 
             free(name);
             free(bb);
