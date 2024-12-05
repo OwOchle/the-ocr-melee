@@ -2,6 +2,7 @@
 #include "linked_list.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <stdbool.h>
 
 void show_bounding_box(
     SDL_Surface *surface, int x1, int y1, int x2, int y2, SDL_Color color
@@ -99,4 +100,28 @@ ShapeBoundingBox* get_shape_boundings(linkedList *shape){
     shape_box->min_x = min_x;
     shape_box->min_y = min_y;
     return shape_box;
+}
+
+void get_shape_center(int* x, int* y, ShapeBoundingBox* shape_boundings){
+    *x = (shape_boundings->max_x - shape_boundings->max_y)/2;
+    *y = (shape_boundings->max_y - shape_boundings->min_y)/2;
+}
+
+bool is_in_shape_bounds(int x, int y, ShapeBoundingBox* shape_boudings){
+    if ((x >= shape_boudings->min_x && x <= shape_boudings->max_x) && (y >= shape_boudings->min_y && y <= shape_boudings->max_x)){
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool is_in_shape(int x, int y, linkedList* shape){
+    ShapeBoundingBox* shape_boundings = get_shape_boundings(shape);
+
+    bool status = is_in_shape_bounds(x,y, shape_boundings);
+
+    free(shape_boundings);
+    return status;
 }

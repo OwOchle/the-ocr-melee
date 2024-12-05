@@ -22,6 +22,7 @@ struct Node
     int x;
     int y;
     linkedList *shape;
+    ShapeBoundingBox* shape_bounding_box;
 };
 
 struct linkedList

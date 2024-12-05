@@ -6,11 +6,13 @@
 #include <err.h>
 #include <stdbool.h>
 
-bool is_shape_in_main_grid(linkedList* shape, long avg_width, long avg_height, long avg_ratio, int width, int height, double ratio, linkedList* shapes) {
+
+bool is_shape_in_main_grid(linkedList* shape, long avg_width, long avg_height, long avg_ratio, double avg_density, int width, int height, double ratio, double density, linkedList* shapes) {
     ShapeBoundingBox* shape_box = get_shape_boundings(shape);
 
-    bool size_match = (width >= avg_width * 0.4 && width <= avg_width * 1.8) || (height >= avg_height * 0.4 && height <= avg_height * 1.3);
-    bool ratio_match = (ratio >= avg_ratio * 0.2 && ratio <= avg_ratio * 2);
+    bool size_match = (width >= avg_width * 0.4 && width <= avg_width * 1.6) || (height >= avg_height * 0.4 && height <= avg_height * 1.3);
+    bool ratio_match = (ratio >= avg_ratio * 0.5 && ratio <= avg_ratio * 1.8);
+    bool density_match = (density >= avg_density*0.2);
 
     bool is_in_grid = false;
     Node* elm = shapes->head;
@@ -20,7 +22,7 @@ bool is_shape_in_main_grid(linkedList* shape, long avg_width, long avg_height, l
             int dx = abs(shape_box->min_x - other_box->min_x);
             int dy = abs(shape_box->min_y - other_box->min_y);
 
-            if (dx < avg_width && dy < avg_height) {
+            if (dx <= width && dy <= height) {
                 is_in_grid = true;
                 break;
             }
@@ -56,6 +58,8 @@ linkedList* filter_shapes(linkedList* shapes){
         {
             shape_count++;
             ShapeBoundingBox* shape_box = get_shape_boundings(elm->shape);
+            elm->shape_bounding_box = shape_box;
+
             int width = shape_box->max_x - shape_box->min_x;
             int height = shape_box->max_y - shape_box->min_y;
 
@@ -67,7 +71,10 @@ linkedList* filter_shapes(linkedList* shapes){
             pixel_sum += pixel_c;
             width_sum += width;
             height_sum += height;
-            ratio_sum += ratio;
+            if (ratio > 0.00000 && ratio < 100.0){ // remove Nan and Inf
+                ratio_sum += ratio;
+                //printf("Ratio : %f\n", ratio);
+            }
             area_sum += area;
         }
         elm = elm->next;
@@ -82,18 +89,22 @@ linkedList* filter_shapes(linkedList* shapes){
     elm = shapes->head;
     while (elm->next != NULL)
     {
-        ShapeBoundingBox* shape_box = get_shape_boundings(elm->shape);
-        int width = shape_box->max_x - shape_box->min_x;
-        int height = shape_box->max_y - shape_box->min_y;
+        if (elm->shape_bounding_box == NULL){
+            ShapeBoundingBox* shape_box = get_shape_boundings(elm->shape);
+            elm->shape_bounding_box = shape_box;
+        }
+        int width = elm->shape_bounding_box->max_x - elm->shape_bounding_box->min_x;
+        int height = elm->shape_bounding_box->max_y - elm->shape_bounding_box->min_y;
 
-        double ratio =  (double)((shape_box->max_y-shape_box->min_y) / (double)(shape_box->max_x-shape_box->min_x));
-        double area = (shape_box->max_y-shape_box->min_y) * (shape_box->max_x-shape_box->min_x);
+        double ratio =  (double)((elm->shape_bounding_box->max_y-elm->shape_bounding_box->min_y) / (double)(elm->shape_bounding_box->max_x-elm->shape_bounding_box->min_x));
+        double area = (elm->shape_bounding_box->max_y-elm->shape_bounding_box->min_y) * (elm->shape_bounding_box->max_x-elm->shape_bounding_box->min_x);
 
         long pixel_c =  get_shape_pixel_count(elm->shape);
+        double density = (double)(area/pixel_c);
 
         if (elm->x != -42 && elm->y != -42)
         {   
-           if (is_shape_in_main_grid(elm->shape, avg_width, avg_height, avg_ratio, width, height, ratio, shapes)){
+           if (is_shape_in_main_grid(elm->shape, avg_width, avg_height, avg_ratio, avg_density, width, height, ratio, density, shapes)){
             list_append_shape(filtered_shapes, elm->shape);
            }
         }

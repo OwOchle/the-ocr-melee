@@ -11,4 +11,4 @@
 
 linkedList* filter_shapes(linkedList* shapes);
 
-bool is_shape_in_main_grid(linkedList* shape, long avg_width, long avg_height, long avg_ratio, int width, int height, double ratio, linkedList* shapes);
+bool is_shape_in_main_grid(linkedList* shape, long avg_width, long avg_height, long avg_ratio, double avg_density, int width, int height, double ratio, double density, linkedList* shapes);
