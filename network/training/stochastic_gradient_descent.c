@@ -56,7 +56,7 @@ int stochastic_gradiant_descent(
             network, batch, mini_batch_size, &num_mini_batches
         );
 
-        printf("Created %hi mini batches\n", num_mini_batches);
+        // printf("Created %hi mini batches\n", num_mini_batches);
 
         if (mini_batches == NULL)
         {
@@ -65,7 +65,7 @@ int stochastic_gradiant_descent(
             return 0;
         }
 
-        for (size_t i = 0; i < num_mini_batches; i++)
+        for (uint16_t i = 0; i < num_mini_batches; i++)
         {
             int res = update_mini_batch(
                 network, mini_batches[i], eta, lambda, total_training_size
