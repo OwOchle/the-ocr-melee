@@ -35,7 +35,7 @@ int update_mini_batch(
     if (gradiant == NULL)
     {
         printf("An error occured: gradiant_new()\n");
-        return NULL;
+        return 0;
     }
 
     for (size_t tupleIdx = 0; tupleIdx < batch_size; tupleIdx++)

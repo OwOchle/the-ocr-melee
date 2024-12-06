@@ -57,3 +57,18 @@ void array_float_print(size_t size, const float array[])
 
     printf("%f]\n", array[size - 1]);
 }
+
+size_t array_max_index_float(size_t size, const float array[])
+{
+    size_t max = 0;
+
+    for (size_t i = 0; i < size; i++)
+    {
+        if (array[i] > array[max])
+        {
+            max = i;
+        }
+    }
+
+    return max;
+}

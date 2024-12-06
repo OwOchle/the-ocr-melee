@@ -36,3 +36,5 @@ void array_float_print(size_t size, const float array[]);
  * Prints an array of char
  */
 void array_char_print(size_t size, const char array[]);
+
+size_t array_max_index_float(size_t size, const float array[]);

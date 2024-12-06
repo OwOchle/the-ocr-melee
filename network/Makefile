@@ -4,7 +4,7 @@ OBJS = network.o file_io.o ../utils/array.o ../utils/matrix.o ../utils/verbose.o
  training/update_mini_batch.o training/stochastic_gradient_descent.o evaluate.o ../utils/threaded_matrix.o ../utils/thpool.o ../utils/progress.o ../alphabet-training/batch_conversion.o ../alphabet-training/read_image.o
 TEST_DIRECTORY = tests
 TEST_SRC = $(wildcard $(TEST_DIRECTORY)/*.c)
-CFLAGS = -lm -I..
+CFLAGS = -lm -I.. `pkg-config --cflags --libs sdl2 SDL2_image` -D VERBOSE
 
 debug: CFLAGS += -g -fsanitize=address
 debug: $(OBJS) main.o
