@@ -25,3 +25,4 @@ void show_shapes_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color co
 bool is_in_shape_bounds(int x, int y, ShapeBoundingBox* shape_boudings);
 bool is_in_shape(int x, int y, linkedList* shape);
 
+SDL_Surface **shapes_to_surfaces(linkedList *shapes, size_t *length) ;

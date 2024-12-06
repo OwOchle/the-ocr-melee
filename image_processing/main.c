@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <err.h>
+#include <stdio.h>
 
 #include "gaussian_binary.h"
 #include "gaussian_blur.h"
@@ -85,6 +86,21 @@ int main(int argc, char** argv)
     save_surface("../outputs/output_dfs.png", surface);
     printf("image_processing: Saved DFS file in outputs folder.\n");
 
+    size_t count;
+    SDL_Surface **letters = shapes_to_surfaces(filtered_shapes, &count);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        char *name;
+        asprintf(&name, "../letters/%d.png", i);
+
+        save_surface(name, letters[i]);
+
+        free(name);
+        SDL_FreeSurface(letters[i]);
+    }
+
+    free(letters);
 
     float* gradient_magnitude = malloc(width * height * sizeof(float));
     float* gradient_direction = malloc(width * height * sizeof(float));
