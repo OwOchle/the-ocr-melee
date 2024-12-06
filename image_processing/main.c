@@ -10,6 +10,7 @@
 #include "threshold.h"
 #include "letter_filtering.h"
 #include "auto_rotate.h"
+#include "grid_detection.h"
 
 #include "utils/shapes.h"
 #include "utils/linked_list.h"
@@ -79,7 +80,12 @@ int main(int argc, char** argv)
     linkedList* filtered_shapes = filter_shapes(shapes);
 
     SDL_Color color = {89, 67, 167};
-    show_shapes_boundings(surface, filtered_shapes, color);
+    //show_shapes_boundings(surface, filtered_shapes, color);
+    linkedList* isolated = detect_unique_shapes(filtered_shapes);
+
+    show_shapes_boundings(surface, isolated, color);
+
+    shapes_center_histogram(surface, filtered_shapes);
 
 
     save_surface("../outputs/output_dfs.png", surface);

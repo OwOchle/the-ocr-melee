@@ -42,12 +42,24 @@ void show_bounding_box(
     }
 }
 
+int round_to_upper_five_multiple(int num) {
+    int remainder = num % 5;
+    if (remainder < 3) {
+        return num - remainder;
+    } else {
+        return num + (5 - remainder);
+    }
+}
+
 void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color){
     ShapeBoundingBox* box = get_shape_boundings(shape);
 
     show_bounding_box(surface, box->max_x, box->max_y, box->min_x, box->min_y, color);
 
-    free(box);
+    
+    show_bounding_box(surface, round_to_upper_five_multiple(box->center_x), round_to_upper_five_multiple(box->center_y), round_to_upper_five_multiple(box->center_x), round_to_upper_five_multiple(box->center_y), color);
+
+
 }
 
 void show_shapes_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color){
@@ -99,12 +111,18 @@ ShapeBoundingBox* get_shape_boundings(linkedList *shape){
     shape_box->max_y = max_y;
     shape_box->min_x = min_x;
     shape_box->min_y = min_y;
+
+    int x, y;
+    get_shape_center(&x, &y, shape_box);
+    shape_box->center_x = x;
+    shape_box->center_y = y;
+
     return shape_box;
 }
 
 void get_shape_center(int* x, int* y, ShapeBoundingBox* shape_boundings){
-    *x = (shape_boundings->max_x - shape_boundings->max_y)/2;
-    *y = (shape_boundings->max_y - shape_boundings->min_y)/2;
+    *x = (shape_boundings->max_x + shape_boundings->min_x)/2;
+    *y = (shape_boundings->max_y + shape_boundings->min_y)/2;
 }
 
 bool is_in_shape_bounds(int x, int y, ShapeBoundingBox* shape_boudings){
@@ -121,7 +139,129 @@ bool is_in_shape(int x, int y, linkedList* shape){
     ShapeBoundingBox* shape_boundings = get_shape_boundings(shape);
 
     bool status = is_in_shape_bounds(x,y, shape_boundings);
-
-    free(shape_boundings);
     return status;
+}
+
+linkedList* find_shape_containing_point(int x, int y, linkedList* shapes) {
+    if (shapes == NULL || shapes->head == NULL) {
+        return NULL;
+    }
+
+    Node* current = shapes->head;
+    while (current != NULL) {
+        // Skip nodes with special marker coordinates
+        if (current->x != -42 && current->y != -42) {
+            // Ensure shape_bounding_box is created if not already exists
+            if (current->shape_bounding_box == NULL) {
+                current->shape_bounding_box = get_shape_boundings(current->shape);
+            }
+
+            // First, check if point is within bounding box
+            if (is_in_shape_bounds(x, y, current->shape_bounding_box)) {
+                // If in bounds, do more precise shape checking if needed
+                if (is_in_shape(x, y, current->shape)) {
+                    return current->shape;
+                }
+            }
+        }
+        current = current->next;
+    }
+
+    return NULL;
+}
+
+
+linkedList* detect_unique_shapes(linkedList* shapes) {
+    linkedList* unique_shapes = list_create();
+
+    Node* current = shapes->head;
+    while (current != NULL) {
+        // Skip invalid shapes
+        if (current->x == -42 && current->y == -42) {
+            current = current->next;
+            continue;
+        }
+
+        // Ensure bounding box is created
+        current->shape_bounding_box = get_shape_boundings(current->shape);
+        
+        // Get current shape's characteristics
+        int current_width = current->shape_bounding_box->max_x - current->shape_bounding_box->min_x;
+        int current_height = current->shape_bounding_box->max_y - current->shape_bounding_box->min_y;
+        int current_y_mid = current->shape_bounding_box->center_y;
+        int current_x_mid = current->shape_bounding_box->center_x;
+
+        bool is_I_like = current_height > 4*current_width;
+
+        // Flag to track if a similar shape is found
+        bool similar_shape_found = false;
+
+        // Compare with other shapes
+        Node* compare = shapes->head;
+        while (compare != NULL) {
+            // Skip comparing shape with itself or invalid shapes
+            if (compare == current || compare->x == -42 && compare->y == -42) {
+                compare = compare->next;
+                continue;
+            }
+
+            // Ensure comparison shape's bounding box is created
+            compare->shape_bounding_box = get_shape_boundings(compare->shape);
+
+            // Check vertical proximity (same line)
+            int compare_y_mid = compare->shape_bounding_box->center_y;
+            int y_diff = abs(current_y_mid - compare_y_mid);
+
+            // Check horizontal separation
+            int compare_x_mid = compare->shape_bounding_box->center_x;
+            int x_diff = abs(current_x_mid - compare_x_mid);
+
+            // Check shape size similarity
+            int compare_width = compare->shape_bounding_box->max_x - compare->shape_bounding_box->min_x;
+            int compare_height = compare->shape_bounding_box->max_y - compare->shape_bounding_box->min_y;
+
+            // Conditions for considering shapes as similar:
+            // 1. Vertical proximity (within height of a shape)
+            // 2. Horizontal separation (less than 2x the average width)
+            // 3. Similar width (40-160% of each other)
+            // 4. Similar height (40-160% of each other)
+            bool vertical_proximity = y_diff <= current_height * 2;
+            bool horizontal_proximity;
+            if (is_I_like){
+                horizontal_proximity = x_diff <= (current_width + compare_width) * 12;
+            }
+            else {
+                horizontal_proximity = x_diff <= (current_width + compare_width) * 2;
+            }
+
+            bool size_similarity;
+            if (is_I_like){
+                size_similarity = 
+                (current_height >= compare_height * 0.4 && current_height <= compare_height * 1.6);
+            }
+            else
+            {
+                size_similarity = 
+                (current_width >= compare_width * 0.4 && current_width <= compare_width * 1.8) &&
+                (current_height >= compare_height * 0.4 && current_height <= compare_height * 1.6);
+            }
+            
+
+            if (vertical_proximity && horizontal_proximity && size_similarity) {
+                similar_shape_found = true;
+                break;
+            }
+
+            compare = compare->next;
+        }
+
+        // If no similar shape found, add to unique shapes
+        if (similar_shape_found) {
+            list_append_shape(unique_shapes, current->shape);
+        }
+
+        current = current->next;
+    }
+
+    return unique_shapes;
 }

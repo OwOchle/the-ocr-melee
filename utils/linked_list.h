@@ -8,6 +8,8 @@ typedef struct Node Node_Shape;
 typedef struct Pixel Pixel;
 typedef struct linkedList linkedList;
 
+extern struct ShapeBoundingBox;
+
 struct Pixel
 {
     int x;
@@ -22,7 +24,7 @@ struct Node
     int x;
     int y;
     linkedList *shape;
-    ShapeBoundingBox* shape_bounding_box;
+    struct ShapeBoundingBox* shape_bounding_box;
 };
 
 struct linkedList

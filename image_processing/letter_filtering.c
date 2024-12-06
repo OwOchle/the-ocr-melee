@@ -73,7 +73,6 @@ linkedList* filter_shapes(linkedList* shapes){
             height_sum += height;
             if (ratio > 0.00000 && ratio < 100.0){ // remove Nan and Inf
                 ratio_sum += ratio;
-                //printf("Ratio : %f\n", ratio);
             }
             area_sum += area;
         }
@@ -89,24 +88,24 @@ linkedList* filter_shapes(linkedList* shapes){
     elm = shapes->head;
     while (elm->next != NULL)
     {
-        if (elm->shape_bounding_box == NULL){
-            ShapeBoundingBox* shape_box = get_shape_boundings(elm->shape);
-            elm->shape_bounding_box = shape_box;
-        }
-        int width = elm->shape_bounding_box->max_x - elm->shape_bounding_box->min_x;
-        int height = elm->shape_bounding_box->max_y - elm->shape_bounding_box->min_y;
-
-        double ratio =  (double)((elm->shape_bounding_box->max_y-elm->shape_bounding_box->min_y) / (double)(elm->shape_bounding_box->max_x-elm->shape_bounding_box->min_x));
-        double area = (elm->shape_bounding_box->max_y-elm->shape_bounding_box->min_y) * (elm->shape_bounding_box->max_x-elm->shape_bounding_box->min_x);
-
-        long pixel_c =  get_shape_pixel_count(elm->shape);
-        double density = (double)(area/pixel_c);
-
         if (elm->x != -42 && elm->y != -42)
         {   
-           if (is_shape_in_main_grid(elm->shape, avg_width, avg_height, avg_ratio, avg_density, width, height, ratio, density, shapes)){
-            list_append_shape(filtered_shapes, elm->shape);
+            if (elm->shape_bounding_box == NULL){
+                ShapeBoundingBox* shape_box = get_shape_boundings(elm->shape);
+                elm->shape_bounding_box = shape_box;
+            }            
+            int width = elm->shape_bounding_box->max_x - elm->shape_bounding_box->min_x;
+            int height = elm->shape_bounding_box->max_y - elm->shape_bounding_box->min_y;
+
+            double ratio =  (double)((elm->shape_bounding_box->max_y-elm->shape_bounding_box->min_y) / (double)(elm->shape_bounding_box->max_x-elm->shape_bounding_box->min_x));
+            double area = (elm->shape_bounding_box->max_y-elm->shape_bounding_box->min_y) * (elm->shape_bounding_box->max_x-elm->shape_bounding_box->min_x);
+
+            long pixel_c =  get_shape_pixel_count(elm->shape);
+            double density = (double)(area/pixel_c);
+            if (is_shape_in_main_grid(elm->shape, avg_width, avg_height, avg_ratio, avg_density, width, height, ratio, density, shapes)){
+                list_append_shape(filtered_shapes, elm->shape);
            }
+           free(elm->shape_bounding_box);
         }
         elm = elm->next;
     }
