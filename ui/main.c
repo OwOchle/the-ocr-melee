@@ -3,9 +3,21 @@
 
 GtkWidget *mainWindow = NULL;
 GtkImage *mainImage = NULL;
+
 GtkWidget *solverWindow = NULL;
+GtkImage *solverImage = NULL;
+
 GtkWidget *settingsWindow = NULL;
+GtkImage *settingsImage= NULL;
+
 GtkWidget *rotationWindow = NULL;
+GtkImage *rotationImage= NULL;
+
+char* fileName = "téléchargé.png"; // Image de départ
+
+GdkPixbuf *pixbuf = NULL;
+
+
 
 int main(int argc, char *argv[])
 {
@@ -19,10 +31,13 @@ int main(int argc, char *argv[])
     mainImage = GTK_IMAGE(gtk_builder_get_object(builder, "mainImage"));
 
     solverWindow = GTK_WIDGET(gtk_builder_get_object(builder, "solverWindow"));
+    solverImage = GTK_IMAGE(gtk_builder_get_object(builder, "solverImage"));
 
     settingsWindow = GTK_WIDGET(gtk_builder_get_object(builder, "settingsWindow"));
+    settingsImage = GTK_IMAGE(gtk_builder_get_object(builder, "settingsImage"));
 
     rotationWindow = GTK_WIDGET(gtk_builder_get_object(builder, "rotationWindow"));
+    rotationImage = GTK_IMAGE(gtk_builder_get_object(builder, "rotationImage"));
 
     gtk_builder_connect_signals(builder, NULL);
     g_object_unref(builder);
@@ -49,28 +64,28 @@ void open_main() // Bouton qui ouvre le main menu
     gtk_widget_hide(solverWindow);
     gtk_widget_hide(rotationWindow);
     gtk_widget_hide(settingsWindow);
-    gtk_widget_show(mainWindow);
+    gtk_widget_show_all(mainWindow);
 }
 
 void open_solver() // Bouton qui ouvre le solver
 {
     printf("Solver opened\n");
     gtk_widget_hide(mainWindow);
-    gtk_widget_show(solverWindow);
+    gtk_widget_show_all(solverWindow);
 }
 
 void open_settings() // Bouton qui ouvre les settings
 {
     printf("Settings opened\n");
     gtk_widget_hide(mainWindow);
-    gtk_widget_show(settingsWindow);
+    gtk_widget_show_all(settingsWindow);
 }
 
 void open_rotation() // Bouton qui ouvre la fenêtre de rotation
 {
     printf("Rotation window opened\n");
     gtk_widget_hide(mainWindow);
-    gtk_widget_show(rotationWindow);
+    gtk_widget_show_all(rotationWindow);
 }
 
 void leftRotation() // Bouton de rotation gauche
@@ -107,9 +122,16 @@ void stepByStep_clicked() // Bouton qui solve en montrant chaque étape
 
 void on_imageImport(GtkFileChooserButton *file)
 {
-    char *str = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
-    printf("imported file name = %s\n", str);
-    gtk_image_set_from_file(mainImage,str);
+    fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
+    printf("imported file name = %s\n", fileName);
+
+    pixbuf = gdk_pixbuf_new_from_file(fileName, NULL);
+    pixbuf = gdk_pixbuf_scale_simple(pixbuf, 800,450,GDK_INTERP_BILINEAR);
+
+    gtk_image_set_from_pixbuf(mainImage,pixbuf);
+    gtk_image_set_from_pixbuf(solverImage,pixbuf);
+    gtk_image_set_from_pixbuf(settingsImage,pixbuf);
+    gtk_image_set_from_pixbuf(rotationImage,pixbuf);
 }
 
 void on_networkImput(GtkFileChooserButton *file)
