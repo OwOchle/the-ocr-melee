@@ -1,8 +1,13 @@
+#define  _POSIX_C_SOURCE 200809L
+
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <sys/stat.h>
+#include <stdlib.h>
+#include <string.h>
 
+#include "fs_utils.h"
 #include "proc_steps.h"
 
 GtkWidget *mainWindow = NULL;
@@ -19,7 +24,11 @@ GtkImage *rotationImage= NULL;
 
 char* imageName = NULL;
 
+char *temp_dir = NULL;
+
 GdkPixbuf *pixbuf = NULL;
+
+int imageSize = 500;
 
 bool check_image_existence()
 {
@@ -56,8 +65,23 @@ bool check_image_existence()
     return true;
 }
 
+void on_close() 
+{
+    printf("Cleaning garbage\n");
+    if (temp_dir != NULL)
+        remove_dir_recursive(temp_dir);
+}
+
 int main(int argc, char *argv[])
 {
+    char *tmp = malloc(sizeof("/tmp/tmpdir.XXXXXX"));;
+    strcpy(tmp, "/tmp/tmpdir.XXXXXX");
+    temp_dir = mkdtemp(tmp);
+
+    printf("temp directory is %s\n", temp_dir);
+
+    atexit(on_close);
+
     GtkBuilder *builder;
     gtk_init(&argc, &argv);
 
@@ -79,6 +103,7 @@ int main(int argc, char *argv[])
     gtk_builder_connect_signals(builder, NULL);
     g_object_unref(builder);
 
+    gtk_widget_show(mainWindow);
     gtk_widget_show_all(mainWindow);
     gtk_window_set_position((GtkWindow*)mainWindow,GTK_WIN_POS_CENTER);
     gtk_main();
@@ -158,7 +183,20 @@ void rotButton_clicked() // Bouton qui rotate AUTO
 
 void update_all_pixbufs()
 {
-    pixbuf = gdk_pixbuf_scale_simple(pixbuf, 800,450,GDK_INTERP_BILINEAR);
+    int imageWidth = gdk_pixbuf_get_width(pixbuf);
+    int imageHeight = gdk_pixbuf_get_height(pixbuf);
+    float imageRatio = (float)imageWidth/(float)imageHeight;
+
+    printf("image is %ux%u pixels\nRatio : %f\n", imageWidth, imageHeight, imageRatio);
+
+    if (imageRatio == 1.0f){
+        pixbuf = gdk_pixbuf_scale_simple(pixbuf, imageSize,imageSize,GDK_INTERP_BILINEAR);
+        printf("new image is %ux%u pixels\n", imageSize, imageSize);
+    }
+    else{
+        pixbuf = gdk_pixbuf_scale_simple(pixbuf, imageSize * imageRatio, imageSize,GDK_INTERP_BILINEAR);
+        printf("new image is %ux%u pixels\n", (int)(imageSize * imageRatio), imageSize);
+    }
 
     gtk_image_set_from_pixbuf(mainImage,pixbuf);
     gtk_image_set_from_pixbuf(solverImage,pixbuf);
@@ -172,7 +210,7 @@ void stepByStep_clicked() // Bouton qui solve en montrant chaque étape
     {
         return;
     }
-    
+
     printf("------------------------------------------\n");
     printf("Solving:\nStep 1 : ...\nStep 2 : ...\nStep 3 : ...\n");
     printf("------------------------------------------\n");
