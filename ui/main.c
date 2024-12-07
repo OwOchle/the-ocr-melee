@@ -55,6 +55,7 @@ void exit_app() // Quand on ferme la fenêtre
     gtk_widget_destroy(solverWindow);
     gtk_widget_destroy(settingsWindow);
     gtk_widget_destroy(rotationWindow);
+    
     gtk_main_quit();
 }
 
@@ -134,7 +135,7 @@ void on_imageImport(GtkFileChooserButton *file)
     gtk_image_set_from_pixbuf(rotationImage,pixbuf);
 }
 
-void on_networkImput(GtkFileChooserButton *file)
+void on_network_import(GtkFileChooserButton *file)
 {
 
 }
