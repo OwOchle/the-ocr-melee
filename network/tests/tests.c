@@ -1,7 +1,7 @@
-#include "utils/array.h"
-#include "utils/matrix.h"
+#include "../../utils/array.h"
+#include "../../utils/matrix.h"
 
-#include <stdio.h>
+// #include <stdio.h>
 #include <stdlib.h>
 
 void test1()

@@ -7,20 +7,45 @@
 
 #include "update_mini_batch.h"
 
+#include "../../utils/progress.h"
+// #include "../../utils/verbose.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+struct BarData
+{
+    int accuracy;
+    int total_training_size;
+    float cost;
+};
+
+void __progress_printer(void *data, char *out)
+{
+    struct BarData *bdata = data;
+    sprintf(
+        out, "Acc: %4d/%d | Cost: %.5f", bdata->accuracy,
+        bdata->total_training_size, bdata->cost
+    );
+}
 
 int stochastic_gradiant_descent(
     Network *network, Batch *batch, size_t epochs, uint16_t mini_batch_size,
     float eta, float lambda, Batch *validation_batch
 )
 {
+    // Constants
     uint16_t total_training_size = batch->batchSize;
     uint16_t total_evaluation_size = 0;
     if (validation_batch != NULL)
         total_evaluation_size = validation_batch->batchSize;
 
+    // Progress bar setup
+    pb_set_data_print_function(__progress_printer);
+    struct BarData *bdata = malloc(sizeof(struct BarData));
+
+    // Training Time
     for (size_t epoch = 0; epoch < epochs; epoch++)
     {
         batch_shuffle(batch);
@@ -30,31 +55,43 @@ int stochastic_gradiant_descent(
         Batch **mini_batches = create_mini_batches(
             network, batch, mini_batch_size, &num_mini_batches
         );
+
+        // printf("Created %hi mini batches\n", num_mini_batches);
+
         if (mini_batches == NULL)
         {
+            printf("An error occured: mini_batches()\n");
+            free(bdata);
             return 0;
         }
 
-        for (size_t i = 0; i < num_mini_batches; i++)
+        for (uint16_t i = 0; i < num_mini_batches; i++)
         {
             int res = update_mini_batch(
                 network, mini_batches[i], eta, lambda, total_training_size
             );
             if (!res)
+            {
+                printf("An error occured: update_mini_batch()\n");
                 return 0;
+            }
 
             batch_free(mini_batches[i]);
         }
 
-        printf("Epoch %zu training complete\n", epoch);
-        printf(
-            "Accuracy on training data: %i / %i\n________________________\n",
-            accuracy(network, batch), total_training_size
-        );
+        bdata->accuracy = accuracy(network, batch);
+        bdata->total_training_size = total_training_size;
+        bdata->cost = total_cost(network, batch, lambda);
+
+        pb_update_current(epoch, bdata);
 
         free(mini_batches);
         mini_batches = NULL;
     }
+
+    pb_update_current(epochs, NULL);
+    free(bdata);
+    bdata = NULL;
 
     return 1;
 }
@@ -64,14 +101,16 @@ Batch **create_mini_batches(
     uint16_t *num_mini_batches
 )
 {
+    if (network == NULL || batch == NULL || mini_batch_size == 0)
+        return NULL;
+
     uint16_t batch_size = batch->batchSize;
     *num_mini_batches = (batch_size + mini_batch_size - 1) / mini_batch_size;
 
     size_t input_size = network->entryCount;
     size_t output_size = network->layers[network->layerCount - 1]->nodeCount;
 
-    Batch **mini_batches =
-        (Batch **)malloc(*num_mini_batches * sizeof(Batch *));
+    Batch **mini_batches = malloc(*num_mini_batches * sizeof(Batch *));
     if (mini_batches == NULL)
         return NULL;
 
@@ -89,13 +128,12 @@ Batch **create_mini_batches(
             // Free previously
             for (uint16_t j = 0; j < k; j++)
             {
-                free(mini_batches[j]);
+                batch_free(mini_batches[k]);
             }
             free(mini_batches);
             return NULL;
         }
 
-        // Copy the layers from the batch to the mini_batch
         for (uint16_t j = 0; j < current_batch_size; j++)
         {
             float *input_ptr = mini_batches[k]->layers[j]->inputData;

@@ -1,4 +1,5 @@
 #include "array.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +22,24 @@ void array_uint16t_print(size_t size, const uint16_t array[])
     printf("%hi]\n", array[size - 1]);
 }
 
+void array_char_print(size_t size, const char array[])
+{
+    if (size == 0)
+    {
+        printf("[]\n");
+        return;
+    }
+
+    printf("[");
+
+    for (size_t i = 0; i < size - 1; i++)
+    {
+        printf("%hhi, ", array[i]);
+    }
+
+    printf("%hhi]\n", array[size - 1]);
+}
+
 void array_float_print(size_t size, const float array[])
 {
     if (size == 0)
@@ -39,12 +58,17 @@ void array_float_print(size_t size, const float array[])
     printf("%f]\n", array[size - 1]);
 }
 
-float array_get_as_matrix(const float array[], size_t width, size_t x, size_t y)
+size_t array_max_index_float(size_t size, const float array[])
 {
-    return array[y * width + x];
-}
+    size_t max = 0;
 
-float *array_get_as_matrix_ptr(float array[], size_t width, size_t x, size_t y)
-{
-    return array + (y * width) + x;
+    for (size_t i = 0; i < size; i++)
+    {
+        if (array[i] > array[max])
+        {
+            max = i;
+        }
+    }
+
+    return max;
 }

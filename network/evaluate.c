@@ -4,9 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../utils/array.h"
 #include "../utils/matrix.h"
 #include "network.h"
 #include "network_utils/activation_functions.h"
+#include "network_utils/cost_functions.h"
+// #include "../utils/threaded_matrix.h"
 
 typedef float *Matrix;
 typedef float *Vector;
@@ -99,58 +102,12 @@ int accuracy(Network *network, Batch *training_data)
     {
         BatchLayer *layer = training_data->layers[i];
 
-        printf(
-            "Taking %.1f and %.1f as input:\n", layer->inputData[0],
-            layer->inputData[1]
-        );
-        printf(
-            "Expecting 'isFalse' = %.1f and 'isTrue' = %.1f\n",
-            layer->outputData[0], layer->outputData[1]
-        );
-
         float *predicted_output = feedforward(network, layer->inputData);
 
         int predicted_max = argmax(predicted_output, output_size);
-        printf("- output[%i] should be max\n", predicted_max);
         int actual_max = argmax(layer->outputData, output_size);
-        printf("- output[%i] is max\n", actual_max);
-
-        printf(
-            "=> Actual 'isFalse' = %f and 'isTrue' = %f\n", predicted_output[0],
-            predicted_output[1]
-        );
 
         if (predicted_max == actual_max)
-        {
-            ++count;
-        }
-
-        free(predicted_output);
-    }
-
-    return count;
-}
-
-float binary_accuracy(Network *network, Batch *batch)
-{
-    int count = 0;
-
-    for (uint16_t i = 0; i < batch->batchSize; i++)
-    {
-        BatchLayer *layer = batch->layers[i];
-
-        printf(
-            "Taking %.0f and %.0f as input => %.0f\n", layer->inputData[0],
-            layer->inputData[1], layer->outputData[0]
-        );
-        float *predicted_output = feedforward(network, layer->inputData);
-        printf("Network thinks it is %f\n", predicted_output[0]);
-
-        int predicted_proba = predicted_output[0] >= 0.5 ? 1 : 0;
-
-        int actual_proba = layer->outputData[0] >= 0.5 ? 1 : 0;
-
-        if (predicted_proba == actual_proba)
         {
             count++;
         }
@@ -159,4 +116,42 @@ float binary_accuracy(Network *network, Batch *batch)
     }
 
     return count;
+}
+
+float total_cost(Network *network, Batch *batch, float lambda)
+{
+    float cost = 0.0f;
+    uint16_t batch_size = batch->batchSize;
+
+    uint16_t output_size = network->layers[network->layerCount - 1]->nodeCount;
+    for (size_t i = 0; i < batch_size; i++)
+    {
+        float *desired_output = batch->layers[i]->outputData;
+        float *output = feedforward(network, batch->layers[i]->inputData);
+
+        cost += cross_entropy_cost(output_size, output, desired_output) /
+                batch_size;
+
+        free(output);
+    }
+
+    float linear_norm = 0.0f;
+    for (size_t i = 0; i < network->layerCount - 1; i++)
+    {
+        Layer *layer = network->layers[i];
+        Layer *nextLayer = network->layers[i + 1];
+        for (size_t j = 0; j < layer->nodeCount; j++)
+        {
+            for (size_t k = 0; k < nextLayer->nodeCount; k++)
+            {
+                float weight = array_get_as_matrix(
+                    layer->weights, nextLayer->nodeCount, j, k
+                );
+                linear_norm += weight * weight;
+            }
+        }
+    }
+    cost += 0.5f * (lambda / batch_size) * linear_norm;
+
+    return cost;
 }

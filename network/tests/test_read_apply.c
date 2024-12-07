@@ -1,9 +1,9 @@
-#include "file_io.h"
-#include "network.h"
-#include "utils/array.h"
+#include "../file_io.h"
+#include "../network.h"
+#include "../../utils/array.h"
 
 #include <err.h>
-#include <stdio.h>
+// #include <stdio.h>
 #include <stdlib.h>
 
 int main()
