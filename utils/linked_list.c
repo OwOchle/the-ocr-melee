@@ -128,3 +128,17 @@ long get_shape_pixel_count(linkedList* shape){
     }
     return i;
 }
+
+size_t list_length(linkedList *li)
+{
+    size_t l = 0;
+
+    for (Node *p = li->head; p != NULL; p = p->next)
+    {
+        l++;
+    }
+
+    printf("%lu maths\n", l);
+
+    return l;
+}

@@ -8,7 +8,7 @@ typedef struct Node Node_Shape;
 typedef struct Pixel Pixel;
 typedef struct linkedList linkedList;
 
-extern struct ShapeBoundingBox;
+struct ShapeBoundingBox;
 
 struct Pixel
 {
@@ -45,3 +45,5 @@ void list_free(linkedList *li);
 void list_free_shape(linkedList *li);
 
 long get_shape_pixel_count(linkedList* shape);
+
+size_t list_length(linkedList *li);

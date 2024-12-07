@@ -29,3 +29,4 @@ bool is_in_shape(int x, int y, linkedList* shape);
 
 linkedList* find_shape_containing_point(int x, int y, linkedList* shapes);
 linkedList* detect_unique_shapes(linkedList* shapes);
+SDL_Surface **shapes_to_surfaces(linkedList *shapes, size_t *length) ;
