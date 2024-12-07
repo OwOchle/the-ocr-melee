@@ -13,6 +13,7 @@
     <property name="can-focus">False</property>
     <property name="default-width">1080</property>
     <property name="default-height">700</property>
+    <signal name="destroy" handler="exit_app" swapped="no"/>
     <child>
       <!-- n-columns=3 n-rows=3 -->
       <object class="GtkGrid" id="settingsGrid">
@@ -59,7 +60,7 @@
               </object>
               <packing>
                 <property name="x">30</property>
-                <property name="y">488</property>
+                <property name="y">500</property>
               </packing>
             </child>
             <child>
@@ -74,7 +75,7 @@
               </object>
               <packing>
                 <property name="x">365</property>
-                <property name="y">450</property>
+                <property name="y">475</property>
               </packing>
             </child>
             <child>
@@ -88,7 +89,7 @@
               </object>
               <packing>
                 <property name="x">600</property>
-                <property name="y">450</property>
+                <property name="y">475</property>
               </packing>
             </child>
             <child>
@@ -101,7 +102,7 @@
               </object>
               <packing>
                 <property name="x">355</property>
-                <property name="y">400</property>
+                <property name="y">525</property>
               </packing>
             </child>
             <child>
@@ -114,7 +115,20 @@
               </object>
               <packing>
                 <property name="x">587</property>
-                <property name="y">400</property>
+                <property name="y">525</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkImage" id="settingsImage">
+                <property name="width-request">100</property>
+                <property name="height-request">80</property>
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="pixbuf">mots-melés-anglais- (1).png</property>
+              </object>
+              <packing>
+                <property name="x">160</property>
+                <property name="y">20</property>
               </packing>
             </child>
           </object>
@@ -244,7 +258,7 @@
                 <property name="height-request">600</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="pixbuf">Valen (1).png</property>
+                <property name="pixbuf">mots-melés-anglais- (1).png</property>
               </object>
               <packing>
                 <property name="x">265</property>
@@ -274,6 +288,7 @@
     <property name="can-focus">False</property>
     <property name="default-width">1080</property>
     <property name="default-height">700</property>
+    <signal name="destroy" handler="exit_app" swapped="no"/>
     <child>
       <!-- n-columns=3 n-rows=3 -->
       <object class="GtkGrid" id="rotationGrid">
@@ -320,7 +335,7 @@
               </object>
               <packing>
                 <property name="x">30</property>
-                <property name="y">488</property>
+                <property name="y">500</property>
               </packing>
             </child>
             <child>
@@ -335,7 +350,7 @@
               </object>
               <packing>
                 <property name="x">335</property>
-                <property name="y">450</property>
+                <property name="y">475</property>
               </packing>
             </child>
             <child>
@@ -350,7 +365,7 @@
               </object>
               <packing>
                 <property name="x">635</property>
-                <property name="y">450</property>
+                <property name="y">475</property>
               </packing>
             </child>
             <child>
@@ -365,7 +380,20 @@
               </object>
               <packing>
                 <property name="x">448</property>
-                <property name="y">450</property>
+                <property name="y">475</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkImage" id="rotationImage">
+                <property name="width-request">100</property>
+                <property name="height-request">80</property>
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="pixbuf">mots-melés-anglais- (1).png</property>
+              </object>
+              <packing>
+                <property name="x">160</property>
+                <property name="y">20</property>
               </packing>
             </child>
           </object>
@@ -438,7 +466,7 @@
               </object>
               <packing>
                 <property name="x">30</property>
-                <property name="y">488</property>
+                <property name="y">500</property>
               </packing>
             </child>
             <child>
@@ -453,7 +481,7 @@
               </object>
               <packing>
                 <property name="x">365</property>
-                <property name="y">450</property>
+                <property name="y">475</property>
               </packing>
             </child>
             <child>
@@ -468,7 +496,20 @@
               </object>
               <packing>
                 <property name="x">600</property>
-                <property name="y">450</property>
+                <property name="y">475</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkImage" id="solverImage">
+                <property name="width-request">100</property>
+                <property name="height-request">80</property>
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="pixbuf">mots-melés-anglais- (1).png</property>
+              </object>
+              <packing>
+                <property name="x">160</property>
+                <property name="y">20</property>
               </packing>
             </child>
           </object>
