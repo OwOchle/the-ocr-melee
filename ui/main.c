@@ -13,9 +13,13 @@ GtkImage *settingsImage= NULL;
 GtkWidget *rotationWindow = NULL;
 GtkImage *rotationImage= NULL;
 
-char* fileName = "téléchargé.png"; // Image de départ
+char* imageName;
 
 GdkPixbuf *pixbuf = NULL;
+int imageWidth = 0;
+int imageHeight = 0;
+
+int imageSize = 500;
 
 
 
@@ -42,7 +46,8 @@ int main(int argc, char *argv[])
     gtk_builder_connect_signals(builder, NULL);
     g_object_unref(builder);
 
-    gtk_widget_show(mainWindow);
+    gtk_widget_show_all(mainWindow);
+    gtk_window_set_position((GtkWindow*)mainWindow,GTK_WIN_POS_CENTER);
     gtk_main();
 
     return 0;
@@ -64,6 +69,7 @@ void open_main() // Bouton qui ouvre le main menu
     gtk_widget_hide(solverWindow);
     gtk_widget_hide(rotationWindow);
     gtk_widget_hide(settingsWindow);
+    // gtk_window_set_position((GtkWindow*)mainWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(mainWindow);
 }
 
@@ -71,6 +77,7 @@ void open_solver() // Bouton qui ouvre le solver
 {
     printf("Solver opened\n");
     gtk_widget_hide(mainWindow);
+    // gtk_window_set_position((GtkWindow*)solverWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(solverWindow);
 }
 
@@ -78,6 +85,7 @@ void open_settings() // Bouton qui ouvre les settings
 {
     printf("Settings opened\n");
     gtk_widget_hide(mainWindow);
+    // gtk_window_set_position((GtkWindow*)settingsWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(settingsWindow);
 }
 
@@ -85,6 +93,7 @@ void open_rotation() // Bouton qui ouvre la fenêtre de rotation
 {
     printf("Rotation window opened\n");
     gtk_widget_hide(mainWindow);
+    // gtk_window_set_position((GtkWindow*)rotationWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(rotationWindow);
 }
 
@@ -122,11 +131,24 @@ void stepByStep_clicked() // Bouton qui solve en montrant chaque étape
 
 void on_imageImport(GtkFileChooserButton *file)
 {
-    fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
-    printf("imported file name = %s\n", fileName);
+    imageName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
+    printf("imported file name = %s\n", imageName);
 
-    pixbuf = gdk_pixbuf_new_from_file(fileName, NULL);
-    pixbuf = gdk_pixbuf_scale_simple(pixbuf, 800,450,GDK_INTERP_BILINEAR);
+    pixbuf = gdk_pixbuf_new_from_file(imageName, NULL);
+    imageWidth = gdk_pixbuf_get_width(pixbuf);
+    imageHeight = gdk_pixbuf_get_height(pixbuf);
+    float imageRatio = (float)imageWidth/(float)imageHeight;
+
+    printf("image is %ux%u pixels\nRatio : %f\n", imageWidth, imageHeight, imageRatio);
+
+    if (imageRatio == 1.0f){
+        pixbuf = gdk_pixbuf_scale_simple(pixbuf, imageSize,imageSize,GDK_INTERP_BILINEAR);
+        printf("new image is %ux%u pixels\n", imageSize, imageSize);
+    }
+    else{
+        pixbuf = gdk_pixbuf_scale_simple(pixbuf, imageSize * imageRatio, imageSize,GDK_INTERP_BILINEAR);
+        printf("new image is %ux%u pixels\n", (int)(imageSize * imageRatio), imageSize);
+    }
 
     gtk_image_set_from_pixbuf(mainImage,pixbuf);
     gtk_image_set_from_pixbuf(solverImage,pixbuf);

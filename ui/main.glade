@@ -11,6 +11,8 @@
   </object>
   <object class="GtkWindow" id="settingsWindow">
     <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Settings</property>
+    <property name="resizable">False</property>
     <property name="default-width">1080</property>
     <property name="default-height">700</property>
     <signal name="destroy" handler="exit_app" swapped="no"/>
@@ -46,21 +48,26 @@
             <property name="name">solverFixed</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
             <child>
               <object class="GtkButton" id="backSettings">
-                <property name="label" translatable="yes">Main Menu</property>
                 <property name="width-request">100</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-bottom">25</property>
                 <signal name="clicked" handler="open_main" swapped="no"/>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="pixbuf">../assets/BackArrow.png</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="x">30</property>
-                <property name="y">500</property>
+                <property name="y">50</property>
               </packing>
             </child>
             <child>
@@ -75,7 +82,7 @@
               </object>
               <packing>
                 <property name="x">365</property>
-                <property name="y">475</property>
+                <property name="y">25</property>
               </packing>
             </child>
             <child>
@@ -89,7 +96,7 @@
               </object>
               <packing>
                 <property name="x">600</property>
-                <property name="y">475</property>
+                <property name="y">25</property>
               </packing>
             </child>
             <child>
@@ -98,11 +105,12 @@
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="halign">center</property>
                 <property name="label" translatable="yes">Import an image</property>
               </object>
               <packing>
                 <property name="x">355</property>
-                <property name="y">525</property>
+                <property name="y">75</property>
               </packing>
             </child>
             <child>
@@ -111,41 +119,34 @@
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="halign">center</property>
                 <property name="label" translatable="yes">Import a network</property>
               </object>
               <packing>
                 <property name="x">587</property>
-                <property name="y">525</property>
+                <property name="y">75</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkImage" id="settingsImage">
-                <property name="width-request">100</property>
-                <property name="height-request">80</property>
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="pixbuf">mots-melés-anglais- (1).png</property>
-              </object>
-              <packing>
-                <property name="x">160</property>
-                <property name="y">20</property>
-              </packing>
-            </child>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">2</property>
+            <property name="width">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkImage" id="settingsImage">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="margin-top">5</property>
+            <property name="pixbuf">../assets/OCR_Logo.png</property>
           </object>
           <packing>
             <property name="left-attach">0</property>
             <property name="top-attach">1</property>
             <property name="width">3</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
@@ -178,6 +179,9 @@
               <attribute name="weight" value="bold"/>
               <attribute name="variant" value="title-caps"/>
             </attributes>
+            <style>
+              <class name="large"/>
+            </style>
           </object>
           <packing>
             <property name="left-attach">0</property>
@@ -258,7 +262,7 @@
                 <property name="height-request">600</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="pixbuf">mots-melés-anglais- (1).png</property>
+                <property name="pixbuf">../assets/OCR_Logo.png</property>
               </object>
               <packing>
                 <property name="x">265</property>
@@ -286,6 +290,8 @@
   </object>
   <object class="GtkWindow" id="rotationWindow">
     <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Rotation</property>
+    <property name="resizable">False</property>
     <property name="default-width">1080</property>
     <property name="default-height">700</property>
     <signal name="destroy" handler="exit_app" swapped="no"/>
@@ -321,21 +327,29 @@
             <property name="name">solverFixed</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="margin-bottom">25</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
             <child>
               <object class="GtkButton" id="backRotation">
-                <property name="label" translatable="yes">Main Menu</property>
                 <property name="width-request">100</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-bottom">10</property>
                 <signal name="clicked" handler="open_main" swapped="no"/>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="pixbuf">../assets/BackArrow.png</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="x">30</property>
-                <property name="y">500</property>
+                <property name="y">50</property>
               </packing>
             </child>
             <child>
@@ -350,7 +364,7 @@
               </object>
               <packing>
                 <property name="x">335</property>
-                <property name="y">475</property>
+                <property name="y">25</property>
               </packing>
             </child>
             <child>
@@ -365,7 +379,7 @@
               </object>
               <packing>
                 <property name="x">635</property>
-                <property name="y">475</property>
+                <property name="y">25</property>
               </packing>
             </child>
             <child>
@@ -380,22 +394,23 @@
               </object>
               <packing>
                 <property name="x">448</property>
-                <property name="y">475</property>
+                <property name="y">25</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkImage" id="rotationImage">
-                <property name="width-request">100</property>
-                <property name="height-request">80</property>
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="pixbuf">mots-melés-anglais- (1).png</property>
-              </object>
-              <packing>
-                <property name="x">160</property>
-                <property name="y">20</property>
-              </packing>
-            </child>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">2</property>
+            <property name="width">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkImage" id="rotationImage">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="margin-top">5</property>
+            <property name="pixbuf">../assets/OCR_Logo.png</property>
           </object>
           <packing>
             <property name="left-attach">0</property>
@@ -403,20 +418,13 @@
             <property name="width">3</property>
           </packing>
         </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
       </object>
     </child>
   </object>
   <object class="GtkWindow" id="solverWindow">
     <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Solver</property>
+    <property name="resizable">False</property>
     <property name="default-width">1080</property>
     <property name="default-height">700</property>
     <signal name="destroy" handler="exit_app" swapped="no"/>
@@ -456,23 +464,30 @@
             <property name="vexpand">True</property>
             <child>
               <object class="GtkButton" id="backSolver">
-                <property name="label" translatable="yes">Main Menu</property>
                 <property name="width-request">100</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-bottom">25</property>
                 <signal name="clicked" handler="open_main" swapped="no"/>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="pixbuf">../assets/BackArrow.png</property>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="x">30</property>
-                <property name="y">500</property>
+                <property name="y">50</property>
               </packing>
             </child>
             <child>
               <object class="GtkButton" id="allInOneButton">
                 <property name="label" translatable="yes">All in one</property>
-                <property name="width-request">100</property>
+                <property name="width-request">130</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -481,13 +496,13 @@
               </object>
               <packing>
                 <property name="x">365</property>
-                <property name="y">475</property>
+                <property name="y">25</property>
               </packing>
             </child>
             <child>
               <object class="GtkButton" id="stepByStepButton">
                 <property name="label" translatable="yes">Step by step</property>
-                <property name="width-request">100</property>
+                <property name="width-request">130</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -496,37 +511,29 @@
               </object>
               <packing>
                 <property name="x">600</property>
-                <property name="y">475</property>
+                <property name="y">25</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkImage" id="solverImage">
-                <property name="width-request">100</property>
-                <property name="height-request">80</property>
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="pixbuf">mots-melés-anglais- (1).png</property>
-              </object>
-              <packing>
-                <property name="x">160</property>
-                <property name="y">20</property>
-              </packing>
-            </child>
+          </object>
+          <packing>
+            <property name="left-attach">0</property>
+            <property name="top-attach">2</property>
+            <property name="width">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkImage" id="solverImage">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="margin-top">5</property>
+            <property name="pixbuf">../assets/OCR_Logo.png</property>
           </object>
           <packing>
             <property name="left-attach">0</property>
             <property name="top-attach">1</property>
             <property name="width">3</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
         </child>
       </object>
     </child>
