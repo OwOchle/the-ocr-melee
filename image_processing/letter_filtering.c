@@ -6,6 +6,8 @@
 #include <err.h>
 #include <stdbool.h>
 
+#include "utils/verbose.h"
+
 
 bool is_shape_in_main_grid(linkedList* shape, long avg_width, long avg_height, long avg_ratio, double avg_density, int width, int height, double ratio, double density, linkedList* shapes) {
     ShapeBoundingBox* shape_box = get_shape_boundings(shape);
@@ -110,12 +112,12 @@ linkedList* filter_shapes(linkedList* shapes){
         elm = elm->next;
     }
 
-    printf("Mean pixel count : %li\n", pixel_sum/shape_count);
-    printf("Mean height_sum : %li\n", height_sum/shape_count);
-    printf("Mean width_sum : %li\n", width_sum/shape_count);
-    printf("Mean area_sum : %li\n", area_sum/shape_count);
-    printf("Mean density : %f\n", (double)(area_sum/shape_count)/(double)(pixel_sum/shape_count));
-    printf("Mean ratio_sum : %f\n", ratio_sum/(double)shape_count);
+    verbose_printf("Mean pixel count : %li\n", pixel_sum/shape_count);
+    verbose_printf("Mean height_sum : %li\n", height_sum/shape_count);
+    verbose_printf("Mean width_sum : %li\n", width_sum/shape_count);
+    verbose_printf("Mean area_sum : %li\n", area_sum/shape_count);
+    verbose_printf("Mean density : %f\n", (double)(area_sum/shape_count)/(double)(pixel_sum/shape_count));
+    verbose_printf("Mean ratio_sum : %f\n", ratio_sum/(double)shape_count);
 
 
     return filtered_shapes;

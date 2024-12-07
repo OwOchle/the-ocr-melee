@@ -8,11 +8,14 @@
 #include "auto_rotate.h"
 #include "cutter.h"
 #include "utils/array.h"
+#include "utils/verbose.h"
 
 #define get_as_matrix_ptr(array, width, x, y) (array + (y * width) + x)
 #define get_as_matrix(array, width, x, y) array[((y) * width) + (x)]
 
-extern void save_surface(const char* file_name, SDL_Surface* image);
+void save_surface(const char* file_name, SDL_Surface* image) {
+    IMG_SavePNG(image, file_name);
+}
 
 bool *shape_to_matrix(linkedList *shape)
 {
@@ -76,11 +79,11 @@ bool is_a_matching_towards_right(bool *shape, ShapeBoundingBox *bb)
         }
     }
 
-    printf("Met black: %d, met white: %d\n", met_black, met_white);
+    verbose_printf("Met black: %d, met white: %d\n", met_black, met_white);
 
     if (met_black != 1 || met_white != 2)
     {
-        printf("False\n");
+        verbose_printf("False\n");
         return false;
     }
 

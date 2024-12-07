@@ -6,6 +6,8 @@
 #include <err.h>
 #include <stdbool.h>
 
+#include "utils/verbose.h"
+
 const int MARK_COLOR_R = 168;
 const int MARK_COLOR_G = 157;
 const int MARK_COLOR_B = 20;
@@ -155,7 +157,7 @@ void shapes_center_histogram(SDL_Surface* surface, linkedList* shapes) {
     // Print merged histogram
     for (int i = 0; i < h; i++) {
         if (histo_y[i] >= 8) {
-            printf("%i %i\n", histo_y[i], i);
+            verbose_printf("%i %i\n", histo_y[i], i);
         }
     }
 

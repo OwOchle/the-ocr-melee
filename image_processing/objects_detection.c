@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <err.h>
 
+#include "utils/verbose.h"
 
 
 int is_valid(SDL_Surface *surface, SDL_Surface *marks_surface, int x, int y)
@@ -39,7 +40,7 @@ int is_valid(SDL_Surface *surface, SDL_Surface *marks_surface, int x, int y)
     // r == 50 && g == 168 && b == 82
     if (!((r == 0 && g == 0 && b == 0) || (r == 255 && g == 255 && b == 255)))
     {
-        printf("Marked color : %i, %i, %i\n", r, g, b);
+        verbose_printf("Marked color : %i, %i, %i\n", r, g, b);
         return 0;
     }
     // printf("Is Valid\n");

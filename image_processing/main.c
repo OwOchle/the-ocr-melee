@@ -1,159 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <err.h>
-#include <stdio.h>
+#include <string.h>
 
-#include "gaussian_binary.h"
-#include "gaussian_blur.h"
 #include "grayscale.h"
+#include "gaussian_binary.h"
 #include "objects_detection.h"
-#include "sobel.h"
-#include "threshold.h"
-#include "letter_filtering.h"
-#include "auto_rotate.h"
-#include "grid_detection.h"
-
-#include "utils/shapes.h"
 #include "utils/linked_list.h"
+#include "utils/shapes.h"
+#include "letter_filtering.h"
+#include "grid_detection.h"
+#include "sobel.h"
 
-#include "cutter.h"
+#define FP_SIZE 2097152
+#define BUF_SIZE 2048
 
-void save_surface(const char* file_name, SDL_Surface* image) {
-    IMG_SavePNG(image, file_name);
-}
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-    if (argc != 2)
-        errx(EXIT_FAILURE, "Usage: image-file");
-
-    if(SDL_Init(SDL_INIT_VIDEO)!=0)
-        errx(EXIT_FAILURE, "%s", SDL_GetError());
-
-    SDL_Window* window = SDL_CreateWindow("Line Detection", 0, 0, 0, 0,SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
-    if(window == NULL)
-        errx(EXIT_FAILURE, "%s", SDL_GetError());
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL)
-        errx(EXIT_FAILURE, "%s", SDL_GetError());
-
-    SDL_Surface* t = IMG_Load(argv[1]);
-    if (t == NULL)
-        errx(EXIT_FAILURE, "%s", SDL_GetError());
-    SDL_Surface *surface = SDL_ConvertSurfaceFormat(t, SDL_PIXELFORMAT_RGB888, 0);
-    
-    if (surface == NULL)
-        errx(EXIT_FAILURE, "%s", SDL_GetError());
-
-    int height = surface->h, width = surface->w;
-
-    SDL_SetWindowSize(window,  surface->w, surface->h);
-
-    surface_to_grayscale(surface);
-
-    // Gaussian Blur
-    /*
-    surface_to_blur(surface, 2, 0.5); // 4 for lvl 2
-
-    save_surface("../outputs/output_blur.png", surface);
-
-    printf("image_processing: Saved blured file in outputs folder.\n");*/
-    
-    // Threshold
-
-    // surface_to_threshold(surface, 240); // Adjust the threshold as needed
-    //surface_to_gaussian_binary(surface, 2, 2, 3);
-    surface_to_simple_binary(surface, 128);
-
-    save_surface("../outputs/output_threshold.png", surface);
-    printf("image_processing: Saved threshold file in outputs folder.\n");
-
-    //Object detection
-    linkedList* shapes = surface_to_objects(surface);
-
-    /*printf("Should be rotated by %d\n", determine_rotation(surface, shapes));
-
-    SDL_FreeSurface(t);
-
-    return 0;*/
-
-    linkedList* filtered_shapes = filter_shapes(shapes);
-
-    SDL_Color color = {89, 67, 167};
-    //show_shapes_boundings(surface, filtered_shapes, color);
-    linkedList* isolated = detect_unique_shapes(filtered_shapes);
-
-    show_shapes_boundings(surface, isolated, color);
-
-    shapes_center_histogram(surface, filtered_shapes);
-
-
-    save_surface("../outputs/output_dfs.png", surface);
-    printf("image_processing: Saved DFS file in outputs folder.\n");
-
-    size_t count;
-    SDL_Surface **letters = shapes_to_surfaces(filtered_shapes, &count);
-
-    for (size_t i = 0; i < count; i++)
+    if (argc < 4)
     {
-        char *name;
-        asprintf(&name, "../letters/%d.png", i);
-
-        save_surface(name, letters[i]);
-
-        free(name);
-        SDL_FreeSurface(letters[i]);
+        fprintf(stderr,
+        "Usage: ./image_processing <input image> <step> <output>\n"
+        "       Arguments:\n"
+        "           input image: Input image path\n"
+        "           step: 'grayscale', 'binary', 'shapes', 'sobel'\n"
+        "           output: Output image path or '-' for stdout\n"
+        );
+        exit(1);
     }
 
-    free(letters);
+    SDL_Surface *input_image = IMG_Load(argv[1]);
 
-    float* gradient_magnitude = malloc(width * height * sizeof(float));
-    float* gradient_direction = malloc(width * height * sizeof(float));
-    
-    surface_to_sobel(surface, gradient_magnitude, gradient_direction);
-
-    save_surface("../outputs/output_sobel.png", surface);
-
-    printf("image_processing: Saved sobel file in outputs folder.\n");
-
-    SDL_Surface *cropped = crop_surface(surface, 15, 15, 20, 20);
-
-    save_surface("../outputs/output_cropped.png", cropped);
-    
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-
-    SDL_UpdateTexture(texture, NULL, surface->pixels, surface->pitch);
-    SDL_RenderCopy(renderer, texture, NULL, NULL);
-    SDL_RenderPresent(renderer);
-
-    free(gradient_magnitude);
-    free(gradient_direction);
-
-    /*
-    SDL_Event event;
-    while (1)
+    if (input_image == NULL)
     {
-        SDL_WaitEvent(&event);
-        switch (event.type)
-        {
-            case SDL_QUIT:
-                SDL_FreeSurface(surface);
-                SDL_DestroyTexture(texture);
-                SDL_DestroyRenderer(renderer);
-                SDL_DestroyWindow(window);
-                SDL_Quit();
-                return EXIT_SUCCESS;
+        errx(1, "Error while loading input image: %s", SDL_GetError());
+    }
 
-            case SDL_WINDOWEVENT:
-                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-                {
-                        SDL_RenderCopy(renderer,texture,NULL,NULL);
-                        SDL_RenderPresent(renderer);
-                }
-                break;
+    if (!strcmp(argv[2], "grayscale"))
+    {
+        surface_to_grayscale(input_image);
+    } 
+    else if (!strcmp(argv[2], "binary"))
+    {
+        surface_to_grayscale(input_image);
+        surface_to_simple_binary(input_image, 128);
+    }
+    else if (!strcmp(argv[2], "shapes"))
+    {
+        surface_to_grayscale(input_image);
+        surface_to_simple_binary(input_image, 128);
+
+        linkedList* shapes = surface_to_objects(input_image);
+        linkedList* filtered_shapes = filter_shapes(shapes);
+
+        SDL_Color color = {89, 67, 167};
+        linkedList* isolated = detect_unique_shapes(filtered_shapes);
+
+        show_shapes_boundings(input_image, isolated, color);
+
+        shapes_center_histogram(input_image, filtered_shapes);
+        
+        list_free(isolated);
+        list_free(filtered_shapes);
+    }
+    else if (!strcmp(argv[2], "sobel"))
+    {
+        float* gradient_magnitude = malloc(input_image->w * input_image->h * sizeof(float));
+        float* gradient_direction = malloc(input_image->w * input_image->h * sizeof(float));
+
+        surface_to_grayscale(input_image);
+        surface_to_simple_binary(input_image, 128);
+        surface_to_sobel(input_image, gradient_magnitude, gradient_direction);
+
+        free(gradient_direction);
+        free(gradient_magnitude);
+    }
+    else
+    {
+        errx(1, "Unknown step '%s'. Possible values are: grayscale, binary, shapes, sobel", argv[2]);
+    }
+
+    if (!strcmp(argv[3], "-"))
+    {
+        SDL_RWops *ops = SDL_RWFromFP(stdout, 1);
+
+        if (IMG_SavePNG_RW(input_image, ops, 0))
+        {
+            errx(1, "Error while writing image: %s", SDL_GetError());
         }
-    }*/
-    return EXIT_SUCCESS;
+
+        SDL_FreeRW(ops);
+    }
+    else
+    {
+        IMG_SavePNG(input_image, argv[3]);
+    }
+
+    SDL_FreeSurface(input_image);
 }
