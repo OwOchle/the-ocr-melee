@@ -28,7 +28,7 @@ bool is_marked(SDL_Surface* marks_surface, ShapeBoundingBox* bounding_box){
         Uint32 *mark_pixel =
         (Uint32 *)((Uint8 *)marks_surface->pixels + bounding_box->center_y * marks_surface->pitch +
                    bounding_box->center_x * marks_surface->format->BytesPerPixel);
-        int r,g,b;
+        Uint8 r,g,b;
         SDL_GetRGB(*mark_pixel, marks_surface->format, &r, &g, &b);
         if (r == MARK_COLOR_R && g == MARK_COLOR_G && b == MARK_COLOR_B){
             return true;
@@ -37,7 +37,7 @@ bool is_marked(SDL_Surface* marks_surface, ShapeBoundingBox* bounding_box){
     }
     return EXIT_FAILURE;
 }
-
+/*
 void letter_dfs_by_similar(SDL_Surface* marks_surface, Node* shape, linkedList* shapes, linkedList* dest, int depth){
     const int MAX_DEPTH = 3000;
     if (depth > MAX_DEPTH)
@@ -48,20 +48,18 @@ void letter_dfs_by_similar(SDL_Surface* marks_surface, Node* shape, linkedList* 
     int width = marks_surface->w;
     int height = marks_surface->h;
 
-    // Check pixel color and mark status
-    int x = shape->shape_bounding_box->center_x;
-    int y = shape->shape_bounding_box->center_y;
-
-    Uint32 *mark_pixel =
-        (Uint32 *)((Uint8 *)marks_surface->pixels + y * marks_surface->pitch +
-                   x * marks_surface->format->BytesPerPixel);
-
     // If pixel is already marked (blue), return
     if (is_marked(marks_surface, shape->shape_bounding_box)){
         return;
     }
 
     // Mark
+    int x = shape->shape_bounding_box->center_x;
+    int y = shape->shape_bounding_box->center_y;
+
+    Uint32 *mark_pixel =
+        (Uint32 *)((Uint8 *)marks_surface->pixels + y * marks_surface->pitch +
+                   x * marks_surface->format->BytesPerPixel);
     *mark_pixel = SDL_MapRGB(marks_surface->format, MARK_COLOR_R, MARK_COLOR_G, MARK_COLOR_B);
 
     int dx[] = {  0,-1, 1, 0 };
@@ -80,6 +78,22 @@ void letter_dfs_by_similar(SDL_Surface* marks_surface, Node* shape, linkedList* 
     }
 }
 
+linkedList *surface_to_objects(SDL_Surface *surface)
+{
+    int height = surface->h;
+    int width = surface->w;
+
+    linkedList *shape_list = list_create();
+
+    // Create a temporary surface for the result
+    SDL_Surface *marks_surface = SDL_CreateRGBSurface(
+        0, width, height, 32, surface->format->Rmask, surface->format->Gmask,
+        surface->format->Bmask, surface->format->Amask
+    );
+
+    int sizes = 0;
+    int shapes_c = 0;
+*/
 void merge_histogram_lines(int *histogram, int histogram_size, int threshold) {
     int *merged_histogram = calloc(histogram_size, sizeof(int));
     
