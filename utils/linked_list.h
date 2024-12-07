@@ -38,6 +38,7 @@ static Node_Shape *node_create_shape(linkedList* shape);
 
 void list_append(linkedList *li, int x, int y);
 void list_append_shape(linkedList *li, linkedList* shape);
+void list_append_node(linkedList *li, Node *elm);
 
 linkedList *list_create();
 

@@ -24,6 +24,7 @@ void save_surface(const char* file_name, SDL_Surface* image) {
 
 int main(int argc, char** argv)
 {
+    srand(time(NULL));
     if (argc != 2)
         errx(EXIT_FAILURE, "Usage: image-file");
 
@@ -84,10 +85,11 @@ int main(int argc, char** argv)
     //show_shapes_boundings(surface, filtered_shapes, color);
     linkedList* isolated = detect_unique_shapes(filtered_shapes);
 
-    show_shapes_boundings(surface, isolated, color);
+    show_shapes_center(surface, isolated, color);
 
-    shapes_center_histogram(surface, filtered_shapes);
+    // shapes_center_histogram(surface, filtered_shapes);
 
+    get_shape_groups(surface, filtered_shapes);
 
     save_surface("../outputs/output_dfs.png", surface);
     printf("image_processing: Saved DFS file in outputs folder.\n");
