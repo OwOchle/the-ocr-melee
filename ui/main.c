@@ -17,13 +17,13 @@ GtkImage *settingsImage= NULL;
 GtkWidget *rotationWindow = NULL;
 GtkImage *rotationImage= NULL;
 
-char* fileName = NULL; // Image de départ
+char* imageName = NULL;
 
 GdkPixbuf *pixbuf = NULL;
 
 bool check_image_existence()
 {
-    if (fileName == NULL)
+    if (imageName == NULL)
     {
         GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
         GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW(mainWindow),
@@ -39,7 +39,7 @@ bool check_image_existence()
 
     struct stat _;
 
-    if (stat(fileName, &_))
+    if (stat(imageName, &_))
     {
         GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
         GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW(mainWindow),
@@ -79,7 +79,8 @@ int main(int argc, char *argv[])
     gtk_builder_connect_signals(builder, NULL);
     g_object_unref(builder);
 
-    gtk_widget_show(mainWindow);
+    gtk_widget_show_all(mainWindow);
+    gtk_window_set_position((GtkWindow*)mainWindow,GTK_WIN_POS_CENTER);
     gtk_main();
 
     return 0;
@@ -102,6 +103,7 @@ void open_main() // Bouton qui ouvre le main menu
     gtk_widget_hide(solverWindow);
     gtk_widget_hide(rotationWindow);
     gtk_widget_hide(settingsWindow);
+    // gtk_window_set_position((GtkWindow*)mainWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(mainWindow);
 }
 
@@ -109,6 +111,7 @@ void open_solver() // Bouton qui ouvre le solver
 {
     printf("Solver opened\n");
     gtk_widget_hide(mainWindow);
+    // gtk_window_set_position((GtkWindow*)solverWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(solverWindow);
 }
 
@@ -116,6 +119,7 @@ void open_settings() // Bouton qui ouvre les settings
 {
     printf("Settings opened\n");
     gtk_widget_hide(mainWindow);
+    // gtk_window_set_position((GtkWindow*)settingsWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(settingsWindow);
 }
 
@@ -123,6 +127,7 @@ void open_rotation() // Bouton qui ouvre la fenêtre de rotation
 {
     printf("Rotation window opened\n");
     gtk_widget_hide(mainWindow);
+    // gtk_window_set_position((GtkWindow*)rotationWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(rotationWindow);
 }
 
@@ -167,22 +172,23 @@ void stepByStep_clicked() // Bouton qui solve en montrant chaque étape
     {
         return;
     }
+    
     printf("------------------------------------------\n");
     printf("Solving:\nStep 1 : ...\nStep 2 : ...\nStep 3 : ...\n");
     printf("------------------------------------------\n");
     
     g_object_unref(pixbuf);
-    pixbuf = get_next_image_step(fileName);
+    pixbuf = get_next_image_step(imageName);
     update_all_pixbufs();
 }
 
 void on_imageImport(GtkFileChooserButton *file)
 {
     reset_steps();
-    fileName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
-    printf("imported file name = %s\n", fileName);
+    imageName = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
+    printf("imported file name = %s\n", imageName);
 
-    pixbuf = gdk_pixbuf_new_from_file(fileName, NULL);
+    pixbuf = gdk_pixbuf_new_from_file(imageName, NULL);
     update_all_pixbufs();
 }
 
