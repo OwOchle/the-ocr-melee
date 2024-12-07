@@ -3,10 +3,11 @@ CC = gcc
 PKGS = sdl2 SDL2_image
 PKGCONFIG = `pkg-config --cflags --libs $(PKGS)`
 LDFLAGS = -lm
-CFLAGS = $(PKGCONFIG) -lm
-OBJS = main.o grayscale.o gaussian_blur.o sobel.o line_detection.o threshold.o
+CFLAGS = $(PKGCONFIG) -I. -I.. -I../utils -g -fsanitize=address
 
-debug: CFLAGS += -g -fsanitize=address
+OBJS = main.o grayscale.o gaussian_blur.o sobel.o threshold.o gaussian_binary.o letter_filtering.o grid_detection.o objects_detection.o ../utils/linked_list.o ../utils/shapes.o cutter.o auto_rotate.o
+
+debug: CFLAGS += -g
 debug: $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o image_processing 
 
@@ -16,4 +17,4 @@ release: $(OBJS)
 .PHONY: clean
 
 clean:
-	$(RM) $(OBJS) main
+	$(RM) $(OBJS) image_processing

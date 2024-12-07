@@ -47,7 +47,7 @@ def detect_grid_lines_y(image, target, line_width):
     return target
 
 
-def detect_grid_lines_x(image, target):
+def detect_grid_lines_x(image, target, line_width):
     """Detect grid letters via horizontal lines.
 
     :param image: image to detect letters on
@@ -60,8 +60,6 @@ def detect_grid_lines_x(image, target):
     else:
         height, width = image.shape
     print(height, width)
-
-    line_width = 3
 
     sum_line_height = 0
 

@@ -35,6 +35,8 @@ def hough_lines(image, edges: np.ndarray, threshold: float, min_theta: float, ma
                 accumulator[rho_idx, t_idx] += 1
 
     # Find the accumulator values above the threshold
+    # print(np.mean(accumulator))
+    
     rho_idx, theta_idx = np.where(accumulator > threshold)
 
     # Copy the image to draw lines
