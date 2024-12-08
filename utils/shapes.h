@@ -5,6 +5,11 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 
+#define sbb_width(bb) bb->max_x - bb->min_x
+#define sbb_height(bb) bb->max_y - bb->min_y
+
+#define split_bb(surface, bb) crop_surface(surface, bb->min_x, bb->min_y, sbb_width(bb), sbb_height(bb))
+
 typedef struct ShapeBoundingBox
 {
     int max_x;
@@ -25,7 +30,12 @@ void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color col
 void show_shapes_center(
     SDL_Surface *surface, linkedList *shape, SDL_Color color
 );
-
+void show_boundings(
+    SDL_Surface *surface, ShapeBoundingBox *box, SDL_Color color
+);
+void show_bounding_box(
+    SDL_Surface *surface, int x1, int y1, int x2, int y2, SDL_Color color
+);
 void show_shapes_boundings(
     SDL_Surface *surface, linkedList *shapes, SDL_Color color
 );
@@ -38,5 +48,7 @@ bool is_in_shape_bounds(int x, int y, ShapeBoundingBox* shape_boudings);
 bool is_in_shape(int x, int y, linkedList* shape);
 
 linkedList* find_shape_containing_point(int x, int y, linkedList* shapes);
+linkedList *
+find_shapes_in_boundings(linkedList *shapes, ShapeBoundingBox *target_box);
 linkedList* detect_unique_shapes(linkedList* shapes);
 SDL_Surface **shapes_to_surfaces(linkedList *shapes, size_t *length) ;

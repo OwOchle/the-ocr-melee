@@ -65,7 +65,7 @@ void surface_to_blur(SDL_Surface *surface, int radius, double sigma){
 
     for (int x = radius; x < width-radius; x++)
     {
-        for (int y = radius; y < width-radius; y++)
+        for (int y = radius; y < height - radius; y++)
         {
             double weighted_sum_r = 0.0, weighted_sum_g = 0.0, weighted_sum_b = 0.0;
 

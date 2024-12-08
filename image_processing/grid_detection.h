@@ -12,6 +12,10 @@ void letter_dfs_by_similar(
     SDL_Surface *marks_surface, linkedList *shape, linkedList *shapes,
     linkedList *dest, int depth
 );
-ShapeBoundingBox *get_shape_groups(SDL_Surface *surface, linkedList *shapes);
+ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, int *size);
+ShapeBoundingBox **get_shape_word_groups(
+    SDL_Surface *surface, linkedList *shapes, int *size,
+    ShapeBoundingBox *bounds
+);
 
-void shapes_center_histogram(SDL_Surface* surface, linkedList* shapes);
+ShapeBoundingBox *get_largest_under(ShapeBoundingBox **boxes, size_t size, size_t threshold);

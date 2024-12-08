@@ -45,7 +45,7 @@ void surface_to_sobel(SDL_Surface *surface, float* gradient_magnitude, float* gr
 
     for (int x = radius; x < width-radius; x++)
     {
-        for (int y = radius; y < width-radius; y++)
+        for (int y = radius; y < height - radius; y++)
         {
             double gx = 0.0, gy = 0.0;
             for (int i = -radius; i <= radius; i++)

@@ -54,6 +54,15 @@ int round_to_upper_five_multiple(int num) {
     }
 }
 
+void show_boundings(
+    SDL_Surface *surface, ShapeBoundingBox *box, SDL_Color color
+)
+{
+    show_bounding_box(
+        surface, box->max_x, box->max_y, box->min_x, box->min_y, color
+    );
+}
+
 void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color)
 {
     ShapeBoundingBox *box = get_shape_boundings(shape);
@@ -93,6 +102,10 @@ void show_shapes_center(
     SDL_Surface *surface, linkedList *shapes, SDL_Color color
 )
 {
+    if (shapes == NULL)
+    {
+        return;
+    }
     Node *elm = shapes->head;
     if (shapes->head != NULL)
     {
@@ -190,8 +203,7 @@ linkedList* find_shape_containing_point(int x, int y, linkedList* shapes) {
             // Ensure shape_bounding_box is created if not already exists
             if (current->shape_bounding_box == NULL) {
                 current->shape_bounding_box = get_shape_boundings(current->shape);
-            }
-            // First, check if point is within bounding box
+            } // First, check if point is within bounding box
             if (is_in_shape_bounds(x, y, current->shape_bounding_box)) {
                 return current->shape;
             }
@@ -202,6 +214,55 @@ linkedList* find_shape_containing_point(int x, int y, linkedList* shapes) {
     return NULL;
 }
 
+linkedList *
+find_shapes_in_boundings(linkedList *shapes, ShapeBoundingBox *target_box)
+{
+    // Create a new list to store shapes within the bounding box
+    linkedList *shapes_in_boundings = list_create();
+
+    // Check if input is valid
+    if (shapes == NULL || target_box == NULL || shapes->head == NULL)
+    {
+        return shapes_in_boundings;
+    }
+
+    // Iterate through all shapes
+    Node *current = shapes->head;
+    while (current != NULL)
+    {
+        // Skip invalid shapes
+        if (current->x == -42 && current->y == -42)
+        {
+            current = current->next;
+            continue;
+        }
+
+        // Ensure the shape's bounding box is calculated
+        ShapeBoundingBox *shape_box = get_shape_boundings(current->shape);
+
+        // Check if the shape's bounding box is fully contained within the
+        // target box
+        bool contained_x =
+            (shape_box->min_x >= target_box->min_x &&
+             shape_box->max_x <= target_box->max_x);
+        bool contained_y =
+            (shape_box->min_y >= target_box->min_y &&
+             shape_box->max_y <= target_box->max_y);
+
+        // If the shape is fully contained, add it to the result list
+        if (contained_x && contained_y)
+        {
+            list_append_shape(shapes_in_boundings, current->shape);
+        }
+
+        // Free the temporary bounding box to prevent memory leaks
+        free(shape_box);
+
+        current = current->next;
+    }
+
+    return shapes_in_boundings;
+}
 
 linkedList* detect_unique_shapes(linkedList* shapes) {
     linkedList* unique_shapes = list_create();
