@@ -257,6 +257,29 @@ ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, in
     return box_res;
 }
 
+ShapeBoundingBox *get_largest_under(ShapeBoundingBox **boxes, size_t size, size_t threshold)
+{
+    size_t max_size = 0;
+    ShapeBoundingBox *max = boxes[0];
+
+    size_t width;
+    size_t height;
+
+    for (size_t i = 0; i < size; i++)
+    {
+        width = boxes[i]->max_x - boxes[i]->min_x;
+        height = boxes[i]->max_y - boxes[i]->min_y;
+
+        if (width * height > max_size && width * height < threshold)
+        {
+            max_size = width * height;
+            max = boxes[i];
+        }
+    }
+
+    return max;
+}
+
 void word_dfs(
     SDL_Surface *marks_surface, linkedList *shape, linkedList *shapes,
     int depth, SDL_Color group_color, int *max_x, int *max_y, int *min_x,
@@ -414,7 +437,10 @@ ShapeBoundingBox **get_shape_word_groups(
             if (box_width >= 0 && box_height >= 0 && max_x < surface->w &&
                 max_y < surface->h && min_y >= 0 && min_x >= 0)
             {
-                group_count++;
+                if (max_x <= bounds->max_x && max_y <= bounds->max_y &&
+                    min_x >= bounds->min_x && min_y >= bounds->min_y)
+                {
+                    group_count++;
                 box_res =
                     realloc(box_res, group_count * sizeof(ShapeBoundingBox *));
 
@@ -425,11 +451,7 @@ ShapeBoundingBox **get_shape_word_groups(
                                               .max_y = max_y,
                                               .center_x = (min_x + max_x) / 2,
                                               .center_y = (min_y + max_y) / 2};
-
-                printf("%i/%i\n", bounds->max_x, bounds->max_y);
-                if (max_x <= bounds->max_x && max_y <= bounds->max_y &&
-                    min_x >= bounds->min_x && min_y >= bounds->min_y)
-                {
+                    printf("%i/%i\n", bounds->max_x, bounds->max_y);
                     box_res[group_count - 1] = new_box;
 
                     // Optional: Visualize bounding box

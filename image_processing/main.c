@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <err.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "gaussian_binary.h"
 #include "gaussian_blur.h"
@@ -40,6 +41,7 @@ int main(int argc, char** argv)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
 
     SDL_Surface* t = IMG_Load(argv[1]);
+    SDL_Surface *clean_surface = IMG_Load(argv[1]);
     if (t == NULL)
         errx(EXIT_FAILURE, "%s", SDL_GetError());
     SDL_Surface *surface = SDL_ConvertSurfaceFormat(t, SDL_PIXELFORMAT_RGB888, 0);
@@ -52,6 +54,7 @@ int main(int argc, char** argv)
     SDL_SetWindowSize(window,  surface->w, surface->h);
 
     surface_to_grayscale(surface);
+    surface_to_grayscale(clean_surface);
 
     // Gaussian Blur
 
@@ -66,6 +69,7 @@ int main(int argc, char** argv)
     // surface_to_threshold(surface, 240); // Adjust the threshold as needed
     //surface_to_gaussian_binary(surface, 2, 2, 3);
     surface_to_simple_binary(surface, 210);
+    surface_to_simple_binary(clean_surface, 210);
 
     save_surface("../outputs/output_threshold.png", surface);
     printf("image_processing: Saved threshold file in outputs folder.\n");
@@ -94,10 +98,66 @@ int main(int argc, char** argv)
     // linkedList* cool = find_shapes_in_boundings(*(boxes + 1),
     // filtered_shapes);
 
+    ShapeBoundingBox *largest = get_largest_under(boxes, size, (size_t)-1);
+
+    ShapeBoundingBox *words_box = get_largest_under(boxes, size, ((sbb_width(largest)) * (sbb_height(largest))) - 1);
+
+    SDL_Surface *word_list_cropped = crop_surface(surface, words_box->min_x, words_box->min_y, sbb_width(words_box), sbb_height(words_box));
+
+    save_surface("../outputs/words.png", word_list_cropped);
+
+    SDL_FreeSurface(word_list_cropped);
+
     int words_box_idx = 1;
-    get_shape_word_groups(
-        surface, filtered_shapes, &size, boxes[words_box_idx]
+    int detected_word_count = 0;
+    ShapeBoundingBox **words = get_shape_word_groups(
+        surface, filtered_shapes, &detected_word_count, words_box
     );
+
+    linkedList *letters_l;
+    size_t letter_index = 0;
+
+    for (size_t i = 0; i < detected_word_count; i++)
+    {
+        letter_index = 0;
+        char *name;
+        asprintf(&name, "../outputs/word_%d.png", i);
+
+        ShapeBoundingBox *bb = words[i];
+        printf("%p\n", bb);
+
+        fflush(stdout);
+
+        SDL_Surface *s = split_bb(clean_surface, bb);
+
+        letters_l = find_shapes_in_boundings(filtered_shapes, bb);
+
+        char *letter_name;
+        SDL_Surface *letter;
+        ShapeBoundingBox *shapebb;
+
+        for (Node *n = letters_l->head; n; n = n->next)
+        {
+            letter_index++;
+            asprintf(&letter_name, "../outputs/word_%d_letter_%d.png", i, letter_index);
+            shapebb = get_shape_boundings(n->shape);
+
+            letter = split_bb(clean_surface, shapebb);
+
+            save_surface(letter_name, letter);
+
+            free(letter_name);
+            SDL_FreeSurface(letter);
+            free(shapebb);
+        }
+
+        list_free(letters_l);
+
+        save_surface(name, s);
+        SDL_FreeSurface(s);
+
+        free(name);
+    }
 
     printf("Size: %i\n", size);
 

@@ -17,3 +17,5 @@ ShapeBoundingBox **get_shape_word_groups(
     SDL_Surface *surface, linkedList *shapes, int *size,
     ShapeBoundingBox *bounds
 );
+
+ShapeBoundingBox *get_largest_under(ShapeBoundingBox **boxes, size_t size, size_t threshold);

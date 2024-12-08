@@ -5,6 +5,11 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 
+#define sbb_width(bb) bb->max_x - bb->min_x
+#define sbb_height(bb) bb->max_y - bb->min_y
+
+#define split_bb(surface, bb) crop_surface(surface, bb->min_x, bb->min_y, sbb_width(bb), sbb_height(bb))
+
 typedef struct ShapeBoundingBox
 {
     int max_x;
