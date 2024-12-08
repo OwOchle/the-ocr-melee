@@ -78,7 +78,8 @@ bool is_marked(SDL_Surface* marks_surface, ShapeBoundingBox* bounding_box){
 
 void letter_dfs_by_similar(
     SDL_Surface *marks_surface, linkedList *shape, linkedList *shapes,
-    linkedList *dest, int depth, SDL_Color group_color
+    linkedList *dest, int depth, SDL_Color group_color, int *max_x, int *max_y,
+    int *min_x, int *min_y
 )
 {
     const int MAX_DEPTH = 3000;
@@ -110,8 +111,14 @@ void letter_dfs_by_similar(
     int shape_width = box->max_x - box->min_x;
     int shape_height = box->max_y - box->min_y;
 
-    int margin_y = 4 * shape_height;
-    int margin_x = 6 * shape_width;
+    int margin_y = 3 * shape_height;
+    int margin_x = 8 * shape_width;
+
+    // Update bounds
+    *max_x = (box->max_x > *max_x) ? box->max_x : *max_x;
+    *max_y = (box->max_y > *max_y) ? box->max_y : *max_y;
+    *min_x = (*min_x == 0 || box->min_x < *min_x) ? box->min_x : *min_x;
+    *min_y = (*min_y == 0 || box->min_y < *min_y) ? box->min_y : *min_y;
 
     for (int i = 0; i < marks_surface->w - x - 1 && i <= margin_x;
          i++) // Positive left
@@ -130,10 +137,11 @@ void letter_dfs_by_similar(
                     shape_height <= shape_height2 * 1.5)
                 {
                     letter_dfs_by_similar(
-                        marks_surface, shape, shapes, dest, depth += 1,
-                        group_color
+                        marks_surface, shape, shapes, dest, depth + 1,
+                        group_color, max_x, max_y, min_x, min_y
                     );
                 }
+                free(box);
             }
         }
     }
@@ -154,10 +162,11 @@ void letter_dfs_by_similar(
                     shape_height <= shape_height2 * 1.5)
                 {
                     letter_dfs_by_similar(
-                        marks_surface, shape, shapes, dest, depth += 1,
-                        group_color
+                        marks_surface, shape, shapes, dest, depth + 1,
+                        group_color, max_x, max_y, min_x, min_y
                     );
                 }
+                free(box);
             }
         }
     }
@@ -165,7 +174,7 @@ void letter_dfs_by_similar(
     free(box);
 }
 
-ShapeBoundingBox *get_shape_groups(SDL_Surface *surface, linkedList *shapes)
+ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes)
 {
     SDL_Color color = {89, 67, 167}; // Purple (Not marked)
     show_shapes_center(surface, shapes, color);
@@ -178,9 +187,10 @@ ShapeBoundingBox *get_shape_groups(SDL_Surface *surface, linkedList *shapes)
         0, width, height, 32, surface->format->Rmask, surface->format->Gmask,
         surface->format->Bmask, surface->format->Amask
     );
-    SDL_BlitSurface(
-        surface, NULL, marks_surface, NULL
-    ); // print the surface into the marks one.
+    SDL_BlitSurface(surface, NULL, marks_surface, NULL);
+
+    ShapeBoundingBox **box_res = malloc(sizeof(ShapeBoundingBox *));
+
     int i = 0;
     for (int y = 0; y < height; y++)
     {
@@ -191,94 +201,52 @@ ShapeBoundingBox *get_shape_groups(SDL_Surface *surface, linkedList *shapes)
                 if (!is_pixel_marked(marks_surface, x, y) &&
                     is_pixel_colored(marks_surface, x, y, UNMARKED_COLOR))
                 {
-                    i++;
+
+                    int max_x = 0;
+                    int max_y = 0;
+                    int min_x = width;
+                    int min_y = height;
+
                     printf("X: %i, y : %i\n", x, y);
                     SDL_Color color2 = {
                         rand() % 255, rand() % 255, rand() % 255
                     };
 
+                    ShapeBoundingBox *box = malloc(sizeof(ShapeBoundingBox));
+
                     linkedList *shape_list = list_create();
                     linkedList *shape =
                         find_shape_containing_point(x, y, shapes);
                     letter_dfs_by_similar(
-                        marks_surface, shape, shapes, shape_list, 0, color2
+                        marks_surface, shape, shapes, shape_list, 0, color2,
+                        &max_x, &max_y, &min_x, &min_y
                     );
+                    printf("maxX: %i, maxy : %i\n", max_x, max_y);
+
+                    int box_width = max_x - min_x;
+                    int box_height = max_y - min_y;
+
+                    if (box_width >= 0 && box_height >= 0 &&
+                        max_x < surface->w && max_y < surface->h &&
+                        min_y >= 0 && min_x >= 0)
+                    {
+                        i++;
+                        show_bounding_box(
+                            marks_surface, max_x, max_y, min_x, min_y, color2
+                        );
+                        box_res =
+                            realloc(box_res, i * sizeof(ShapeBoundingBox *));
+                        printf(
+                            "Box %d size: Width = %d, Height = %d, Area = %d\n",
+                            i, // box index
+                            box_width, box_height, box_width * box_height
+                        );
+                        box_res[i - 1] = box;
+                    }
                 }
             }
         }
     }
     SDL_BlitSurface(marks_surface, NULL, surface, NULL);
-}
-
-void merge_histogram_lines(int *histogram, int histogram_size, int threshold) {
-    int *merged_histogram = calloc(histogram_size, sizeof(int));
-    
-    for (int i = 0; i < histogram_size; i++) {
-        // Skip already processed lines
-        if (histogram[i] == 0) continue;
-        
-        // Start merging lines
-        int current_line_points = histogram[i];
-        int current_line_position = i;
-        
-        // Look for nearby lines to merge
-        for (int j = i + 1; j < histogram_size; j++) {
-            // If line is within threshold and has points
-            if (histogram[j] > 0 && abs(j - i) <= threshold) {
-                current_line_points += histogram[j];
-                histogram[j] = 0; // Mark as processed
-            }
-        }
-        
-        // Store merged line
-        merged_histogram[current_line_position] = current_line_points;
-    }
-    
-    // Copy back to original histogram
-    memcpy(histogram, merged_histogram, histogram_size * sizeof(int));
-    
-    free(merged_histogram);
-}
-
-void shapes_center_histogram(SDL_Surface* surface, linkedList* shapes) {
-    const int w = surface->w;
-    const int h = surface->h;
-
-    int *histo_x = calloc(w, sizeof(int)); // Vertical lines
-    int *histo_y = calloc(h, sizeof(int)); // Horizontal lines
-
-    Node *elm = shapes->head;
-    while (elm->next != NULL) {
-        if (elm->x != -42 && elm->y != -42) {
-            ShapeBoundingBox* box = get_shape_boundings(elm->shape);
-            elm->shape_bounding_box = box;
-
-            if (box != NULL) {
-                int center_x = elm->shape_bounding_box->center_x;
-                int center_y = elm->shape_bounding_box->center_y;
-                if (center_x >= 0 && center_y >= 0) {
-                    histo_x[center_x]++;
-                    histo_y[center_y]++;
-                }
-            }
-        }
-        elm = elm->next;
-    }
-    
-    // Merge lines with a threshold of 5 pixels
-    merge_histogram_lines(histo_y, h, 2);
-    
-    // Print merged histogram
-    for (int i = 0; i < h; i++) {
-        if (histo_y[i] >= 8) {
-            printf("%i %i\n", histo_y[i], i);
-        }
-    }
-
-    free(histo_x);
-    free(histo_y);
-}
-
-void box_lines(linkedList* shapes){
-
+    return box_res;
 }

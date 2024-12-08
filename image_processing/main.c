@@ -54,18 +54,18 @@ int main(int argc, char** argv)
     surface_to_grayscale(surface);
 
     // Gaussian Blur
-    /*
-    surface_to_blur(surface, 2, 0.5); // 4 for lvl 2
+
+    surface_to_blur(surface, 4, 0.5); // 4 for lvl 2
 
     save_surface("../outputs/output_blur.png", surface);
 
-    printf("image_processing: Saved blured file in outputs folder.\n");*/
-    
+    printf("image_processing: Saved blured file in outputs folder.\n");
+
     // Threshold
 
     // surface_to_threshold(surface, 240); // Adjust the threshold as needed
     //surface_to_gaussian_binary(surface, 2, 2, 3);
-    surface_to_simple_binary(surface, 128);
+    surface_to_simple_binary(surface, 210);
 
     save_surface("../outputs/output_threshold.png", surface);
     printf("image_processing: Saved threshold file in outputs folder.\n");
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 
     // shapes_center_histogram(surface, filtered_shapes);
 
-    get_shape_groups(surface, filtered_shapes);
+    ShapeBoundingBox **boxes = get_shape_groups(surface, filtered_shapes);
 
     save_surface("../outputs/output_dfs.png", surface);
     printf("image_processing: Saved DFS file in outputs folder.\n");

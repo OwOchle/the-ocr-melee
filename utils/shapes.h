@@ -25,7 +25,12 @@ void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color col
 void show_shapes_center(
     SDL_Surface *surface, linkedList *shape, SDL_Color color
 );
-
+void show_boundings(
+    SDL_Surface *surface, ShapeBoundingBox *box, SDL_Color color
+);
+void show_bounding_box(
+    SDL_Surface *surface, int x1, int y1, int x2, int y2, SDL_Color color
+);
 void show_shapes_boundings(
     SDL_Surface *surface, linkedList *shapes, SDL_Color color
 );

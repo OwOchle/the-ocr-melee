@@ -54,6 +54,15 @@ int round_to_upper_five_multiple(int num) {
     }
 }
 
+void show_boundings(
+    SDL_Surface *surface, ShapeBoundingBox *box, SDL_Color color
+)
+{
+    show_bounding_box(
+        surface, box->max_x, box->max_y, box->min_x, box->min_y, color
+    );
+}
+
 void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color)
 {
     ShapeBoundingBox *box = get_shape_boundings(shape);
