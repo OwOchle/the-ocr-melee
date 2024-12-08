@@ -1,15 +1,15 @@
-#define  _POSIX_C_SOURCE 200809L
-
 #include <gtk/gtk.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdio.h>
 
 #include "fs_utils.h"
 #include "proc_steps.h"
+#include "solve_it.h"
+#include "word_search.h"
 
 #ifdef FROM_STRING
 extern char thing[];
@@ -31,6 +31,8 @@ GtkImage *rotationImage= NULL;
 char* imageName = NULL;
 
 char *temp_dir = NULL;
+
+char *network_path = NULL;
 
 GdkPixbuf *pixbuf = NULL;
 
@@ -224,6 +226,8 @@ void automaticRotation() // Bouton de rotation droit
 void allInOne_clicked() // Bouton qui solve d'un coup
 {
     printf("Solving...\n");
+    get_output_from_proc(temp_dir, imageName);
+
     if (gridCreated == 0)
     {
         gridCreated = 1;
@@ -275,6 +279,7 @@ void update_all_pixbufs()
     gtk_image_set_from_pixbuf(solverImage,pixbuf);
     gtk_image_set_from_pixbuf(settingsImage,pixbuf);
     gtk_image_set_from_pixbuf(rotationImage,pixbuf);
+    gtk_image_set_from_pixbuf(gridImage, pixbuf);
 }
 
 void on_imageImport(GtkFileChooserButton *file)
@@ -298,21 +303,40 @@ void stepByStep_clicked() // Bouton qui solve en montrant chaque étape
     printf("Solving:\nStep 1 : ...\nStep 2 : ...\nStep 3 : ...\n");
     printf("------------------------------------------\n");
 
+    GdkPixbuf *out = get_next_image_step(imageName);
+
+    if (out != NULL)
+    {
+        g_object_unref(pixbuf);
+        pixbuf = out;
+        update_all_pixbufs();
+        return;
+    }
+
+    struct output result = get_output_from_proc(temp_dir, imageName);
+
+    mixed_words_t *res = ocr_letters(temp_dir, network_path, result);
+
     if (gridCreated == 0)
     {
         gridCreated = 1;
-        for (int i = 0; i < 5-1; i++)
+        for (int i = 0; i < (result.width - 1); i++)
         {
-            gtk_grid_insert_row(grid, 0);
+            gtk_grid_insert_row(grid, 0);   
+        }
+
+        for (int i = 0; i < (result.height - 1); i++)
+        {
             gtk_grid_insert_column(grid, 0);
         }
 
-        for (int x = 0; x < 5; x++)
+        for (int x = 0; x < result.width; x++)
         {
-            for (int y = 0; y < 5; y++)
+            for (int y = 0; y < result.height; y++)
             {
-                GtkWidget *entry = gtk_entry_new();
-                char *letter = "a";
+                GtkWidget *entry = gtk_entry_new(); 
+                char *letter = calloc(2, sizeof(char));
+                letter[0] = res->grid[(y * res->width) + x];
                 gtk_entry_set_width_chars(GTK_ENTRY(entry), 2);
                 gtk_entry_set_alignment(GTK_ENTRY(entry), 0.5);
                 gtk_entry_set_text(GTK_ENTRY(entry), letter);
@@ -321,13 +345,33 @@ void stepByStep_clicked() // Bouton qui solve en montrant chaque étape
             }
         }
     }
+
+    char *name;
+    asprintf(&name, "%s/grid", temp_dir);
+
+    FILE *f = fopen(name, "w+");
     
-    g_object_unref(pixbuf);
-    pixbuf = get_next_image_step(imageName);
-    update_all_pixbufs();
+
+    for (size_t y = 0; y < res->height; y++)
+    {
+        for (size_t x = 0; x < res->width; x++)
+        {
+            GtkEntry *e = GTK_ENTRY(gtk_grid_get_child_at(grid, x, y));
+            fprintf(f, "%c", gtk_entry_get_text(e)[0]);
+        }
+
+        if (y != res->height - 1)
+            fprintf(f, "\n");
+    }
+
+    solver_action(name, res);
+
+    free(name);
+    fclose(f);
 }
 
 void on_network_import(GtkFileChooserButton *file)
 {
-    
+    network_path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file));
+    printf("imported network = %s\n", network_path);
 }

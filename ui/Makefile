@@ -1,7 +1,7 @@
 CC = gcc
 PKGS = gtk+-3.0
-CFLAGS = `pkg-config --cflags --libs $(PKGS)` -export-dynamic -rdynamic
-OBJS = main.o proc_steps.o fs_utils.o
+CFLAGS = `pkg-config --cflags --libs $(PKGS)` -export-dynamic -rdynamic 
+OBJS = main.o proc_steps.o fs_utils.o solve_it.o
 
 define EMBED_CODE
     .section .rodata

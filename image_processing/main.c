@@ -18,6 +18,13 @@
 #define FP_SIZE 2097152
 #define BUF_SIZE 2048
 
+struct output {
+    size_t width;
+    size_t height;
+    size_t word_count;
+    size_t word_lengths[32];
+};
+
 void execute_full(SDL_Surface *input, SDL_Surface *clean_input, char *output_path)
 {
     surface_to_grayscale(input);
@@ -70,7 +77,21 @@ void execute_full(SDL_Surface *input, SDL_Surface *clean_input, char *output_pat
 
             letter = split_bb(clean_input, letter_bb);
 
-            IMG_SavePNG(letter, letter_name);
+            size_t w = letter->w;
+            size_t h = letter->h;
+
+            SDL_Surface *out_surface = SDL_CreateRGBSurface(0, 20, 20, 32, 0, 0, 0, 0);
+
+            SDL_Rect rect = { 0, 0, 20, 20 };
+
+            SDL_FillRect(out_surface, &rect, 0xFFFFFFFF);
+
+            SDL_Rect in_rect = {0,0,w,h};
+            SDL_Rect out_rect = {1,1,18,18};
+
+            SDL_BlitScaled(letter, &in_rect, out_surface, &out_rect);
+
+            IMG_SavePNG(out_surface, letter_name);
 
             free(letter_name);
             free(letter_bb);
@@ -105,8 +126,21 @@ void execute_full(SDL_Surface *input, SDL_Surface *clean_input, char *output_pat
         {
             asprintf(&name, "%s/grid_%lu_%lu.png", output_path, cur_col, cur_line);
             cur_grid_letter = split_bb(clean_input, l);
+            size_t w = cur_grid_letter->w;
+            size_t h = cur_grid_letter->h;
 
-            IMG_SavePNG(cur_grid_letter, name);
+            SDL_Surface *out_surface = SDL_CreateRGBSurface(0, 20, 20, 32, 0, 0, 0, 0);
+
+            SDL_Rect rect = { 0, 0, 20, 20 };
+
+            SDL_FillRect(out_surface, &rect, 0xFFFFFFFF);
+
+            SDL_Rect in_rect = {0,0,w,h};
+            SDL_Rect out_rect = {1,1,18,18};
+
+            SDL_BlitScaled(cur_grid_letter, &in_rect, out_surface, &out_rect);
+
+            IMG_SavePNG(out_surface, name);
 
             free(name);
             SDL_FreeSurface(cur_grid_letter);
@@ -120,12 +154,18 @@ void execute_full(SDL_Surface *input, SDL_Surface *clean_input, char *output_pat
         cur_col = 0;
     } while ((line_left = find_nearest_down(letters_in_grid, line_left)) != NULL);
 
-    printf("%lu\n%lu\n", max_col, cur_line);
-    printf("%lu\n", word_count);
+    struct output dat;
+
+    dat.width = max_col;
+    dat.height = cur_line;
+    dat.word_count = word_count;
+
     for (size_t i = 0; i < word_count; i++)
     {
-        printf("%lu\n", word_lengths[i]);
+        dat.word_lengths[i] = word_lengths[i];
     }
+
+    fwrite(&dat, sizeof(struct output), 1, stdout);
 }
 
 int main(int argc, char **argv)

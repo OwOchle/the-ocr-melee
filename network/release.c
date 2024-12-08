@@ -13,9 +13,7 @@
 
 #define IMAGE_SIZE 20
 
-
-
-float *load_image_SDL(char *path)
+float *load_image_SDL_(char *path)
 {
     SDL_Surface *image = IMG_Load(path);
 
@@ -54,7 +52,7 @@ int main(int argc, char **argv)
         errx(1, "Could not read network at path '%s'", argv[1]);
     }
 
-    float *image = load_image_SDL(argv[2]);
+    float *image = load_image_SDL_(argv[2]);
 
     verbose_print_matrix_float(image, IMAGE_SIZE, IMAGE_SIZE);
 
@@ -64,7 +62,7 @@ int main(int argc, char **argv)
 
     size_t index = array_max_index_float(size, res);
 
-    printf("My guess is telling me the letter is an %c\n", 'A' + index);
+    printf("%c", 'A' + index);
 
     free(res);
     network_free(network);

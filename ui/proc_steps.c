@@ -33,9 +33,11 @@ GdkPixbuf *get_next_image_step(char *filename)
             step_name = "shapes";
             break;
         
-        default:
+        case 3:
             step_name = "sobel";
             break;
+        case 4:
+            return NULL;
     }
 
     printf("Loading buf for type: %s", step_name);
