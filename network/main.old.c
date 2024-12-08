@@ -1,81 +1,74 @@
-#include "evaluate.h"
-#include "file_io.h"
-#include "network.h"
-#include "../utils/array.h"
-// #include "../utils/matrix.h"
-
-#include <err.h>
-#include <errno.h>
 #include <stdio.h>
+#include <err.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-int main()
+#include "file_io.h"
+#include "../utils/array.h"
+#include "../utils/matrix.h"
+#include "evaluate.h"
+
+#define get_pixel(surface, x, y) ((Uint8 *)surface->pixels + (y) * surface->pitch + (x) * surface->format->BytesPerPixel)
+
+#define IMAGE_SIZE 20
+
+
+
+float *load_image_SDL(char *path)
 {
-    uint16_t nodesPerLayers[] = {16, 8};
+    SDL_Surface *image = IMG_Load(path);
 
-    Network *network = network_new(2, nodesPerLayers, 2);
-
-    if (network == NULL)
+    if (image == NULL)
     {
-        errx(1, "Could not allocate a new network");
+        errx(1, "Could not load image at path '%s'", path);
     }
 
-    network_init_gaussian(network);
-
-    network_write(network, "net.neuron");
-
-    Network *networkR;
-    int error = network_read(&networkR, "net.neuron");
-
-    if (networkR == NULL)
+    float *out = malloc(sizeof(float) * IMAGE_SIZE * IMAGE_SIZE);
+    for (size_t y = 0; y < image->h; y++)
     {
-        errx(
-            1, "Could not read file with error : %d and errno %d", error, errno
-        );
+        for (size_t x = 0; x < image->w; x++)
+        {
+            Uint8 *pix = get_pixel(image, x, y);
+            array_get_as_matrix(out, IMAGE_SIZE, x, y) = (pix[0] + pix[1] + pix[2]) ? 1.0 : 0.0;
+        }
     }
 
-    // network_write(networkR, "netR.neuron");
+    SDL_FreeSurface(image);
 
-    float *input = calloc(2, sizeof(float));
+    return out;
+}
 
-    input[0] = 1.0f;
-    input[1] = 0.0f;
 
-    float *out = feedforward(network, input);
-
-    if (out == NULL)
+int main(int argc, char **argv)
+{
+    if (argc < 3)
     {
-        network_free(network);
-        network_free(networkR);
-        errx(1, "Error happend while applying the network");
+        errx(1, "Not enough arguments\nUsage: ./network <network path> <letter image path>");
     }
 
-    array_float_print(2, out);
-
-    network_free(network);
-    network_free(networkR);
-
-    Network *networkX;
+    Network *network;
     
-    NETWORK_ERRNO err = network_read(&networkX, "netR.neuron");
-
-    if (err != NO_ERROR) {
-        errx(1, "Network reading failed with error %d", err);
-    }
-
-    out = feedforward(networkX, input);
-
-    if (out == NULL)
+    if (network_read(&network, argv[1]))
     {
-        network_free(networkX);
-        errx(1, "Error happend while applying the network");
+        errx(1, "Could not read network at path '%s'", argv[1]);
     }
 
-    array_float_print(2, out);
+    float *image = load_image_SDL(argv[2]);
 
-    network_free(networkX);
-    free(out);
+    verbose_print_matrix_float(image, IMAGE_SIZE, IMAGE_SIZE);
 
-    return EXIT_SUCCESS;
+    float *res = feedforward(network, image);
+
+    size_t size = network_last_layer_count(network);
+
+    size_t index = array_max_index_float(size, res);
+
+    printf("My guess is telling me the letter is an %c\n", 'A' + index);
+
+    free(res);
+    network_free(network);
+    free(image);
+
+    return 0;
 }
