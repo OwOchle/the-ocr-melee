@@ -18,5 +18,3 @@ CMakeLists.txt
 
 data/
 .env/
-
-grid_letters/
