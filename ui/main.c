@@ -147,34 +147,6 @@ void automaticRotation() // Bouton de rotation droit
     printf("Rotating...\n");
 }
 
-void allInOne_clicked() // Bouton qui solve d'un coup
-{
-    printf("Solving...\n");
-    if (gridCreated == 0)
-    {
-        gridCreated = 1;
-        for (int i = 0; i < 5-1; i++)
-        {
-            gtk_grid_insert_row(grid, 0);
-            gtk_grid_insert_column(grid, 0);
-        }
-
-        for (int x = 0; x < 5; x++)
-        {
-            for (int y = 0; y < 5; y++)
-            {
-                GtkWidget *entry = gtk_entry_new();
-                char *letter = "a";
-                gtk_entry_set_width_chars(GTK_ENTRY(entry), 2);
-                gtk_entry_set_alignment(GTK_ENTRY(entry), 0.5);
-                gtk_entry_set_text(GTK_ENTRY(entry), letter);
-                gtk_entry_set_max_length(GTK_ENTRY(entry), 1);
-                gtk_grid_attach(grid, entry, x,y,1,1);
-            }
-        }
-    }
-}
-
 void rotButton_clicked() // Bouton qui rotate AUTO
 {
     printf("Rotating...\n");
