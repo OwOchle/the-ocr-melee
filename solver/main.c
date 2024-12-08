@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include "solver.h"
 #include "file_reader.h"
@@ -13,6 +14,13 @@ int main(int argc, char **argv)
 {
     if (argc < 3)
     {
+        fprintf(stderr,
+        "Usage: ./image_processing <grid file> <word>\n"
+        "       Arguments:\n"
+        "           input image: Input image path\n"
+        "           step: 'grayscale', 'binary', 'shapes', 'sobel'\n"
+        "           output: Output image path or '-' for stdout\n"
+        );
         errx(1, "Invalid number of argument. expected 4, got : %d", argc);
         return 1;
     }
@@ -21,19 +29,23 @@ int main(int argc, char **argv)
 
     print_grid(grid);
 
-    word_coord *res = malloc(sizeof(word_coord));
-    if (!find_word_matrix(grid->grid, grid->height, grid->width, argv[2], strlen(argv[2]), res))
+    char *word = malloc(sizeof(char) * strlen(argv[2]) + 1);
+
+    strcpy(word, argv[2]);
+
+    for (char *p = word ; *p; ++p) *p = tolower(*p);
+
+    word_coord res;
+    if (!find_word_matrix(grid->grid, grid->height, grid->width, word, strlen(word), &res))
     {
-        free(res);
-        free(grid->grid);
-        free(grid);
         printf("Not found\n");
-        return 0;
+    }
+    else
+    {
+        printf("(%d,%d)(%d,%d)\n", res.ystart, res.xstart, res.yend, res.xend);
     }
 
-    printf("(%d,%d)(%d,%d)\n", res->ystart, res->xstart, res->yend, res->xend);
-
-    free(res);
+    free(word);
     free(grid->grid);
     free(grid);
 
