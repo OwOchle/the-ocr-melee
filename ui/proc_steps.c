@@ -5,7 +5,9 @@
 #include <err.h>
 #include <stdio.h>
 
-#define IMAGE_PROCESSING_EXECUTABLE "../image_processing/image_processing"
+#ifndef IMAGE_PROCESSING_EXE
+#define IMAGE_PROCESSING_EXE "../image_processing/image_processing"
+#endif
 
 int current_step = 0;
 
@@ -55,9 +57,9 @@ GdkPixbuf *get_next_image_step(char *filename)
         close(image_pipe[0]);
         dup2(image_pipe[1], STDOUT_FILENO);
 
-        char *arguments[5] = {IMAGE_PROCESSING_EXECUTABLE, filename, step_name, "-", NULL};
+        char *arguments[5] = {IMAGE_PROCESSING_EXE, filename, step_name, "-", NULL};
 
-        execvp(IMAGE_PROCESSING_EXECUTABLE, arguments);
+        execvp(IMAGE_PROCESSING_EXE, arguments);
         exit(1);
     }
     else

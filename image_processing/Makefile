@@ -9,7 +9,11 @@ OBJS = main.o grayscale.o gaussian_blur.o sobel.o threshold.o gaussian_binary.o 
 
 debug: CFLAGS += -g -fsanitize=address
 debug: $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o image_processing 
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o image_processing
+
+debug-no-asan: CFLAGS += -g
+debug-no-asan: $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o image_processing
 
 release: CFLAGS += -O3
 release: $(OBJS)

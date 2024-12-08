@@ -6,9 +6,15 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "fs_utils.h"
 #include "proc_steps.h"
+
+#ifdef FROM_STRING
+extern char thing[];
+extern int ui_size;
+#endif
 
 GtkWidget *mainWindow = NULL;
 GtkImage *mainImage = NULL;
@@ -29,6 +35,8 @@ char *temp_dir = NULL;
 GdkPixbuf *pixbuf = NULL;
 
 int imageSize = 500;
+
+void update_all_pixbufs();
 
 bool check_image_existence()
 {
@@ -86,7 +94,12 @@ int main(int argc, char *argv[])
     gtk_init(&argc, &argv);
 
     builder = gtk_builder_new();
+
+    #ifndef FROM_STRING
     gtk_builder_add_from_file(builder, "main.glade", NULL);
+    #else
+    gtk_builder_add_from_string(builder, thing, ui_size, NULL);
+    #endif
 
     mainWindow = GTK_WIDGET(gtk_builder_get_object(builder, "mainWindow"));
     mainImage = GTK_IMAGE(gtk_builder_get_object(builder, "mainImage"));

@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     }
     else if (!strcmp(argv[2], "full"))
     {
-        errx(1, "Not working yet")
+        errx(1, "Not working yet");
     }
     else
     {
