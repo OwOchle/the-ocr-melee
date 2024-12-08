@@ -43,5 +43,7 @@ bool is_in_shape_bounds(int x, int y, ShapeBoundingBox* shape_boudings);
 bool is_in_shape(int x, int y, linkedList* shape);
 
 linkedList* find_shape_containing_point(int x, int y, linkedList* shapes);
+linkedList *
+find_shapes_in_boundings(linkedList *shapes, ShapeBoundingBox *target_box);
 linkedList* detect_unique_shapes(linkedList* shapes);
 SDL_Surface **shapes_to_surfaces(linkedList *shapes, size_t *length) ;

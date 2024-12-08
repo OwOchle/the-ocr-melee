@@ -13,3 +13,7 @@ void letter_dfs_by_similar(
     linkedList *dest, int depth
 );
 ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, int *size);
+ShapeBoundingBox **get_shape_word_groups(
+    SDL_Surface *surface, linkedList *shapes, int *size,
+    ShapeBoundingBox *bounds
+);

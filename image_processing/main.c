@@ -91,6 +91,14 @@ int main(int argc, char** argv)
     int size = 0;
     ShapeBoundingBox **boxes = get_shape_groups(surface, filtered_shapes, &size);
 
+    // linkedList* cool = find_shapes_in_boundings(*(boxes + 1),
+    // filtered_shapes);
+
+    int words_box_idx = 1;
+    get_shape_word_groups(
+        surface, filtered_shapes, &size, boxes[words_box_idx]
+    );
+
     printf("Size: %i\n", size);
 
     save_surface("../outputs/output_dfs.png", surface);
