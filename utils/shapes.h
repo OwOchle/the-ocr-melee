@@ -22,7 +22,17 @@ ShapeBoundingBox* get_shape_boundings(linkedList *shape);
 void get_shape_center(int* x, int* y, ShapeBoundingBox* shape_boundings);
 
 void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color);
-void show_shapes_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color);
+void show_shapes_center(
+    SDL_Surface *surface, linkedList *shape, SDL_Color color
+);
+
+void show_shapes_boundings(
+    SDL_Surface *surface, linkedList *shapes, SDL_Color color
+);
+
+void show_shapes_center(
+    SDL_Surface *surface, linkedList *shapes, SDL_Color color
+);
 
 bool is_in_shape_bounds(int x, int y, ShapeBoundingBox* shape_boudings);
 bool is_in_shape(int x, int y, linkedList* shape);

@@ -5,6 +5,8 @@
 #include <SDL2/SDL_image.h>
 #include <err.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "utils/verbose.h"
 
@@ -12,9 +14,30 @@ const int MARK_COLOR_R = 168;
 const int MARK_COLOR_G = 157;
 const int MARK_COLOR_B = 20;
 
+SDL_Color UNMARKED_COLOR = {89, 67, 167}; // Purple (Not marked)
 
-int mark_box(SDL_Surface* surface, ShapeBoundingBox* bounding_box){
+bool is_pixel_colored(SDL_Surface *marks_surface, int x, int y, SDL_Color color)
+{
+    Uint32 *mark_pixel =
+        (Uint32 *)((Uint8 *)marks_surface->pixels + y * marks_surface->pitch +
+                   x * marks_surface->format->BytesPerPixel);
+    Uint8 r, g, b;
+    SDL_GetRGB(*mark_pixel, marks_surface->format, &r, &g, &b);
+    if (r == color.r && g == color.g && b == color.b)
+    {
+        return true;
+    }
+    return false;
+}
+
+int mark_box(
+    SDL_Surface *surface, ShapeBoundingBox *bounding_box, linkedList *shape,
+    SDL_Color bound_color
+)
+{
+    show_shape_boundings(surface, shape, bound_color);
     // Mark the center;
+    // printf("mark ze box\n");
     if (bounding_box->center_x != NULL && bounding_box->center_y != NULL){
         Uint32 *mark_pixel =
         (Uint32 *)((Uint8 *)surface->pixels + bounding_box->center_y * surface->pitch +
@@ -25,77 +48,170 @@ int mark_box(SDL_Surface* surface, ShapeBoundingBox* bounding_box){
     return EXIT_FAILURE;
 }
 
+bool is_pixel_marked(SDL_Surface *marks_surface, int x, int y)
+{
+    if (x >= marks_surface->w || y >= marks_surface->h)
+    {
+        printf(
+            "X: %i, Y: %i out of bounds (%i,%i)\n", x, y, marks_surface->w,
+            marks_surface->h
+        );
+    }
+    Uint32 *mark_pixel =
+        (Uint32 *)((Uint8 *)marks_surface->pixels + y * marks_surface->pitch +
+                   x * marks_surface->format->BytesPerPixel);
+    Uint8 r, g, b;
+    SDL_GetRGB(*mark_pixel, marks_surface->format, &r, &g, &b);
+    if (r == MARK_COLOR_R && g == MARK_COLOR_G && b == MARK_COLOR_B)
+    {
+        return true;
+    }
+    return false;
+}
+
 bool is_marked(SDL_Surface* marks_surface, ShapeBoundingBox* bounding_box){
     if (bounding_box->center_x != NULL && bounding_box->center_y != NULL){
-        Uint32 *mark_pixel =
-        (Uint32 *)((Uint8 *)marks_surface->pixels + bounding_box->center_y * marks_surface->pitch +
-                   bounding_box->center_x * marks_surface->format->BytesPerPixel);
-        Uint8 r,g,b;
-        SDL_GetRGB(*mark_pixel, marks_surface->format, &r, &g, &b);
-        if (r == MARK_COLOR_R && g == MARK_COLOR_G && b == MARK_COLOR_B){
-            return true;
-        }
-        return false;
+        return is_pixel_marked(
+            marks_surface, bounding_box->center_x, bounding_box->center_y
+        );
     }
     return EXIT_FAILURE;
 }
-/*
-void letter_dfs_by_similar(SDL_Surface* marks_surface, Node* shape, linkedList* shapes, linkedList* dest, int depth){
+
+void letter_dfs_by_similar(
+    SDL_Surface *marks_surface, linkedList *shape, linkedList *shapes,
+    linkedList *dest, int depth, SDL_Color group_color
+)
+{
     const int MAX_DEPTH = 3000;
     if (depth > MAX_DEPTH)
     {
         return;
     }
-
+    if (shape == NULL)
+    {
+        printf("Shape Null quit\n");
+        return;
+    }
     int width = marks_surface->w;
     int height = marks_surface->h;
 
+    ShapeBoundingBox *box = get_shape_boundings(shape);
+
     // If pixel is already marked (blue), return
-    if (is_marked(marks_surface, shape->shape_bounding_box)){
+    if (is_marked(marks_surface, box))
+    {
         return;
     }
 
     // Mark
-    int x = shape->shape_bounding_box->center_x;
-    int y = shape->shape_bounding_box->center_y;
+    int x = box->center_x;
+    int y = box->center_y;
+    mark_box(marks_surface, box, shape, group_color);
 
-    Uint32 *mark_pixel =
-        (Uint32 *)((Uint8 *)marks_surface->pixels + y * marks_surface->pitch +
-                   x * marks_surface->format->BytesPerPixel);
-    *mark_pixel = SDL_MapRGB(marks_surface->format, MARK_COLOR_R, MARK_COLOR_G, MARK_COLOR_B);
+    int shape_width = box->max_x - box->min_x;
+    int shape_height = box->max_y - box->min_y;
 
-    int dx[] = {  0,-1, 1, 0 };
-    int dy[] = { -1, 0, 0, 1 };
+    int margin_y = 4 * shape_height;
+    int margin_x = 6 * shape_width;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < marks_surface->w - x - 1 && i <= margin_x;
+         i++) // Positive left
     {
-        int new_x = x + dx[i];
-        int new_y = y + dy[i];
-
-        if (!is_marked(marks_surface, shape->shape_bounding_box))
+        if (!is_pixel_marked(marks_surface, x + i, y))
         {
+            linkedList *shape = find_shape_containing_point(x + i, y, shapes);
 
-            list_append_shape(dest, shape);
+            if (shape != NULL)
+            {
+                ShapeBoundingBox *box = get_shape_boundings(shape);
+                int shape_width2 = box->max_x - box->min_x;
+                int shape_height2 = box->max_y - box->min_y;
+
+                if (shape_height >= shape_height2 * 0.4 &&
+                    shape_height <= shape_height2 * 1.5)
+                {
+                    letter_dfs_by_similar(
+                        marks_surface, shape, shapes, dest, depth += 1,
+                        group_color
+                    );
+                }
+            }
         }
     }
+    for (int i = 0; i < marks_surface->h - y - 1 && i <= margin_y;
+         i++) // Positive left
+    {
+        if (!is_pixel_marked(marks_surface, x, y + i))
+        {
+            linkedList *shape = find_shape_containing_point(x, y + i, shapes);
+
+            if (shape != NULL)
+            {
+                ShapeBoundingBox *box = get_shape_boundings(shape);
+                int shape_width2 = box->max_x - box->min_x;
+                int shape_height2 = box->max_y - box->min_y;
+
+                if (shape_height >= shape_height2 * 0.4 &&
+                    shape_height <= shape_height2 * 1.5)
+                {
+                    letter_dfs_by_similar(
+                        marks_surface, shape, shapes, dest, depth += 1,
+                        group_color
+                    );
+                }
+            }
+        }
+    }
+
+    free(box);
 }
 
-linkedList *surface_to_objects(SDL_Surface *surface)
+ShapeBoundingBox *get_shape_groups(SDL_Surface *surface, linkedList *shapes)
 {
+    SDL_Color color = {89, 67, 167}; // Purple (Not marked)
+    show_shapes_center(surface, shapes, color);
+
     int height = surface->h;
     int width = surface->w;
 
-    linkedList *shape_list = list_create();
-
-    // Create a temporary surface for the result
+    // Marks surface
     SDL_Surface *marks_surface = SDL_CreateRGBSurface(
         0, width, height, 32, surface->format->Rmask, surface->format->Gmask,
         surface->format->Bmask, surface->format->Amask
     );
+    SDL_BlitSurface(
+        surface, NULL, marks_surface, NULL
+    ); // print the surface into the marks one.
+    int i = 0;
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            if (1 == 1)
+            {
+                if (!is_pixel_marked(marks_surface, x, y) &&
+                    is_pixel_colored(marks_surface, x, y, UNMARKED_COLOR))
+                {
+                    i++;
+                    printf("X: %i, y : %i\n", x, y);
+                    SDL_Color color2 = {
+                        rand() % 255, rand() % 255, rand() % 255
+                    };
 
-    int sizes = 0;
-    int shapes_c = 0;
-*/
+                    linkedList *shape_list = list_create();
+                    linkedList *shape =
+                        find_shape_containing_point(x, y, shapes);
+                    letter_dfs_by_similar(
+                        marks_surface, shape, shapes, shape_list, 0, color2
+                    );
+                }
+            }
+        }
+    }
+    SDL_BlitSurface(marks_surface, NULL, surface, NULL);
+}
+
 void merge_histogram_lines(int *histogram, int histogram_size, int threshold) {
     int *merged_histogram = calloc(histogram_size, sizeof(int));
     

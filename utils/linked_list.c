@@ -68,7 +68,23 @@ void list_append_shape(linkedList *li, linkedList* shape){
     }
 }
 
+void list_append_node(linkedList *li, Node *elm)
+{
+    if (li->head == NULL && li->tail == NULL)
+    { // Empty list
+        li->head = elm;
+        li->tail = elm;
+    }
+    else
+    {
+        Node *tailNode = li->tail;
+        elm->next = NULL;
+        elm->prev = tailNode;
 
+        tailNode->next = elm;
+        li->tail = elm;
+    }
+}
 
 linkedList *list_create()
 {

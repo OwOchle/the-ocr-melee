@@ -57,25 +57,50 @@ int round_to_upper_five_multiple(int num) {
 void show_shape_boundings(SDL_Surface *surface, linkedList* shape, SDL_Color color)
 {
     ShapeBoundingBox *box = get_shape_boundings(shape);
+    show_bounding_box(
+        surface, box->max_x, box->max_y, box->min_x, box->min_y, color
+    );
+}
 
-    show_bounding_box(surface, box->max_x, box->max_y, box->min_x, box->min_y, color);
-
-    
-    show_bounding_box(surface, round_to_upper_five_multiple(box->center_x), round_to_upper_five_multiple(box->center_y), round_to_upper_five_multiple(box->center_x), round_to_upper_five_multiple(box->center_y), color);
+void show_shape_center(SDL_Surface *surface, linkedList *shape, SDL_Color color)
+{
+    ShapeBoundingBox *box = get_shape_boundings(shape);
+    show_bounding_box(
+        surface, box->center_x, box->center_y, box->center_x, box->center_y,
+        color
+    );
 }
 
 void show_shapes_boundings(
-    SDL_Surface *surface, linkedList *shape, SDL_Color color
+    SDL_Surface *surface, linkedList *shapes, SDL_Color color
 )
 {
-    Node *elm = shape->head;
-    if (shape->head != NULL)
+    Node *elm = shapes->head;
+    if (shapes->head != NULL)
     {
         while (elm->next != NULL)
         {
             if (elm->x != -42 && elm->y != -42)
             {
                 show_shape_boundings(surface, elm->shape, color);
+            }
+            elm = elm->next;
+        }
+    }
+}
+
+void show_shapes_center(
+    SDL_Surface *surface, linkedList *shapes, SDL_Color color
+)
+{
+    Node *elm = shapes->head;
+    if (shapes->head != NULL)
+    {
+        while (elm->next != NULL)
+        {
+            if (elm->x != -42 && elm->y != -42)
+            {
+                show_shape_center(surface, elm->shape, color);
             }
             elm = elm->next;
         }
@@ -134,7 +159,7 @@ void get_shape_center(int* x, int* y, ShapeBoundingBox* shape_boundings){
 bool is_in_shape_bounds(int x, int y, ShapeBoundingBox *shape_boudings)
 {
     if ((x >= shape_boudings->min_x && x <= shape_boudings->max_x) &&
-        (y >= shape_boudings->min_y && y <= shape_boudings->max_x))
+        (y >= shape_boudings->min_y && y <= shape_boudings->max_y))
     {
         return true;
     }
@@ -154,6 +179,7 @@ bool is_in_shape(int x, int y, linkedList *shape)
 
 linkedList* find_shape_containing_point(int x, int y, linkedList* shapes) {
     if (shapes == NULL || shapes->head == NULL) {
+        printf("wtf\n");
         return NULL;
     }
 
@@ -165,13 +191,9 @@ linkedList* find_shape_containing_point(int x, int y, linkedList* shapes) {
             if (current->shape_bounding_box == NULL) {
                 current->shape_bounding_box = get_shape_boundings(current->shape);
             }
-
             // First, check if point is within bounding box
             if (is_in_shape_bounds(x, y, current->shape_bounding_box)) {
-                // If in bounds, do more precise shape checking if needed
-                if (is_in_shape(x, y, current->shape)) {
-                    return current->shape;
-                }
+                return current->shape;
             }
         }
         current = current->next;
