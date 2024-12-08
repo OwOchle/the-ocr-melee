@@ -9,16 +9,17 @@
 #include "../network/training/stochastic_gradient_descent.h"
 #include "../utils/matrix.h"
 #include "../utils/progress.h"
-#include "../utils/threaded_matrix.h"
-#include "../utils/verbose.h"
+// #include "../utils/array.h"
+// #include "../utils/threaded_matrix.h"
+// #include "../utils/verbose.h"
 #include "batch_conversion.h"
 #include "read_image.h"
 
 #define THREAD_COUNT 1
 
 // Hyper parameters
-#define ETA 0.25f
-#define LAMBDA 0.01f
+#define ETA 0.075f
+#define LAMBDA 0.001f
 #define HIDDEN_LAYER_COUNT1 128
 #define MINI_BATCH_SIZE 32
 
@@ -44,6 +45,15 @@ Network *get_network(char *path)
     return net;
 }
 
+void print_letter(float image[], size_t size) {
+    for (size_t y = 0; y < size; y++) {
+        for (size_t x = 0; x < size; x++) {
+            printf("%0.f", image[y * size + x]);
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, char **argv)
 {
     if (argc < 4)
@@ -60,7 +70,7 @@ int main(int argc, char **argv)
     }
 
     pb_init(epochs, 0);
-    mat_th_init_threadpool(THREAD_COUNT);
+    // mat_th_init_threadpool(THREAD_COUNT);
 
     size_t count;
 
@@ -71,14 +81,23 @@ int main(int argc, char **argv)
         errx(2, "output is null");
     }
 
-    int index = 125;
-    verbose_printf(
-        "name: %s, character: %c, category: %d\n", output[index].name,
-        output[index].character, output[index].category
-    );
+    int index = 0;
+    // printf(
+    //     "name: %s, character: %c, category: %d\n", output[index].name,
+    //     output[index].character, output[index].category
+    // );
     verbose_print_matrix_uchar(output[index].image, IMAGE_SIZE, IMAGE_SIZE);
 
     Batch *batch = images_to_batch(count, output);
+
+
+    // for (size_t i = 100; i < 110; i++)
+    // {
+    //     print_letter(batch->layers[i]->inputData, IMAGE_SIZE);
+    // }
+
+    
+    // array_print(IMAGE_SIZE * IMAGE_SIZE, batch->layers[0]->inputData);
 
     printf(
         "TrainingData infos:\n  imageSize=%ux%u\n  setSize=%zu\n", IMAGE_SIZE,
@@ -144,7 +163,7 @@ int main(int argc, char **argv)
         );
     }
 
-    mat_th_destroy_threadpool();
+    // mat_th_destroy_threadpool();
     network_free(network);
     batch_free(batch);
     free(output);

@@ -22,3 +22,5 @@ typedef struct InputImage
 InputImage *load_directory(char *path, size_t *count);
 
 int load_image(char *path, InputImage *output);
+
+int load_image_SDL(const char *path, InputImage *output);

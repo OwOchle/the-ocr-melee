@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "batch_conversion.h"
 #include "../network/network_utils/batch.h"
@@ -36,7 +37,13 @@ Batch *images_to_batch(size_t image_count, InputImage *images)
 
     for (size_t i = 0; i < image_count; i++)
     {
-        batch->layers[i]->inputData = to_float_array(IMAGE_SIZE * IMAGE_SIZE, images[i].image);
+        // batch->layers[i]->inputData = to_float_array(IMAGE_SIZE * IMAGE_SIZE, images[i].image);        
+
+        for (size_t j = 0; j < IMAGE_SIZE * IMAGE_SIZE; j++)
+        {
+            batch->layers[i]->inputData[j] = images[i].image[j];
+        }
+
 
         char expected_index = images[i].character - 'A';
 
@@ -46,6 +53,7 @@ Batch *images_to_batch(size_t image_count, InputImage *images)
 
         batch->layers[i]->outputData[expected_index] = 1.0f;
     }
+    // print_letter_float(batch->layers[0]->inputData, IMAGE_SIZE);
 
     // verbose_printf("Batch conversion done\n");
 
