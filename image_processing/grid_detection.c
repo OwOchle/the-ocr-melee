@@ -52,10 +52,6 @@ bool is_pixel_marked(SDL_Surface *marks_surface, int x, int y)
 {
     if (x >= marks_surface->w || y >= marks_surface->h)
     {
-        printf(
-            "X: %i, Y: %i out of bounds (%i,%i)\n", x, y, marks_surface->w,
-            marks_surface->h
-        );
     }
     Uint32 *mark_pixel =
         (Uint32 *)((Uint8 *)marks_surface->pixels + y * marks_surface->pitch +
@@ -209,7 +205,6 @@ ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, in
                     int min_x = width;
                     int min_y = height;
 
-                    printf("X: %i, y : %i\n", x, y);
                     SDL_Color color2 = {
                         rand() % 255, rand() % 255, rand() % 255
                     };
@@ -223,7 +218,6 @@ ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, in
                         marks_surface, shape, shapes, shape_list, 0, color2,
                         &max_x, &max_y, &min_x, &min_y
                     );
-                    printf("maxX: %i, maxy : %i\n", max_x, max_y);
 
                     int box_width = max_x - min_x;
                     int box_height = max_y - min_y;
@@ -238,11 +232,6 @@ ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, in
                         );
                         box_res =
                             realloc(box_res, i * sizeof(ShapeBoundingBox *));
-                        printf(
-                            "Box %d size: Width = %d, Height = %d, Area = %d\n",
-                            i, // box index
-                            box_width, box_height, box_width * box_height
-                        );
                         box->max_x = max_x;
                         box->max_y = max_y;
                         box->min_x = min_x;
@@ -453,7 +442,6 @@ ShapeBoundingBox **get_shape_word_groups(
                                               .max_y = max_y,
                                               .center_x = (min_x + max_x) / 2,
                                               .center_y = (min_y + max_y) / 2};
-                    printf("%i/%i\n", bounds->max_x, bounds->max_y);
                     box_res[group_count - 1] = new_box;
 
                     // Optional: Visualize bounding box

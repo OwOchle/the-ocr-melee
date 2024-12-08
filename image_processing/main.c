@@ -13,9 +13,120 @@
 #include "letter_filtering.h"
 #include "grid_detection.h"
 #include "sobel.h"
+#include "cutter.h"
 
 #define FP_SIZE 2097152
 #define BUF_SIZE 2048
+
+void execute_full(SDL_Surface *input, SDL_Surface *clean_input, char *output_path)
+{
+    surface_to_grayscale(input);
+    surface_to_grayscale(clean_input);
+
+    surface_to_simple_binary(input, 210);
+    surface_to_simple_binary(clean_input, 210);
+
+    linkedList *shapes = surface_to_objects(input);
+
+    linkedList *filtered_shapes = filter_shapes(shapes);
+
+    list_free(detect_unique_shapes(filtered_shapes));
+
+    int box_count;
+    ShapeBoundingBox **boxes = get_shape_groups(input, filtered_shapes, &box_count);
+
+    ShapeBoundingBox *grid_box = get_largest_under(boxes, box_count, (size_t) - 1);
+
+    ShapeBoundingBox *words_box = get_largest_under(boxes, box_count, sbb_area(grid_box));
+
+    int word_count;
+    ShapeBoundingBox **words = get_shape_word_groups(
+        input, filtered_shapes, &word_count, words_box
+    );
+
+    linkedList *letters;
+    size_t letter_index;
+    ShapeBoundingBox *word_bb;
+
+    char *letter_name;
+    SDL_Surface *letter;
+    ShapeBoundingBox *letter_bb;
+
+    size_t *word_lengths = malloc(sizeof(size_t) * word_count);
+
+    // Cutting words
+    for (size_t i = 0; i < word_count; i++)
+    {
+        letter_index = 0;
+        
+        word_bb = words[i];
+
+        letters = find_shapes_in_boundings(filtered_shapes, word_bb);
+
+        for (Node *n = letters->head; n; n = n->next)
+        {
+            asprintf(&letter_name, "%s/word_%d_letter_%d.png", output_path, i, letter_index);
+            letter_bb = get_shape_boundings(n->shape);
+
+            letter = split_bb(clean_input, letter_bb);
+
+            IMG_SavePNG(letter, letter_name);
+
+            free(letter_name);
+            free(letter_bb);
+            SDL_FreeSurface(letter);
+            letter_index++;
+        }
+
+        list_free(letters);
+
+        word_lengths[i] = letter_index;
+    }
+
+    linkedList *letters_in_grid = find_shapes_in_boundings(filtered_shapes, grid_box);
+
+    size_t cur_line = 0;
+    size_t cur_col = 0;
+    
+    size_t max_col = 0;
+
+    Node *top_left = find_top_left(letters_in_grid);
+
+    ShapeBoundingBox *line_left = top_left->shape_bounding_box;
+    ShapeBoundingBox *l = top_left->shape_bounding_box;
+
+    SDL_Surface *cur_grid_letter;
+    char *name;
+
+    do 
+    {
+        l = line_left;
+        do 
+        {
+            asprintf(&name, "%s/grid_%lu_%lu.png", output_path, cur_col, cur_line);
+            cur_grid_letter = split_bb(clean_input, l);
+
+            IMG_SavePNG(cur_grid_letter, name);
+
+            free(name);
+            SDL_FreeSurface(cur_grid_letter);
+            cur_col++;
+        } while ((l = find_nearest_right(letters_in_grid, l)) != NULL);
+
+        if (cur_col > max_col)
+            max_col = cur_col;
+        
+        cur_line++;
+        cur_col = 0;
+    } while ((line_left = find_nearest_down(letters_in_grid, line_left)) != NULL);
+
+    printf("%lu\n%lu\n", max_col, cur_line);
+    printf("%lu\n", word_count);
+    for (size_t i = 0; i < word_count; i++)
+    {
+        printf("%lu\n", word_lengths[i]);
+    }
+}
 
 int main(int argc, char **argv)
 {
@@ -35,6 +146,7 @@ int main(int argc, char **argv)
     }
 
     SDL_Surface *input_image = IMG_Load(argv[1]);
+    SDL_Surface *clean_surface = IMG_Load(argv[1]);
 
     if (input_image == NULL)
     {
@@ -62,8 +174,6 @@ int main(int argc, char **argv)
         linkedList* isolated = detect_unique_shapes(filtered_shapes);
 
         show_shapes_boundings(input_image, isolated, color);
-
-        shapes_center_histogram(input_image, filtered_shapes);
         
         list_free(isolated);
         list_free(filtered_shapes);
@@ -82,7 +192,7 @@ int main(int argc, char **argv)
     }
     else if (!strcmp(argv[2], "full"))
     {
-        errx(1, "Not working yet");
+        execute_full(input_image, clean_surface, argv[3]);
     }
     else
     {

@@ -404,3 +404,93 @@ SDL_Surface **shapes_to_surfaces(linkedList *shapes, size_t *length)
 
     return out;
 }
+
+linkedList *find_shapes_in_y_delta(linkedList *shapes, ShapeBoundingBox *control, size_t delta)
+{
+    linkedList *l = list_create();
+    for (Node *n = shapes->head; n; n = n->next)
+    {
+        if (abs(n->shape_bounding_box->center_y - control->center_y) < delta)
+        {
+            list_append_node(l, n);
+        }
+    }
+
+    return l;
+}
+
+linkedList *find_shapes_in_x_delta(linkedList *shapes, ShapeBoundingBox *control, size_t delta)
+{
+    linkedList *l = list_create();
+    for (Node *n = shapes->head; n; n = n->next)
+    {
+        if (abs(n->shape_bounding_box->center_x - control->center_x) < delta)
+        {
+            list_append_node(l, n);
+        }
+    }
+
+    return l;
+}
+
+Node *find_top_left(linkedList *shapes)
+{
+    Node *best = shapes->head;
+
+    for (Node *n = shapes->head; n; n = n->next)
+    {
+        n->shape_bounding_box = get_shape_boundings(n->shape);
+        if (best->shape_bounding_box->center_x >= n->shape_bounding_box->center_x 
+            && best->shape_bounding_box->center_y >= n->shape_bounding_box->center_y)
+        {
+            best = n;
+        }
+    }
+
+    return best;
+}
+
+ShapeBoundingBox *find_nearest_right(linkedList *shapes, ShapeBoundingBox *control)
+{
+    Node *closest = NULL;
+    size_t dist = (size_t) -1;
+
+    for (Node *n = shapes->head; n; n = n->next)
+    {
+        n->shape_bounding_box = get_shape_boundings(n->shape);
+        if (n->shape_bounding_box->center_x <= control->center_x || abs(n->shape_bounding_box->center_y - control->center_y) > 5)
+            continue;
+
+        size_t d = abs(control->center_x - n->shape_bounding_box->center_x);
+        if (d < dist && d > 10)
+        {
+            closest = n;
+            dist = d;
+        }
+    }
+
+
+    return closest != NULL ? closest->shape_bounding_box : NULL;
+}
+
+ShapeBoundingBox *find_nearest_down(linkedList *shapes, ShapeBoundingBox *control)
+{
+    Node *closest = NULL;
+    size_t dist = (size_t) -1;
+
+    for (Node *n = shapes->head; n; n = n->next)
+    {
+        n->shape_bounding_box = get_shape_boundings(n->shape);
+        if (n->shape_bounding_box->center_y <= control->center_y || abs(n->shape_bounding_box->center_x - control->center_x) > 5)
+            continue;
+
+        size_t d = abs(control->center_y - n->shape_bounding_box->center_y);
+        if (d < dist && d > 10)
+        {
+            closest = n;
+            dist = d;
+        }
+    }
+
+    return closest != NULL ? closest->shape_bounding_box : NULL;
+}

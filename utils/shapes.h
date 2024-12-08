@@ -7,6 +7,7 @@
 
 #define sbb_width(bb) bb->max_x - bb->min_x
 #define sbb_height(bb) bb->max_y - bb->min_y
+#define sbb_area(bb) (sbb_width(bb)) * (sbb_height(bb))
 
 #define split_bb(surface, bb) crop_surface(surface, bb->min_x, bb->min_y, sbb_width(bb), sbb_height(bb))
 
@@ -52,3 +53,9 @@ linkedList *
 find_shapes_in_boundings(linkedList *shapes, ShapeBoundingBox *target_box);
 linkedList* detect_unique_shapes(linkedList* shapes);
 SDL_Surface **shapes_to_surfaces(linkedList *shapes, size_t *length) ;
+
+linkedList *find_shapes_in_y_delta(linkedList *shapes, ShapeBoundingBox *control, size_t delta);
+linkedList *find_shapes_in_x_delta(linkedList *shapes, ShapeBoundingBox *control, size_t delta);
+Node *find_top_left(linkedList *shapes);
+ShapeBoundingBox *find_nearest_right(linkedList *shapes, ShapeBoundingBox *control);
+ShapeBoundingBox *find_nearest_down(linkedList *shapes, ShapeBoundingBox *control);
