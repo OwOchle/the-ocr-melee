@@ -610,25 +610,9 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="allInOneButton">
-                <property name="label" translatable="yes">All in one</property>
-                <property name="width-request">130</property>
-                <property name="height-request">80</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="receives-default">True</property>
-                <property name="margin-top">10</property>
-                <signal name="clicked" handler="allInOne_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="x">322</property>
-                <property name="y">25</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton" id="stepByStepButton">
                 <property name="label" translatable="yes">Step by step</property>
-                <property name="width-request">130</property>
+                <property name="width-request">150</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -637,14 +621,14 @@
                 <signal name="clicked" handler="stepByStep_clicked" swapped="no"/>
               </object>
               <packing>
-                <property name="x">620</property>
+                <property name="x">610</property>
                 <property name="y">25</property>
               </packing>
             </child>
             <child>
               <object class="GtkButton" id="gridCorrectionButton">
                 <property name="label" translatable="yes">Grid Correction</property>
-                <property name="width-request">100</property>
+                <property name="width-request">150</property>
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -653,7 +637,7 @@
                 <signal name="clicked" handler="open_gridCorrection" swapped="no"/>
               </object>
               <packing>
-                <property name="x">464</property>
+                <property name="x">322</property>
                 <property name="y">25</property>
               </packing>
             </child>
