@@ -35,7 +35,7 @@ echo "Compiling the validation model..."
 sleep 2
 
 make -C ./network clean
-make -C ./network release
+make -C ./network demo
 
 clear
 
