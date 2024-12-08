@@ -27,6 +27,9 @@ int main(int argc, char **argv)
         "           input image: Input image path\n"
         "           step: 'grayscale', 'binary', 'shapes', 'sobel'\n"
         "           output: Output image path or '-' for stdout\n"
+        "\n"
+        "       Notes:\n"
+        "           if step is 'full', output must be a path to a directory.\n"
         );
         exit(1);
     }
@@ -77,9 +80,13 @@ int main(int argc, char **argv)
         free(gradient_direction);
         free(gradient_magnitude);
     }
+    else if (!strcmp(argv[2], "full"))
+    {
+        errx(1, "Not working yet")
+    }
     else
     {
-        errx(1, "Unknown step '%s'. Possible values are: grayscale, binary, shapes, sobel", argv[2]);
+        errx(1, "Unknown step '%s'. Possible values are: grayscale, binary, shapes, sobel, full", argv[2]);
     }
 
     if (!strcmp(argv[3], "-"))
