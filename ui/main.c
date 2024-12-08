@@ -21,7 +21,10 @@ int imageHeight = 0;
 
 int imageSize = 500;
 
-
+GtkWidget *gridWindow = NULL;
+GtkImage *gridImage = NULL;
+GtkGrid *grid = NULL;
+int gridCreated = 0;
 
 int main(int argc, char *argv[])
 {
@@ -42,6 +45,10 @@ int main(int argc, char *argv[])
 
     rotationWindow = GTK_WIDGET(gtk_builder_get_object(builder, "rotationWindow"));
     rotationImage = GTK_IMAGE(gtk_builder_get_object(builder, "rotationImage"));
+
+    gridWindow = GTK_WIDGET(gtk_builder_get_object(builder, "gridWindow"));
+    gridImage = GTK_IMAGE(gtk_builder_get_object(builder, "gridImage"));
+    grid = GTK_GRID(gtk_builder_get_object(builder, "letterGrid"));
 
     gtk_builder_connect_signals(builder, NULL);
     g_object_unref(builder);
@@ -77,6 +84,7 @@ void open_solver() // Bouton qui ouvre le solver
 {
     printf("Solver opened\n");
     gtk_widget_hide(mainWindow);
+    gtk_widget_hide(gridWindow);
     // gtk_window_set_position((GtkWindow*)solverWindow,GTK_WIN_POS_CENTER);
     gtk_widget_show_all(solverWindow);
 }
@@ -97,6 +105,14 @@ void open_rotation() // Bouton qui ouvre la fenêtre de rotation
     gtk_widget_show_all(rotationWindow);
 }
 
+void open_gridCorrection() // Bouton qui ouvre la fenêtre de correction des lettres
+{
+    printf("Grid correction opened\n");
+    gtk_widget_hide(solverWindow);
+    // gtk_window_set_position((GtkWindow*)rotationWindow, GTK_WIN_POS_CENTER);
+    gtk_widget_show_all(gridWindow);
+}
+
 void leftRotation() // Bouton de rotation gauche
 {
     printf("Rotated left by 3 degrees\n");
@@ -115,6 +131,29 @@ void automaticRotation() // Bouton de rotation droit
 void allInOne_clicked() // Bouton qui solve d'un coup
 {
     printf("Solving...\n");
+    if (gridCreated == 0)
+    {
+        gridCreated = 1;
+        for (int i = 0; i < 5-1; i++)
+        {
+            gtk_grid_insert_row(grid, 0);
+            gtk_grid_insert_column(grid, 0);
+        }
+
+        for (int x = 0; x < 5; x++)
+        {
+            for (int y = 0; y < 5; y++)
+            {
+                GtkWidget *entry = gtk_entry_new();
+                char *letter = "a";
+                gtk_entry_set_width_chars(GTK_ENTRY(entry), 2);
+                gtk_entry_set_alignment(GTK_ENTRY(entry), 0.5);
+                gtk_entry_set_text(GTK_ENTRY(entry), letter);
+                gtk_entry_set_max_length(GTK_ENTRY(entry), 1);
+                gtk_grid_attach(grid, entry, x,y,1,1);
+            }
+        }
+    }
 }
 
 void rotButton_clicked() // Bouton qui rotate AUTO
@@ -127,6 +166,30 @@ void stepByStep_clicked() // Bouton qui solve en montrant chaque étape
     printf("------------------------------------------\n");
     printf("Solving:\nStep 1 : ...\nStep 2 : ...\nStep 3 : ...\n");
     printf("------------------------------------------\n");
+
+    if (gridCreated == 0)
+    {
+        gridCreated = 1;
+        for (int i = 0; i < 5-1; i++)
+        {
+            gtk_grid_insert_row(grid, 0);
+            gtk_grid_insert_column(grid, 0);
+        }
+
+        for (int x = 0; x < 5; x++)
+        {
+            for (int y = 0; y < 5; y++)
+            {
+                GtkWidget *entry = gtk_entry_new();
+                char *letter = "a";
+                gtk_entry_set_width_chars(GTK_ENTRY(entry), 2);
+                gtk_entry_set_alignment(GTK_ENTRY(entry), 0.5);
+                gtk_entry_set_text(GTK_ENTRY(entry), letter);
+                gtk_entry_set_max_length(GTK_ENTRY(entry), 1);
+                gtk_grid_attach(grid, entry, x,y,1,1);
+            }
+        }
+    }
 }
 
 void on_imageImport(GtkFileChooserButton *file)
@@ -154,6 +217,7 @@ void on_imageImport(GtkFileChooserButton *file)
     gtk_image_set_from_pixbuf(solverImage,pixbuf);
     gtk_image_set_from_pixbuf(settingsImage,pixbuf);
     gtk_image_set_from_pixbuf(rotationImage,pixbuf);
+    gtk_image_set_from_pixbuf(gridImage,pixbuf);
 }
 
 void on_networkImput(GtkFileChooserButton *file)
