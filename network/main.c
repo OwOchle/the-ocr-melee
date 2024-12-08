@@ -6,13 +6,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "network.h"
 #include "file_io.h"
 #include "../utils/array.h"
 // #include "../utils/matrix.h"
-#include "../alphabet-training/read_image.h"
-#include "../alphabet-training/batch_conversion.h"
+// #include "../alphabet-training/read_image.h"
+// #include "../alphabet-training/batch_conversion.h"
 #include "evaluate.h"
 
 #define get_pixel(surface, x, y) ((Uint8 *)surface->pixels + (y) * surface->pitch + (x) * surface->format->BytesPerPixel)
@@ -24,7 +25,11 @@
 void print_matrix(float *image, size_t size) {
     for (size_t y = 0; y < size; y++) {
         for (size_t x = 0; x < size; x++) {
-            printf("%.0f", image[y * size + x]);
+            float pixel = image[y * size + x];
+            if (pixel == 0.0)
+                printf("\e[1;32m%.0f\e[0m", pixel);
+            else 
+                printf("%.0f", pixel);
         }
         printf("\n");
     }
@@ -51,20 +56,31 @@ float *load_image_with_SDL(const char *path)
 
     SDL_FreeSurface(image);
 
+    system("clear");
+    printf("Loading image representaion\n\n");
+    print_matrix(out, IMAGE_SIZE);
+
     return out;
 }
 
 void process_image(Network *network, const char *image_path) {
     float *image = load_image_with_SDL(image_path);
     
-    // print_matrix(image, 20);
 
     float *res = feedforward(network, image);
     
     char index = array_max_index_float(26, res);
-    printf("result for %s: %c\n", image_path, 'A' + index);
+
+    sleep(1);
+    printf("____________________________________\n");
+    printf("Result for %s: \e[1;31m%c\e[0m\n", image_path, 'A' + index);
+    printf("____________________________________\n");
+
     free(image);
     free(res);
+    
+    sleep(4);
+    
 }
 
 int main(int argc, char **argv) {
@@ -92,25 +108,25 @@ int main(int argc, char **argv) {
         errx(1, "Could not open directory '%s'", argv[2]);
     }
 
-    size_t count;
-    InputImage *output = load_directory(argv[2], &count);
-    if (output == NULL) {
-        errx(2, "output is null");
-    }
+    // size_t count;
+    // InputImage *output = load_directory(argv[2], &count);
+    // if (output == NULL) {
+    //     errx(2, "output is null");
+    // }
 
-    printf("Evaluating network...\n");
-    Batch *batch = images_to_batch(count, output);
+    // printf("Evaluating network...\n");
+    // Batch *batch = images_to_batch(count, output);
 
-    // print_matrix(batch->layers[2]->outputData, IMAGE_SIZE);
-    // print_matrix(batch->layers[1]->outputData, IMAGE_SIZE);
+    // // print_matrix(batch->layers[2]->outputData, IMAGE_SIZE);
+    // // print_matrix(batch->layers[1]->outputData, IMAGE_SIZE);
 
 
-    int acc = accuracy(network, batch);
+    // int acc = accuracy(network, batch);
 
-    printf("Accuracy: %d/%zu\n", acc, count);
+    // printf("Accuracy: %d/%zu\n", acc, count);
 
-    free(output);
-    batch_free(batch);
-    network_free(network);
+    // free(output);
+    // batch_free(batch);
+    // network_free(network);
     return 0;
 }

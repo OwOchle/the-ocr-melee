@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "../network/evaluate.h"
 #include "../network/file_io.h"
@@ -31,8 +32,8 @@ Network *get_network(char *path)
     if (err != NO_ERROR)
     {
         fprintf(
-            stderr, "\e[1;33m/!\\ error while reading network. Creating new "
-                    "one /!\\\e[0m\n"
+            stderr, "\e[1;33mResult file empty. Creating new "
+                    "one. \e[0m\n"
         );
         uint16_t layers[] = {HIDDEN_LAYER_COUNT1, 26};
 
@@ -100,14 +101,17 @@ int main(int argc, char **argv)
     // array_print(IMAGE_SIZE * IMAGE_SIZE, batch->layers[0]->inputData);
 
     printf(
-        "TrainingData infos:\n  imageSize=%ux%u\n  setSize=%zu\n", IMAGE_SIZE,
+        "\n\e[1;34mTrainingData infos:\e[0m\n  - image size      = %ux%u\n  - data set size   = %zu\n", IMAGE_SIZE,
         IMAGE_SIZE, count
     );
     printf(
-        "Hyperparameters:\n  miniBatchSize=%i\n  eta=%.3f\n  lambda=%.3f\n",
+        "\e[1;34mHyperparameters:\e[0m\n  - mini-batch size = %i\n  - eta             = %.3f\n  - lambda          = %.3f\n",
         MINI_BATCH_SIZE, ETA, LAMBDA
     );
-    printf("ThreadCount: %u\n", THREAD_COUNT);
+
+    sleep(1);
+
+    printf("\n\e[1;35mRunning with %u thread.\e[0m\n", THREAD_COUNT);
 
     if (batch == NULL)
     {
@@ -121,17 +125,21 @@ int main(int argc, char **argv)
         errx(4, "network is null (main.c:%d)", __LINE__);
     }
 
-    printf("========= Running %zu epochs ========\n", epochs);
+    sleep(1);
 
-    printf("\n_________START________\n\n");
+    printf("\e[1;37m\n========= Running %zu epochs ========\e[0m\n", epochs);
+
+    printf("\n________________START_______________\n");
     printf(
         "Accuracy on training data: %i / %i\n", accuracy(network, batch),
         batch->batchSize
     );
     printf(
-        "Cost on training data: %f\n________________________\n",
+        "Cost on training data: %f\n____________________________________\n\n",
         total_cost(network, batch, 0.0f)
     );
+
+    sleep(1);
 
     pb_start();
 
@@ -141,13 +149,13 @@ int main(int argc, char **argv)
 
     pb_destroy();
 
-    printf("\n_________RESULT________\n\n");
+printf("\n\n_______________RESULT_______________\n");
     printf(
         "Accuracy on training data: %i / %i\n", accuracy(network, batch),
         batch->batchSize
     );
     printf(
-        "Cost on training data: %f\n________________________\n",
+        "Cost on training data: %f\n____________________________________\n\n",
         total_cost(network, batch, 0.0f)
     );
 
