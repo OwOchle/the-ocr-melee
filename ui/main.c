@@ -26,6 +26,15 @@ GtkImage *gridImage = NULL;
 GtkGrid *grid = NULL;
 int gridCreated = 0;
 
+void updateImage()
+{
+    gtk_image_set_from_pixbuf(mainImage,pixbuf);
+    gtk_image_set_from_pixbuf(solverImage,pixbuf);
+    gtk_image_set_from_pixbuf(settingsImage,pixbuf);
+    gtk_image_set_from_pixbuf(rotationImage,pixbuf);
+    gtk_image_set_from_pixbuf(gridImage,pixbuf);
+}
+
 int main(int argc, char *argv[])
 {
     GtkBuilder *builder;
@@ -115,12 +124,22 @@ void open_gridCorrection() // Bouton qui ouvre la fenêtre de correction des let
 
 void leftRotation() // Bouton de rotation gauche
 {
-    printf("Rotated left by 3 degrees\n");
+    printf("Rotated left\n");
+    if (pixbuf != NULL)
+    {
+        pixbuf = gdk_pixbuf_rotate_simple(pixbuf, GDK_PIXBUF_ROTATE_CLOCKWISE);
+        updateImage();
+    }
 }
 
 void rightRotation() // Bouton de rotation droit
 {
-    printf("Rotated right by 3 degrees\n");
+    printf("Rotated right\n");
+    if (pixbuf != NULL)
+    {
+        pixbuf = gdk_pixbuf_rotate_simple(pixbuf, GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE);
+        updateImage();
+    }
 }
 
 void automaticRotation() // Bouton de rotation droit
@@ -213,11 +232,7 @@ void on_imageImport(GtkFileChooserButton *file)
         printf("new image is %ux%u pixels\n", (int)(imageSize * imageRatio), imageSize);
     }
 
-    gtk_image_set_from_pixbuf(mainImage,pixbuf);
-    gtk_image_set_from_pixbuf(solverImage,pixbuf);
-    gtk_image_set_from_pixbuf(settingsImage,pixbuf);
-    gtk_image_set_from_pixbuf(rotationImage,pixbuf);
-    gtk_image_set_from_pixbuf(gridImage,pixbuf);
+    updateImage();
 }
 
 void on_networkImput(GtkFileChooserButton *file)

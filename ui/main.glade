@@ -99,7 +99,6 @@
             <property name="halign">center</property>
             <property name="valign">center</property>
             <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
             <property name="pixbuf">../assets/OCR_Logo.png</property>
           </object>
           <packing>
@@ -165,6 +164,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <property name="margin-bottom">25</property>
                 <signal name="clicked" handler="open_main" swapped="no"/>
                 <child>
@@ -186,6 +186,7 @@
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="margin-top">10</property>
                 <property name="filter">imageFilter</property>
                 <property name="title" translatable="yes"/>
                 <signal name="file-set" handler="on_imageImport" swapped="no"/>
@@ -201,6 +202,7 @@
                 <property name="height-request">80</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="margin-top">10</property>
                 <property name="title" translatable="yes"/>
                 <signal name="file-set" handler="on_networkImport" swapped="no"/>
               </object>
@@ -216,6 +218,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
+                <property name="margin-top">10</property>
                 <property name="label" translatable="yes">Import an image</property>
               </object>
               <packing>
@@ -230,6 +233,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
+                <property name="margin-top">10</property>
                 <property name="label" translatable="yes">Import a network</property>
               </object>
               <packing>
@@ -447,6 +451,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <property name="margin-bottom">10</property>
                 <signal name="clicked" handler="open_main" swapped="no"/>
                 <child>
@@ -470,6 +475,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <signal name="clicked" handler="leftRotation" swapped="no"/>
               </object>
               <packing>
@@ -485,6 +491,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <signal name="clicked" handler="rightRotation" swapped="no"/>
               </object>
               <packing>
@@ -500,6 +507,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <signal name="clicked" handler="automaticRotation" swapped="no"/>
               </object>
               <packing>
@@ -579,6 +587,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <property name="margin-bottom">25</property>
                 <signal name="clicked" handler="open_main" swapped="no"/>
                 <child>
@@ -602,6 +611,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <signal name="clicked" handler="allInOne_clicked" swapped="no"/>
               </object>
               <packing>
@@ -617,6 +627,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <signal name="clicked" handler="stepByStep_clicked" swapped="no"/>
               </object>
               <packing>
@@ -632,6 +643,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="margin-top">10</property>
                 <signal name="clicked" handler="open_gridCorrection" swapped="no"/>
               </object>
               <packing>
