@@ -18,7 +18,7 @@ echo "Compiling the demo model..."
 sleep 2
 
 make -C ./alphabet-training clean
-make -C ./alphabet-training release
+make -C ./alphabet-training demo
 
 clear
 
@@ -40,5 +40,6 @@ make -C ./network demo
 clear
 
 echo "Running the validation model..."
+sleep 1
 
 ./network/network $saving_file $validating_data_path

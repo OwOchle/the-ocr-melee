@@ -24,6 +24,10 @@ release: CFLAGS += -O3 -march=native
 release: $(OBJS)
 	$(CC) $^ $(CFLAGS) -o training
 
+demo: CFLAGS += -O3 -march=native -w
+demo: $(OBJS)
+	$(CC) $^ $(CFLAGS) -o training -w
+
 release-profiling: CFLAGS += -O3 -pg -march=native
 release-profiling: $(OBJS)
 	$(CC) $^ $(CFLAGS) -o training
