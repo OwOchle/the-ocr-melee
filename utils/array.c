@@ -34,10 +34,10 @@ void array_char_print(size_t size, const char array[])
 
     for (size_t i = 0; i < size - 1; i++)
     {
-        printf("%hhi, ", array[i]);
+        printf("%c, ", array[i]);
     }
 
-    printf("%hhi]\n", array[size - 1]);
+    printf("%c]\n", array[size - 1]);
 }
 
 void array_float_print(size_t size, const float array[])

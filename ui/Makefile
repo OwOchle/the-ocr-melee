@@ -20,6 +20,10 @@ ui_size:
     .int    ui_end - thing
 endef
 
+main2: CFLAGS = -fsanitize=address -g -I..
+main2: main2.o word_search.o ../utils/array.o
+	$(CC) $(CFLAGS) $^ -o main2
+
 glade.s:
 	$(file >glade.s, $(EMBED_CODE))
 	echo glade.s
