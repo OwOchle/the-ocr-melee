@@ -17,6 +17,9 @@ debug-no-asan: $(OBJS) main.o
 release: $(OBJS) release.o
 	$(CC) $^ $(CFLAGS) -o network
 
+demo: $(OBJS) main.o
+	$(CC) $^ $(CFLAGS) -o network -D VERBOSE
+
 tests_bin:
 	mkdir -p tests_bin
 
