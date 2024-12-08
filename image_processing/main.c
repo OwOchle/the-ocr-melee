@@ -88,8 +88,10 @@ int main(int argc, char** argv)
     show_shapes_center(surface, isolated, color);
 
     // shapes_center_histogram(surface, filtered_shapes);
+    int size = 0;
+    ShapeBoundingBox **boxes = get_shape_groups(surface, filtered_shapes, &size);
 
-    ShapeBoundingBox **boxes = get_shape_groups(surface, filtered_shapes);
+    printf("Size: %i\n", size);
 
     save_surface("../outputs/output_dfs.png", surface);
     printf("image_processing: Saved DFS file in outputs folder.\n");

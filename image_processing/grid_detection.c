@@ -174,7 +174,7 @@ void letter_dfs_by_similar(
     free(box);
 }
 
-ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes)
+ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, int *size)
 {
     SDL_Color color = {89, 67, 167}; // Purple (Not marked)
     show_shapes_center(surface, shapes, color);
@@ -247,6 +247,7 @@ ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes)
             }
         }
     }
+    *size = i;
     SDL_BlitSurface(marks_surface, NULL, surface, NULL);
     return box_res;
 }

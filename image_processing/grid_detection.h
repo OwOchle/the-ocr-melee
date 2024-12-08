@@ -12,6 +12,4 @@ void letter_dfs_by_similar(
     SDL_Surface *marks_surface, linkedList *shape, linkedList *shapes,
     linkedList *dest, int depth
 );
-ShapeBoundingBox *get_shape_groups(SDL_Surface *surface, linkedList *shapes);
-
-void shapes_center_histogram(SDL_Surface* surface, linkedList* shapes);
+ShapeBoundingBox **get_shape_groups(SDL_Surface *surface, linkedList *shapes, int *size);
